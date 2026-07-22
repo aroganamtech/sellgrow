@@ -220,6 +220,7 @@ function CanvasParticles() {
 export default function HomePage() {
   const { t, language, dir, region } = useLanguage();
   const [pageLoading, setPageLoading] = useState(true);
+  const [hasCheckedSession, setHasCheckedSession] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [techStatus, setTechStatus] = useState("Initializing System...");
   const [activeTab, setActiveTab] = useState<"crm" | "inbox" | "voice" | "workflow">("crm");
@@ -227,9 +228,24 @@ export default function HomePage() {
 
   useEffect(() => {
     setMounted(true);
+    
+    if (typeof window !== "undefined") {
+      const hasLoadedBefore = sessionStorage.getItem("sellgrow_loaded");
+      if (hasLoadedBefore) {
+        setPageLoading(false);
+        setHasCheckedSession(true);
+        return;
+      }
+    }
+    
+    setHasCheckedSession(true);
     const timer = setTimeout(() => {
       setPageLoading(false);
+      try {
+        sessionStorage.setItem("sellgrow_loaded", "true");
+      } catch (e) {}
     }, 1500); // 1.5 seconds to show cycling tech status logs
+    
     return () => clearTimeout(timer);
   }, []);
 
@@ -378,121 +394,123 @@ export default function HomePage() {
     <div className="relative min-h-screen flex flex-col">
       <OnboardingModal />
       {/* Loading Splash Screen Overlay */}
-      <div 
-        className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#070b13] space-y-8 select-none transition-all duration-700 ${
-          pageLoading ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-      >
-        {/* Particle Canvas Background */}
-        {pageLoading && <CanvasParticles />}
+      {(!hasCheckedSession || pageLoading) && (
+        <div 
+          className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#070b13] space-y-8 select-none transition-all duration-700 ${
+            pageLoading ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          {/* Particle Canvas Background */}
+          {pageLoading && <CanvasParticles />}
 
-        <style>{`
-          @keyframes shimmer-travel {
-            0% { left: -30%; }
-            100% { left: 110%; }
-          }
-          @keyframes neon-pulse {
-            0%, 100% {
-              filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4)) drop-shadow(0 0 20px rgba(52, 211, 153, 0.2));
-              transform: scale(0.95);
+          <style>{`
+            @keyframes shimmer-travel {
+              0% { left: -30%; }
+              100% { left: 110%; }
             }
-            50% {
-              filter: drop-shadow(0 0 28px rgba(56, 189, 248, 0.95)) drop-shadow(0 0 45px rgba(52, 211, 153, 0.65));
-              transform: scale(1.05);
+            @keyframes neon-pulse {
+              0%, 100% {
+                filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4)) drop-shadow(0 0 20px rgba(52, 211, 153, 0.2));
+                transform: scale(0.95);
+              }
+              50% {
+                filter: drop-shadow(0 0 28px rgba(56, 189, 248, 0.95)) drop-shadow(0 0 45px rgba(52, 211, 153, 0.65));
+                transform: scale(1.05);
+              }
             }
-          }
-          @keyframes eq-bar {
-            0% { height: 4px; }
-            100% { height: 22px; }
-          }
-        `}</style>
+            @keyframes eq-bar {
+              0% { height: 4px; }
+              100% { height: 22px; }
+            }
+          `}</style>
 
-        <div className="relative w-72 h-72 flex items-center justify-center scale-95 md:scale-100">
-          {/* Glow backdrop */}
-          <div className="absolute w-72 h-72 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-          
-          {/* Layered Cyber Rings centered perfectly with inset-0 m-auto */}
-          <div 
-            className="w-56 h-56 rounded-full border border-sky-400/20 border-t-sky-400/80 border-b-sky-400/80 absolute inset-0 m-auto"
-            style={{ animation: "spin 6s linear infinite" }}
-          />
-          <div 
-            className="w-48 h-48 rounded-full border border-dashed border-emerald-400/20 border-l-emerald-400/80 border-r-emerald-400/80 absolute inset-0 m-auto"
-            style={{ animation: "spin 4s linear infinite reverse" }}
-          />
-          
-          {/* Radar Sweep Wedge */}
-          <div 
-            className="w-44 h-44 rounded-full absolute inset-0 m-auto overflow-hidden pointer-events-none"
-            style={{ animation: "spin 3s linear infinite" }}
-          >
-            <div className="w-1/2 h-1/2 absolute top-0 left-0 bg-gradient-to-br from-sky-500/20 to-transparent origin-bottom-right transform rotate-45" />
-          </div>
-
-          {/* Holographic Hex Backplate */}
-          <div className="w-36 h-36 rounded-full border border-white/5 bg-slate-950/90 shadow-[inset_0_0_30px_rgba(56,189,248,0.2),0_10px_30px_rgba(0,0,0,0.6)] absolute inset-0 m-auto flex items-center justify-center overflow-hidden">
+          <div className="relative w-72 h-72 flex items-center justify-center scale-95 md:scale-100">
+            {/* Glow backdrop */}
+            <div className="absolute w-72 h-72 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+            
+            {/* Layered Cyber Rings centered perfectly with inset-0 m-auto */}
             <div 
-              className="absolute inset-0 opacity-15"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='27.71' viewBox='0 0 16 27.71'%3E%3Cpath d='M8 0 L16 4.62 L16 13.86 L8 18.48 L0 13.86 L0 4.62 Z M8 27.71 L16 23.09 L16 13.86 L8 18.48 L0 13.86 L0 23.09 Z' fill='none' stroke='%2338bdf8' stroke-width='1'/%3E%3C/svg%3E")`,
-                backgroundSize: "16px 28px"
-              }}
+              className="w-56 h-56 rounded-full border border-sky-400/20 border-t-sky-400/80 border-b-sky-400/80 absolute inset-0 m-auto"
+              style={{ animation: "spin 6s linear infinite" }}
             />
+            <div 
+              className="w-48 h-48 rounded-full border border-dashed border-emerald-400/20 border-l-emerald-400/80 border-r-emerald-400/80 absolute inset-0 m-auto"
+              style={{ animation: "spin 4s linear infinite reverse" }}
+            />
+            
+            {/* Radar Sweep Wedge */}
+            <div 
+              className="w-44 h-44 rounded-full absolute inset-0 m-auto overflow-hidden pointer-events-none"
+              style={{ animation: "spin 3s linear infinite" }}
+            >
+              <div className="w-1/2 h-1/2 absolute top-0 left-0 bg-gradient-to-br from-sky-500/20 to-transparent origin-bottom-right transform rotate-45" />
+            </div>
+
+            {/* Holographic Hex Backplate */}
+            <div className="w-36 h-36 rounded-full border border-white/5 bg-slate-950/90 shadow-[inset_0_0_30px_rgba(56,189,248,0.2),0_10px_30px_rgba(0,0,0,0.6)] absolute inset-0 m-auto flex items-center justify-center overflow-hidden">
+              <div 
+                className="absolute inset-0 opacity-15"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='27.71' viewBox='0 0 16 27.71'%3E%3Cpath d='M8 0 L16 4.62 L16 13.86 L8 18.48 L0 13.86 L0 4.62 Z M8 27.71 L16 23.09 L16 13.86 L8 18.48 L0 13.86 L0 23.09 Z' fill='none' stroke='%2338bdf8' stroke-width='1'/%3E%3C/svg%3E")`,
+                  backgroundSize: "16px 28px"
+                }}
+              />
+            </div>
+            
+            {/* Central Breathing Neon Logo with HUD Brackets */}
+            <div 
+              className="relative z-10 w-24 h-24 flex items-center justify-center p-2"
+              style={{ animation: "neon-pulse 2.2s ease-in-out infinite" }}
+            >
+              {/* Brackets */}
+              <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-sky-400/80 rounded-tl" />
+              <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-sky-400/80 rounded-tr" />
+              <div className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-sky-400/80 rounded-bl" />
+              <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-sky-400/80 rounded-br" />
+
+              <img
+                src="/logos/Logo-removebg-preview1.png"
+                alt="SellGrow Loading..."
+                className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]"
+              />
+            </div>
           </div>
           
-          {/* Central Breathing Neon Logo with HUD Brackets */}
-          <div 
-            className="relative z-10 w-24 h-24 flex items-center justify-center p-2"
-            style={{ animation: "neon-pulse 2.2s ease-in-out infinite" }}
-          >
-            {/* Brackets */}
-            <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-sky-400/80 rounded-tl" />
-            <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-sky-400/80 rounded-tr" />
-            <div className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-sky-400/80 rounded-bl" />
-            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-sky-400/80 rounded-br" />
+          {/* Loading copy & HUD Console visual */}
+          <div className="text-center space-y-4 max-w-sm px-4 z-20">
+            <div className="space-y-1">
+              <p className="text-sm font-black tracking-[0.25em] uppercase text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]">
+                {!mounted ? "Connecting SellGrow" : t("connectingSellgrow").replace("...", "")}
+              </p>
+              <p className="text-[10px] font-mono text-sky-400/80 tracking-wider">
+                {techStatus}
+              </p>
+            </div>
 
-            <img
-              src="/logos/Logo-removebg-preview1.png"
-              alt="SellGrow Loading..."
-              className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]"
-            />
+            {/* Equalizer Waveform indicator */}
+            <div className="flex items-center justify-center space-x-1 h-6 my-2 opacity-80">
+              <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.6s ease-in-out infinite alternate" }} />
+              <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.9s ease-in-out infinite alternate 0.1s" }} />
+              <div className="w-0.5 rounded-full bg-emerald-400" style={{ animation: "eq-bar 0.7s ease-in-out infinite alternate 0.2s" }} />
+              <div className="w-0.5 rounded-full bg-emerald-400" style={{ animation: "eq-bar 1.1s ease-in-out infinite alternate 0.3s" }} />
+              <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.5s ease-in-out infinite alternate 0.4s" }} />
+              <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.8s ease-in-out infinite alternate 0.5s" }} />
+              <div className="w-0.5 rounded-full bg-emerald-400" style={{ animation: "eq-bar 1.0s ease-in-out infinite alternate 0.2s" }} />
+              <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.6s ease-in-out infinite alternate 0.1s" }} />
+            </div>
+
+            <div className="w-48 h-1 bg-slate-800/85 rounded-full mx-auto overflow-hidden relative border border-white/5">
+              <div className="h-full bg-gradient-to-r from-primary via-secondary to-accent-brand rounded-full animate-progress" />
+              <div 
+                className="absolute top-0 bottom-0 w-12 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                style={{
+                  animation: "shimmer-travel 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite"
+                }}
+              />
+            </div>
           </div>
         </div>
-        
-        {/* Loading copy & HUD Console visual */}
-        <div className="text-center space-y-4 max-w-sm px-4 z-20">
-          <div className="space-y-1">
-            <p className="text-sm font-black tracking-[0.25em] uppercase text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]">
-              {!mounted ? "Connecting SellGrow" : t("connectingSellgrow").replace("...", "")}
-            </p>
-            <p className="text-[10px] font-mono text-sky-400/80 tracking-wider">
-              {techStatus}
-            </p>
-          </div>
-
-          {/* Equalizer Waveform indicator */}
-          <div className="flex items-center justify-center space-x-1 h-6 my-2 opacity-80">
-            <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.6s ease-in-out infinite alternate" }} />
-            <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.9s ease-in-out infinite alternate 0.1s" }} />
-            <div className="w-0.5 rounded-full bg-emerald-400" style={{ animation: "eq-bar 0.7s ease-in-out infinite alternate 0.2s" }} />
-            <div className="w-0.5 rounded-full bg-emerald-400" style={{ animation: "eq-bar 1.1s ease-in-out infinite alternate 0.3s" }} />
-            <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.5s ease-in-out infinite alternate 0.4s" }} />
-            <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.8s ease-in-out infinite alternate 0.5s" }} />
-            <div className="w-0.5 rounded-full bg-emerald-400" style={{ animation: "eq-bar 1.0s ease-in-out infinite alternate 0.2s" }} />
-            <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.6s ease-in-out infinite alternate 0.1s" }} />
-          </div>
-
-          <div className="w-48 h-1 bg-slate-800/85 rounded-full mx-auto overflow-hidden relative border border-white/5">
-            <div className="h-full bg-gradient-to-r from-primary via-secondary to-accent-brand rounded-full animate-progress" />
-            <div 
-              className="absolute top-0 bottom-0 w-12 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-              style={{
-                animation: "shimmer-travel 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite"
-              }}
-            />
-          </div>
-        </div>
-      </div>
+      )}
 
       <Navbar />
 
