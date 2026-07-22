@@ -10,12 +10,13 @@
     "db:init": "node scripts/create_sellgrow_db.js"
   },
   "dependencies": {
+    "framer-motion": "^11.1.7",
+    "lenis": "^1.3.25",
+    "lucide-react": "^0.378.0",
+    "mongodb": "^6.5.0",
     "next": "^14.2.3",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "lucide-react": "^0.378.0",
-    "framer-motion": "^11.1.7",
-    "mongodb": "^6.5.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",

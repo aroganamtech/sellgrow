@@ -40,9 +40,9 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex gap-8">
             <Link
-              href="#features"
+              href="/#footer-features"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
             >
               {t("features")}
@@ -68,7 +68,7 @@ export default function Navbar() {
           </nav>
 
           {/* Action Buttons */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center gap-3">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -232,7 +232,7 @@ export default function Navbar() {
         <div className="md:hidden glass-panel border-b border-opacity-5 animate-fade-in p-4 space-y-4">
           <nav className="flex flex-col space-y-3">
             <Link
-              href="#features"
+              href="/#footer-features"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-muted-foreground hover:text-foreground py-1"
             >

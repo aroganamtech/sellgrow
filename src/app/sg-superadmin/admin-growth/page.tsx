@@ -46,6 +46,12 @@ export default function AdminGrowthPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [users, setUsers] = useState<UserRecord[]>(initialUsersList);
+  const [dbStats, setDbStats] = useState<{
+    registeredUsers: number;
+    mrr: { inr: number; usd: number };
+    executions: number;
+    backendStatus: string;
+  } | null>(null);
 
   const [featureFlags, setFeatureFlags] = useState({
     maintenanceMode: false,
@@ -66,6 +72,19 @@ export default function AdminGrowthPage() {
     const savedAuth = sessionStorage.getItem("sg_superadmin_auth");
     if (savedAuth === "true") {
       setIsAuthenticated(true);
+      
+      // Fetch exact stats from database API
+      fetch("/api/admin/stats")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === "success") {
+            setDbStats(data);
+            if (data.users && data.users.length > 0) {
+              setUsers(data.users);
+            }
+          }
+        })
+        .catch((err) => console.error("Error fetching stats:", err));
     } else {
       router.push("/sg-superadmin");
     }
@@ -121,7 +140,9 @@ export default function AdminGrowthPage() {
               <span>Total Registered Users</span>
               <Users className="w-4 h-4 text-primary" />
             </div>
-            <div className="text-2xl font-extrabold text-slate-900 dark:text-white font-display">1,482</div>
+            <div className="text-2xl font-extrabold text-slate-900 dark:text-white font-display">
+              {dbStats !== null ? dbStats.registeredUsers : "..."}
+            </div>
             <div className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
               <span>↑ +14% this week</span>
             </div>
@@ -132,7 +153,9 @@ export default function AdminGrowthPage() {
               <span>Monthly Revenue (MRR)</span>
               <DollarSign className="w-4 h-4 text-secondary" />
             </div>
-            <div className="text-2xl font-extrabold text-slate-900 dark:text-white font-display">₹4,85,000 / $18.4k</div>
+            <div className="text-2xl font-extrabold text-slate-900 dark:text-white font-display">
+              {dbStats !== null ? `₹${dbStats.mrr.inr.toLocaleString('en-IN')} / $${dbStats.mrr.usd}` : "..."}
+            </div>
             <div className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
               <span>↑ +22% growth</span>
             </div>
@@ -143,7 +166,9 @@ export default function AdminGrowthPage() {
               <span>AI Agent Executions</span>
               <Zap className="w-4 h-4 text-amber-500" />
             </div>
-            <div className="text-2xl font-extrabold text-slate-900 dark:text-white font-display">12,450</div>
+            <div className="text-2xl font-extrabold text-slate-900 dark:text-white font-display">
+              {dbStats !== null ? dbStats.executions : "..."}
+            </div>
             <div className="text-[11px] text-slate-500 dark:text-slate-400">Voice & WhatsApp automation</div>
           </div>
 
@@ -152,7 +177,9 @@ export default function AdminGrowthPage() {
               <span>FastAPI Backend Status</span>
               <Server className="w-4 h-4 text-emerald-500" />
             </div>
-            <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 font-display">Healthy (24ms)</div>
+            <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 font-display">
+              {dbStats !== null ? dbStats.backendStatus : "..."}
+            </div>
             <div className="text-[11px] text-slate-500 dark:text-slate-400">IP Auto-Detection Active</div>
           </div>
         </div>

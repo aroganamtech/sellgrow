@@ -62,7 +62,7 @@ const translations: Record<Language, Translations> = {
     showcaseWhatsappShort: "Centralize customer chats and automate responses at scale.",
     showcaseWhatsappLong: "Leverage the official WhatsApp Business API to interact with customers. Provide instant order updates, broadcast marketing campaigns, and let your support team work from a single unified omnichannel dashboard. Includes AI suggestions for faster response times.",
     showcaseWhatsappFeat1: "Unified team shared inbox for all agents",
-    showcaseWhatsappFeat2: "Automated WhatsApp catalog cataloging & checkouts",
+    showcaseWhatsappFeat2: "Automated WhatsApp catalog & checkouts",
     showcaseWhatsappFeat3: "Broadcasting templates for promo campaigns",
     showcaseWhatsappFeat4: "AI-driven automated replies for FAQs",
 
@@ -588,7 +588,7 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
     const savedLang = localStorage.getItem("language") as Language | null;
     if (savedLang && translations[savedLang]) {
       setLanguageState(savedLang);
-      const isRtl = savedLang === "ar";
+      const isRtl = false; // Keep standard LTR layout for consistent look and feel
       setDir(isRtl ? "rtl" : "ltr");
       document.documentElement.dir = isRtl ? "rtl" : "ltr";
       document.documentElement.lang = savedLang;
@@ -616,12 +616,23 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
   }, []);
 
   const setLanguage = (lang: Language) => {
+    const currentScrollY = typeof window !== "undefined" ? window.scrollY : 0;
+    
     setLanguageState(lang);
     localStorage.setItem("language", lang);
-    const isRtl = lang === "ar";
+    const isRtl = false; // Keep standard LTR layout for consistent look and feel
     setDir(isRtl ? "rtl" : "ltr");
     document.documentElement.dir = isRtl ? "rtl" : "ltr";
     document.documentElement.lang = lang;
+    
+    if (typeof window !== "undefined") {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, currentScrollY);
+        setTimeout(() => {
+          window.scrollTo(0, currentScrollY);
+        }, 50);
+      });
+    }
   };
 
   const setRegion = (reg: Region) => {

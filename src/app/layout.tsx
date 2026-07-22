@@ -6,6 +6,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ScrollRestoration from "@/components/utils/ScrollRestoration";
 import ScrollProgressIndicator from "@/components/utils/ScrollProgressIndicator";
+import SmoothScroll from "@/components/utils/SmoothScroll";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -41,7 +42,9 @@ export default function RootLayout({
         <AuthProvider>
           <LanguageProvider>
             <ThemeProvider>
-              {children}
+              <SmoothScroll>
+                {children}
+              </SmoothScroll>
             </ThemeProvider>
           </LanguageProvider>
         </AuthProvider>

@@ -316,7 +316,7 @@ function SolutionBlock({ item, isReversed, onBookDemo }: SolutionBlockProps) {
       <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center`}>
         
         {/* Left/Right Column: Details */}
-        <div className={`lg:col-span-5 space-y-6 text-left ${isReversed ? "lg:order-2" : "lg:order-1"}`}>
+        <div className={`lg:col-span-5 space-y-6 text-start ${isReversed ? "lg:order-2" : "lg:order-1"}`}>
           <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${item.colorClass}`}>
             <Icon className="w-3.5 h-3.5" />
             {item.title}

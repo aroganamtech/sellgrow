@@ -55,23 +55,23 @@ export default function Footer() {
           </div>
 
           {/* Core Modules Links */}
-          <div className="lg:col-span-2 md:col-span-1 space-y-3">
+          <div id="footer-features" className="lg:col-span-2 md:col-span-1 space-y-3">
             <h4 className="text-xs font-bold text-foreground uppercase tracking-wider font-display">
               {t("features")}
             </h4>
             <ul className="space-y-2 text-xs text-muted-foreground">
               <li>
-                <Link href="#features" className="hover:text-foreground transition-colors">
+                <Link href="/#features" className="hover:text-foreground transition-colors">
                   {t("crm")}
                 </Link>
               </li>
               <li>
-                <Link href="#features" className="hover:text-foreground transition-colors">
+                <Link href="/#features" className="hover:text-foreground transition-colors">
                   {t("inbox")}
                 </Link>
               </li>
               <li>
-                <Link href="#features" className="hover:text-foreground transition-colors">
+                <Link href="/#features" className="hover:text-foreground transition-colors">
                   {t("voice")}
                 </Link>
               </li>
