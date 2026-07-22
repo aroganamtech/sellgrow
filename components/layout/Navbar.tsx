@@ -3,16 +3,18 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLanguage, Language } from "@/contexts/LanguageContext";
+import { useLanguage, Language, Region } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Sun, Moon, Globe, Menu, X, ArrowRight, ShieldCheck } from "lucide-react";
+import { Sun, Moon, Globe, Menu, X, ArrowRight, MapPin, Check } from "lucide-react";
+import Logo from "@/components/layout/Logo";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const { language, setLanguage, t, dir } = useLanguage();
+  const { language, setLanguage, region, setRegion, regionMode, setRegionMode, t, dir } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [regionDropdownOpen, setRegionDropdownOpen] = useState(false);
 
   const languagesList: { code: Language; label: string }[] = [
     { code: "en", label: "English" },
@@ -21,19 +23,19 @@ export default function Navbar() {
     { code: "ta", label: "தமிழ்" },
   ];
 
+  const regionsList: { code: Region; label: string; flag: string; currency: string }[] = [
+    { code: "in", label: "India", flag: "🇮🇳", currency: "INR (₹)" },
+    { code: "global", label: "International", flag: "🌍", currency: "USD ($)" },
+  ];
+
   return (
     <header className="sticky top-0 z-50 w-full glass-panel border-b border-opacity-10 shadow-sm transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-6 md:px-10">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                <ShieldCheck className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-300 dark:via-purple-300 dark:to-pink-300 bg-clip-text text-transparent font-display">
-                SellGrow
-              </span>
+            <Link href="/">
+              <Logo className="w-24 h-16" />
             </Link>
           </div>
 
@@ -46,7 +48,7 @@ export default function Navbar() {
               {t("features")}
             </Link>
             <Link
-              href="#pricing"
+              href="/pricing"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
             >
               {t("pricing")}
@@ -66,20 +68,92 @@ export default function Navbar() {
           </nav>
 
           {/* Action Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Toggle Theme"
+              title="Toggle Light/Dark Theme"
             >
               {theme === "dark" ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
             </button>
 
+            {/* Region Selector (Auto IP vs Manual) */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setRegionDropdownOpen(!regionDropdownOpen);
+                  setLangDropdownOpen(false);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/60 hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors text-xs font-semibold"
+                aria-label="Select Region"
+              >
+                {regionMode === "auto" ? (
+                  <span>🌐 Auto ({region === "in" ? "🇮🇳 IN" : "🌍 Global"})</span>
+                ) : (
+                  <span>{region === "in" ? "🇮🇳 India" : "🌍 International"}</span>
+                )}
+              </button>
+
+              {regionDropdownOpen && (
+                <div className={`absolute ${dir === "rtl" ? "left-0" : "right-0"} mt-2 w-56 origin-top-right rounded-xl glass-panel shadow-lg ring-1 ring-black/5 dark:ring-white/5 z-50 p-1.5 space-y-1.5`}>
+                  <div className="px-2 py-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Region Selection Mode
+                  </div>
+
+                  {/* Auto IP Mode Button */}
+                  <button
+                    onClick={() => {
+                      setRegionMode("auto");
+                      setRegionDropdownOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${
+                      regionMode === "auto" ? "text-primary font-bold bg-primary/10" : "text-muted-foreground"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Globe className="w-3.5 h-3.5 text-primary" />
+                      <span>Auto Detect IP</span>
+                    </span>
+                    <span className="text-[10px] text-emerald-500 font-semibold">Geo-IP</span>
+                  </button>
+
+                  <div className="border-t border-border/40 my-1" />
+
+                  <div className="px-2 py-0.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Manual Selection
+                  </div>
+
+                  {regionsList.map((r) => (
+                    <button
+                      key={r.code}
+                      onClick={() => {
+                        setRegion(r.code);
+                        setRegionDropdownOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${
+                        regionMode === "manual" && region === r.code ? "text-primary font-bold bg-primary/10" : "text-muted-foreground"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>{r.flag}</span>
+                        <span>{r.label}</span>
+                      </span>
+                      <span className="text-[10px] opacity-75">{r.currency}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Language Selector */}
             <div className="relative">
               <button
-                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                onClick={() => {
+                  setLangDropdownOpen(!langDropdownOpen);
+                  setRegionDropdownOpen(false);
+                }}
                 className="flex items-center gap-1.5 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
               >
                 <Globe className="w-4 h-4" />
@@ -96,7 +170,7 @@ export default function Navbar() {
                         setLangDropdownOpen(false);
                       }}
                       className={`w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${
-                        language === lang.code ? "text-indigo-500 font-semibold" : "text-muted-foreground"
+                        language === lang.code ? "text-primary font-semibold" : "text-muted-foreground"
                       }`}
                     >
                       {lang.label}
@@ -111,7 +185,7 @@ export default function Navbar() {
               <div className="flex items-center gap-4">
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl hover:from-indigo-600 hover:to-purple-700 shadow-md shadow-indigo-500/10 transition-all duration-200"
+                  className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-primary to-secondary rounded-xl hover:opacity-95 shadow-md shadow-primary/10 transition-all duration-200"
                 >
                   {t("dashboard")}
                   <ArrowRight className="w-4 h-4 ml-1.5" />
@@ -130,12 +204,6 @@ export default function Navbar() {
                   className="text-sm font-semibold text-muted-foreground hover:text-foreground px-3 py-2 transition-colors"
                 >
                   {t("login")}
-                </Link>
-                <Link
-                  href="/register"
-                  className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 rounded-xl shadow-md transition-all duration-200"
-                >
-                  {t("register")}
                 </Link>
               </div>
             )}
@@ -171,7 +239,7 @@ export default function Navbar() {
               {t("features")}
             </Link>
             <Link
-              href="#pricing"
+              href="/pricing"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-muted-foreground hover:text-foreground py-1"
             >
@@ -195,6 +263,44 @@ export default function Navbar() {
 
           <hr className="border-border opacity-50" />
 
+          {/* Region Mobile Select */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-primary" />
+                Region Mode
+              </span>
+              <button
+                onClick={() => setRegionMode("auto")}
+                className={`px-2.5 py-1 text-xs rounded-lg border flex items-center gap-1 transition-all ${
+                  regionMode === "auto"
+                    ? "border-primary text-primary font-bold bg-primary/10"
+                    : "border-border text-muted-foreground"
+                }`}
+              >
+                <span>🌐 Auto IP</span>
+              </button>
+            </div>
+            <div className="flex justify-end gap-2">
+              {regionsList.map((r) => (
+                <button
+                  key={r.code}
+                  onClick={() => setRegion(r.code)}
+                  className={`px-2.5 py-1 text-xs rounded-lg border flex items-center gap-1 transition-all ${
+                    regionMode === "manual" && region === r.code
+                      ? "border-primary text-primary font-bold bg-primary/10"
+                      : "border-border text-muted-foreground"
+                  }`}
+                >
+                  <span>{r.flag}</span>
+                  <span>{r.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <hr className="border-border opacity-50" />
+
           {/* Language Mobile Select */}
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground flex items-center gap-1.5">
@@ -210,7 +316,7 @@ export default function Navbar() {
                   }}
                   className={`px-2.5 py-1 text-xs rounded-lg border ${
                     language === lang.code
-                      ? "border-indigo-500 text-indigo-500 font-bold bg-indigo-50/10"
+                      ? "border-primary text-primary font-bold bg-primary/10"
                       : "border-border text-muted-foreground"
                   }`}
                 >
@@ -228,7 +334,7 @@ export default function Navbar() {
               <Link
                 href="/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-xl shadow-md"
+                className="w-full text-center py-2.5 text-sm font-semibold text-white bg-primary rounded-xl shadow-md"
               >
                 {t("dashboard")}
               </Link>
@@ -250,13 +356,6 @@ export default function Navbar() {
                 className="w-full text-center py-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
               >
                 {t("login")}
-              </Link>
-              <Link
-                href="/register"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-xl"
-              >
-                {t("register")}
               </Link>
             </div>
           )}

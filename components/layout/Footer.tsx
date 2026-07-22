@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Mail, ShieldCheck, Github, Twitter, Linkedin, Send } from "lucide-react";
+import { Mail, Github, Twitter, Linkedin, Instagram, Facebook, Youtube, Send } from "lucide-react";
+import Logo from "@/components/layout/Logo";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -20,41 +21,45 @@ export default function Footer() {
   };
 
   return (
-    <footer className="border-t border-border bg-white dark:bg-[#060a10] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="border-t border-border/80 bg-white dark:bg-[#060a10] transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           {/* Logo & Description */}
-          <div className="md:col-span-1 space-y-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center">
-                <ShieldCheck className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300 bg-clip-text text-transparent font-display">
-                SellGrow
-              </span>
+          <div className="lg:col-span-4 md:col-span-2 space-y-3">
+            <Link href="/">
+              <Logo className="w-48 h-24" />
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              The AI-Powered Digital Business Operating System. Manage website, catalog, sales CRM, client channels, and LiveKit voice calls from a single dashboard.
+            <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
+              {t("footerDesc")}
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Twitter className="w-4 h-4" />
+            <div className="flex items-center flex-wrap gap-2 pt-1">
+              <a href="#" className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 border border-transparent hover:border-blue-500/20 transition-all" aria-label="Facebook">
+                <Facebook className="w-4 h-4" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+              <a href="#" className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all" aria-label="YouTube">
+                <Youtube className="w-4 h-4" />
+              </a>
+              <a href="#" className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10 border border-transparent hover:border-pink-500/20 transition-all" aria-label="Instagram">
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a href="#" className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 text-muted-foreground hover:text-blue-400 hover:bg-blue-400/10 border border-transparent hover:border-blue-400/20 transition-all" aria-label="LinkedIn">
                 <Linkedin className="w-4 h-4" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+              <a href="#" className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 text-muted-foreground hover:text-foreground hover:bg-white/10 border border-transparent hover:border-white/20 transition-all" aria-label="GitHub">
                 <Github className="w-4 h-4" />
+              </a>
+              <a href="#" className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 text-muted-foreground hover:text-sky-400 hover:bg-sky-500/10 border border-transparent hover:border-sky-500/20 transition-all" aria-label="Twitter">
+                <Twitter className="w-4 h-4" />
               </a>
             </div>
           </div>
 
           {/* Core Modules Links */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+          <div className="lg:col-span-2 md:col-span-1 space-y-3">
+            <h4 className="text-xs font-bold text-foreground uppercase tracking-wider font-display">
               {t("features")}
             </h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-xs text-muted-foreground">
               <li>
                 <Link href="#features" className="hover:text-foreground transition-colors">
                   {t("crm")}
@@ -71,66 +76,66 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#features" className="hover:text-foreground transition-colors">
-                  {t("workflow")}
+                <Link href="/pricing" className="hover:text-foreground transition-colors">
+                  {t("pricing")}
                 </Link>
               </li>
             </ul>
           </div>
 
           {/* Legal / Policy Links */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
-              Resources
+          <div className="lg:col-span-2 md:col-span-1 space-y-3">
+            <h4 className="text-xs font-bold text-foreground uppercase tracking-wider font-display">
+              {t("footerResources")}
             </h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-xs text-muted-foreground">
               <li>
                 <Link href="/privacy-policy" className="hover:text-foreground transition-colors">
-                  Privacy Policy
+                  {t("footerPrivacy")}
                 </Link>
               </li>
               <li>
                 <Link href="/terms" className="hover:text-foreground transition-colors">
-                  Terms of Service
+                  {t("footerTerms")}
                 </Link>
               </li>
               <li>
                 <Link href="/cookies" className="hover:text-foreground transition-colors">
-                  Cookie Policy
+                  {t("footerCookies")}
                 </Link>
               </li>
               <li>
                 <Link href="/disclaimer" className="hover:text-foreground transition-colors">
-                  Disclaimer
+                  {t("footerDisclaimer")}
                 </Link>
               </li>
             </ul>
           </div>
 
           {/* Newsletter Input */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
-              Subscribe
+          <div className="lg:col-span-4 md:col-span-2 space-y-3">
+            <h4 className="text-xs font-bold text-foreground uppercase tracking-wider font-display">
+              {t("footerSubscribe")}
             </h4>
-            <p className="text-sm text-muted-foreground">
-              Stay updated with new AI automations.
+            <p className="text-xs text-muted-foreground">
+              {t("footerSubDesc")}
             </p>
-            <form onSubmit={handleSubscribe} className="relative mt-2">
+            <form onSubmit={handleSubscribe} className="relative mt-2 max-w-md">
               <input
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter email..."
+                placeholder={t("footerEnterEmail")}
                 required
-                className="w-full pl-3 pr-10 py-2 text-sm glass-input focus:outline-none"
+                className="w-full pl-3 pr-10 py-2 text-xs rounded-xl border border-border glass-input focus:outline-none focus:border-primary"
               />
               <button
                 type="submit"
-                className="absolute right-1 top-1 p-1.5 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+                className="absolute right-1 top-1 bottom-1 px-3 rounded-lg bg-primary hover:opacity-90 text-white transition-all text-xs font-semibold flex items-center justify-center"
                 aria-label="Submit Email"
               >
                 {subscribed ? (
-                  <span className="text-[10px] font-bold">Done</span>
+                  <span className="text-[10px] font-bold">{t("footerDone")}</span>
                 ) : (
                   <Send className="w-3.5 h-3.5" />
                 )}
@@ -139,15 +144,10 @@ export default function Footer() {
           </div>
         </div>
 
-        <hr className="border-border opacity-50 my-8" />
+        <hr className="border-border opacity-40 my-6" />
 
-        <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-muted-foreground gap-4">
-          <p>© {new Date().getFullYear()} SellGrow Systems Inc. All rights reserved.</p>
-          <div className="flex space-x-6">
-            <span>GDPR Ready</span>
-            <span>SOC 2 Compliant</span>
-            <span>LiveKit integration v3.0</span>
-          </div>
+        <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-muted-foreground gap-4 pl-12 sm:pl-0">
+          <p>© {new Date().getFullYear()} SellGrow Systems Inc. {t("footerRights")}</p>
         </div>
       </div>
     </footer>

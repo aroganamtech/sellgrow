@@ -30,7 +30,7 @@ export default function Error({
         <div className="flex gap-4">
           <button
             onClick={() => reset()}
-            className="flex-grow inline-flex items-center justify-center gap-1.5 py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md transition-all"
+            className="flex-grow inline-flex items-center justify-center gap-1.5 py-2 px-4 bg-primary hover:opacity-90 text-white rounded-xl text-xs font-semibold shadow-md transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Try Again

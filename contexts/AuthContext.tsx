@@ -6,17 +6,29 @@ import { useRouter } from "next/navigation";
 export interface User {
   id: string;
   name: string;
+  firstName?: string;
   email: string;
+  phone?: string;
   businessName: string;
   businessType: string;
+  businessCategory?: string;
   role: "admin" | "super-admin" | "operator";
+}
+
+export interface RegisterPayload {
+  firstName: string;
+  email: string;
+  phone?: string;
+  password: string;
+  businessName: string;
+  businessCategory: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, businessName: string, businessType: string) => Promise<void>;
-  register: (name: string, email: string, businessName: string, businessType: string) => Promise<void>;
+  login: (email: string, password?: string) => Promise<void>;
+  register: (payload: RegisterPayload | any) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -31,44 +43,64 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const savedUser = localStorage.getItem("sg_user");
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        localStorage.removeItem("sg_user");
+      }
     }
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, businessName: string, businessType: string) => {
+  const login = async (email: string, password?: string) => {
     setIsLoading(true);
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    const mockUser: User = {
-      id: "usr_" + Math.random().toString(36).substr(2, 9),
-      name: "Naveen S",
-      email: email || "operator@sellgrow.io",
-      businessName: businessName || "SellGrow Sandbox",
-      businessType: businessType || "Retail",
-      role: "admin",
-    };
-    setUser(mockUser);
-    localStorage.setItem("sg_user", JSON.stringify(mockUser));
-    setIsLoading(false);
-    router.push("/dashboard");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.status !== "success") {
+        throw new Error(data.message || "Login failed");
+      }
+
+      setUser(data.user);
+      localStorage.setItem("sg_user", JSON.stringify(data.user));
+      setIsLoading(false);
+      router.push("/dashboard");
+    } catch (err: any) {
+      setIsLoading(false);
+      throw err;
+    }
   };
 
-  const register = async (name: string, email: string, businessName: string, businessType: string) => {
+  const register = async (payload: any) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const mockUser: User = {
-      id: "usr_" + Math.random().toString(36).substr(2, 9),
-      name: name || "Naveen S",
-      email: email || "operator@sellgrow.io",
-      businessName: businessName || "SellGrow Enterprise",
-      businessType: businessType || "Retail",
-      role: "admin",
-    };
-    setUser(mockUser);
-    localStorage.setItem("sg_user", JSON.stringify(mockUser));
-    setIsLoading(false);
-    router.push("/dashboard");
+    try {
+      const bodyPayload = typeof payload === "object" ? payload : { name: payload };
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bodyPayload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.status !== "success") {
+        throw new Error(data.message || "Registration failed");
+      }
+
+      setUser(data.user);
+      localStorage.setItem("sg_user", JSON.stringify(data.user));
+      setIsLoading(false);
+      router.push("/dashboard");
+    } catch (err: any) {
+      setIsLoading(false);
+      throw err;
+    }
   };
 
   const logout = () => {

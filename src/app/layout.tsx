@@ -4,6 +4,8 @@ import "@/styles/globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ScrollRestoration from "@/components/utils/ScrollRestoration";
+import ScrollProgressIndicator from "@/components/utils/ScrollProgressIndicator";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -18,11 +20,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "SellGrow | AI-Powered Digital Business Operating System",
+  title: "SellGrow | The Intelligent Sell & Growth Platform",
   description:
-    "A single unified intelligence ecosystem that automates CRM, omnichannel communications, LiveKit voice assistants, visual workflows, and online store catalogs.",
+    "A single unified intelligence ecosystem that automates CRM, omnichannel communications, AI voice assistants, visual workflows, and online store catalogs.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.png",
   },
 };
 
@@ -34,6 +36,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} ${inter.variable}`} suppressHydrationWarning>
       <body className="antialiased min-h-screen grid-bg">
+        <ScrollRestoration />
+        <ScrollProgressIndicator />
         <AuthProvider>
           <LanguageProvider>
             <ThemeProvider>

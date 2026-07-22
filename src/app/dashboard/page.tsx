@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useRouter } from "next/navigation";
+import Logo from "@/components/layout/Logo";
 import {
   TrendingUp,
   MessageSquare,
@@ -120,7 +121,7 @@ export default function DashboardPage() {
       { sender: "agent", text: "Yes, SellGrow has built-in enterprise multi-tenant SOC 2 policies." },
     ],
     messenger: [
-      { sender: "client", text: "I want to request a demo of the LiveKit integration." },
+      { sender: "client", text: "I want to request a demo of the AI Voice Agent integration." },
     ],
   });
   const [inboxInput, setInboxInput] = useState("");
@@ -188,7 +189,7 @@ export default function DashboardPage() {
     setVoiceTranscripts([]);
     setTimeout(() => {
       setVoiceCallState("active");
-      const msg = "Welcome back Naveen. This is your LiveKit agent dialer. I am ready to route communications.";
+      const msg = "Welcome back Naveen. This is your AI voice agent dialer. I am ready to route communications.";
       setVoiceTranscripts([{ sender: "ai", text: msg }]);
       speak(msg);
     }, 1200);
@@ -312,7 +313,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#070b13]">
         <div className="text-center space-y-4">
-          <Activity className="w-10 h-10 animate-spin text-indigo-500 mx-auto" />
+          <Activity className="w-10 h-10 animate-spin text-primary mx-auto" />
           <p className="text-sm font-semibold text-muted-foreground">Authenticating instance...</p>
         </div>
       </div>
@@ -325,13 +326,8 @@ export default function DashboardPage() {
       {/* Top Header Controls */}
       <header className="h-16 border-b border-border bg-white dark:bg-[#0c1220] flex items-center justify-between px-6 sticky top-0 z-40">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center">
-            <ShieldCheck className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300 bg-clip-text text-transparent font-display">
-            SellGrow
-          </span>
-          <span className="text-[10px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded font-mono font-semibold">
+          <Logo className="w-12 h-12" />
+          <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded font-mono font-semibold">
             Enterprise OS
           </span>
         </div>
@@ -362,7 +358,7 @@ export default function DashboardPage() {
                 onClick={() => setLanguage(lang)}
                 className={`px-2 py-0.5 text-[10px] rounded font-bold uppercase transition-all ${
                   language === lang
-                    ? "bg-indigo-600 text-white shadow-sm"
+                    ? "bg-primary text-white shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -389,7 +385,7 @@ export default function DashboardPage() {
         <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-border bg-white dark:bg-[#0c1220] p-4 flex flex-col justify-between shrink-0">
           <div className="space-y-4">
             <div className="flex items-center gap-2 p-2 bg-slate-50 dark:bg-black/20 rounded-xl border border-border border-opacity-50">
-              <div className="w-8 h-8 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center text-xs">
+              <div className="w-8 h-8 rounded-full bg-primary text-white font-bold flex items-center justify-center text-xs">
                 NS
               </div>
               <div className="overflow-hidden">
@@ -420,7 +416,7 @@ export default function DashboardPage() {
                     }}
                     className={`w-full flex items-center gap-3 px-3 py-2 text-xs rounded-xl font-semibold border transition-all ${
                       activeTab === tab.id
-                        ? "bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-600/10"
+                        ? "bg-primary border-primary text-white shadow-md shadow-primary/10"
                         : "border-transparent text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"
                     }`}
                   >
@@ -487,13 +483,13 @@ export default function DashboardPage() {
                 
                 {/* Active Calls & Voice Box */}
                 <div className="lg:col-span-2 p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
-                  <h3 className="text-sm font-bold font-display flex items-center gap-2 border-b pb-2"><Volume2 className="w-4 h-4 text-indigo-500" /> Active AI Voice Status</h3>
+                  <h3 className="text-sm font-bold font-display flex items-center gap-2 border-b pb-2"><Volume2 className="w-4 h-4 text-primary" /> Active AI Voice Status</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="p-4 rounded-xl border bg-slate-50 dark:bg-black/10 text-center space-y-3 flex flex-col justify-between">
-                      <p className="text-xs text-muted-foreground leading-normal">Test the LiveKit Voice agent by starting a quick local line simulation.</p>
+                      <p className="text-xs text-muted-foreground leading-normal">Test the AI Voice agent by starting a quick local line simulation.</p>
                       <button
                         onClick={() => setActiveTab("voice")}
-                        className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold"
+                        className="w-full py-2 bg-primary hover:opacity-90 text-white rounded-xl text-xs font-semibold"
                       >
                         Open Voice Console
                       </button>
@@ -511,7 +507,7 @@ export default function DashboardPage() {
 
                 {/* Automation Running Workflows summary */}
                 <div className="p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
-                  <h3 className="text-sm font-bold font-display flex items-center gap-2 border-b pb-2"><Workflow className="w-4 h-4 text-indigo-500" /> {t("workflowsRunning")}</h3>
+                  <h3 className="text-sm font-bold font-display flex items-center gap-2 border-b pb-2"><Workflow className="w-4 h-4 text-primary" /> {t("workflowsRunning")}</h3>
                   <div className="space-y-3">
                     {workflowNodes.slice(0, 3).map((node, index) => (
                       <div key={index} className="flex justify-between items-center text-xs">
@@ -524,7 +520,7 @@ export default function DashboardPage() {
                     ))}
                     <button
                       onClick={() => setActiveTab("workflow")}
-                      className="w-full text-center text-xs font-bold text-indigo-500 hover:underline pt-2 block"
+                      className="w-full text-center text-xs font-bold text-primary hover:underline pt-2 block"
                     >
                       Configure visual workflow builder
                     </button>
@@ -565,7 +561,7 @@ export default function DashboardPage() {
                           <div
                             key={lead.id}
                             onClick={() => setSelectedLead(lead)}
-                            className="p-3.5 rounded-xl border border-border bg-card shadow-sm hover:border-indigo-500 cursor-pointer transition-all space-y-3"
+                            className="p-3.5 rounded-xl border border-border bg-card shadow-sm hover:border-primary cursor-pointer transition-all space-y-3"
                           >
                             <div className="flex justify-between items-start gap-1">
                               <h4 className="text-xs font-bold text-foreground truncate">{lead.name}</h4>
@@ -573,7 +569,7 @@ export default function DashboardPage() {
                             </div>
 
                             <div className="flex justify-between items-center text-[10px] text-muted-foreground">
-                              <span>Probability: <strong className="text-indigo-500">{lead.probability}%</strong></span>
+                              <span>Probability: <strong className="text-primary">{lead.probability}%</strong></span>
                               <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" /> GPS</span>
                             </div>
 
@@ -638,7 +634,7 @@ export default function DashboardPage() {
                   </div>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 ml-auto"
+                    className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 ml-auto"
                   >
                     <Plus className="w-3.5 h-3.5" /> Add Lead
                   </button>
@@ -655,8 +651,8 @@ export default function DashboardPage() {
                       </div>
                       <p className="text-[10px] text-muted-foreground">Coordinates visit log: {selectedLead.coordinates}</p>
                       <hr className="border-border opacity-50" />
-                      <div className="bg-indigo-500/5 p-3 rounded-lg border border-indigo-500/10">
-                        <p className="text-[10px] font-bold text-indigo-500 flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" /> AI Meeting Summary:</p>
+                      <div className="bg-primary/5 p-3 rounded-lg border border-primary/10">
+                        <p className="text-[10px] font-bold text-primary flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" /> AI Meeting Summary:</p>
                         <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{selectedLead.summary}</p>
                       </div>
                     </div>
@@ -683,7 +679,7 @@ export default function DashboardPage() {
                   <div className="space-y-2">
                     {[
                       { id: "whatsapp", title: "WhatsApp Business API", num: "2 msgs", icon: MessageCircle, color: "text-emerald-500 bg-emerald-500/10" },
-                      { id: "livechat", title: "Web Live Chat", num: "1 msg", icon: MessageSquare, color: "text-indigo-500 bg-indigo-500/10" },
+                      { id: "livechat", title: "Web Live Chat", num: "1 msg", icon: MessageSquare, color: "text-primary bg-primary/10" },
                       { id: "messenger", title: "FB Messenger", num: "0 msgs", icon: Globe, color: "text-blue-500 bg-blue-500/10" },
                     ].map((chan) => {
                       const Icon = chan.icon;
@@ -693,7 +689,7 @@ export default function DashboardPage() {
                           onClick={() => setSelectedChat(chan.id as any)}
                           className={`w-full text-left p-3 rounded-xl border flex items-center justify-between transition-all ${
                             selectedChat === chan.id
-                              ? "border-indigo-500 bg-indigo-500/5"
+                              ? "border-primary bg-primary/5"
                               : "border-transparent hover:bg-black/5 dark:hover:bg-white/5"
                           }`}
                         >
@@ -720,7 +716,7 @@ export default function DashboardPage() {
                     {chatMessages[selectedChat]?.map((msg, idx) => (
                       <div key={idx} className={`p-3 rounded-xl max-w-[75%] text-xs ${
                         msg.sender === "agent"
-                          ? "bg-indigo-600 text-white ml-auto"
+                          ? "bg-primary text-white ml-auto"
                           : "bg-card border border-border text-foreground"
                       }`}>
                         <p className="leading-relaxed">{msg.text}</p>
@@ -735,12 +731,12 @@ export default function DashboardPage() {
                   <div className="p-4 border-t border-border bg-white dark:bg-[#0c1220] space-y-3">
                     {/* Suggestions */}
                     <div className="flex flex-wrap gap-2 items-center">
-                      <span className="text-[9px] font-bold text-indigo-500 flex items-center gap-1 shrink-0"><Sparkles className="w-3 h-3" /> AI Recommend:</span>
+                      <span className="text-[9px] font-bold text-primary flex items-center gap-1 shrink-0"><Sparkles className="w-3 h-3" /> AI Recommend:</span>
                       {aiSuggestions[selectedChat]?.map((sug, idx) => (
                         <button
                           key={idx}
                           onClick={() => setInboxInput(sug)}
-                          className="px-2.5 py-1 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/10 rounded-lg text-[10px] font-medium truncate max-w-xs"
+                          className="px-2.5 py-1 bg-primary/5 hover:bg-primary/10 text-primary border border-primary/10 rounded-lg text-[10px] font-medium truncate max-w-xs"
                         >
                           {sug}
                         </button>
@@ -757,7 +753,7 @@ export default function DashboardPage() {
                       />
                       <button
                         type="submit"
-                        className="px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center shrink-0"
+                        className="px-4 bg-primary hover:opacity-90 text-white rounded-xl text-xs font-semibold flex items-center justify-center shrink-0"
                       >
                         <Send className="w-3.5 h-3.5" />
                       </button>
@@ -768,12 +764,12 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* TAB 4: AI VOICE PLATFORM (LiveKit Dialer) */}
+          {/* TAB 4: AI VOICE PLATFORM (Dialer) */}
           {activeTab === "voice" && (
             <div className="space-y-6 animate-fade-in text-left">
               <div>
                 <h1 className="text-2xl font-bold font-display text-foreground">{t("voice")}</h1>
-                <p className="text-xs text-muted-foreground">Monitor and trigger simulated LiveKit voice agent connections.</p>
+                <p className="text-xs text-muted-foreground">Monitor and trigger simulated AI voice agent connections.</p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -781,17 +777,17 @@ export default function DashboardPage() {
                 {/* VoIP Console widget */}
                 <div className="lg:col-span-2 p-6 rounded-2xl border border-border bg-card shadow-sm text-center space-y-6">
                   <div className="flex justify-between items-center border-b pb-3">
-                    <span className="text-sm font-bold flex items-center gap-2"><PhoneCall className="w-4 h-4 text-indigo-500" /> LiveKit VoIP Simulator</span>
-                    <span className="text-xs font-mono bg-slate-100 dark:bg-slate-800 text-muted px-2 py-0.5 rounded">Endpoint: livekit.sellgrow.io</span>
+                    <span className="text-sm font-bold flex items-center gap-2"><PhoneCall className="w-4 h-4 text-primary" /> AI VoIP Simulator</span>
+                    <span className="text-xs font-mono bg-slate-100 dark:bg-slate-800 text-muted px-2 py-0.5 rounded">Endpoint: voice.sellgrow.io</span>
                   </div>
 
                   {voiceCallState === "idle" && (
                     <div className="py-12 space-y-4">
-                      <div className="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center mx-auto text-indigo-500">
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary">
                         <PhoneCall className="w-8 h-8" />
                       </div>
                       <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-normal">
-                        Click below to test out the LiveKit voice agent dialer. This uses the browser&apos;s speech synthesizer to read agent lines out loud.
+                        Click below to test out the AI voice agent dialer. This uses the browser&apos;s speech synthesizer to read agent lines out loud.
                       </p>
                       <button
                         onClick={handleStartVoiceCall}
@@ -830,7 +826,7 @@ export default function DashboardPage() {
                       {/* Transcripts scroll */}
                       <div className="bg-slate-50 dark:bg-black/20 p-4 rounded-xl border border-border max-h-[180px] overflow-y-auto space-y-2 text-xs text-left">
                         {voiceTranscripts.map((t, idx) => (
-                          <div key={idx} className={`p-2 rounded-lg ${t.sender === "ai" ? "bg-indigo-500/10 text-foreground" : "bg-emerald-500/10 text-foreground"}`}>
+                          <div key={idx} className={`p-2 rounded-lg ${t.sender === "ai" ? "bg-primary/10 text-foreground" : "bg-emerald-500/10 text-foreground"}`}>
                             <strong className="text-[10px] block uppercase text-muted-foreground">{t.sender === "ai" ? "Agent Dial" : "Operator (You)"}</strong>
                             <p className="mt-0.5 leading-relaxed">{t.text}</p>
                           </div>
@@ -919,11 +915,11 @@ export default function DashboardPage() {
                     {workflowNodes.map((node, index) => (
                       <React.Fragment key={node.id}>
                         {index > 0 && (
-                          <div className="w-0.5 h-6 bg-indigo-500/30 dark:bg-indigo-500/20 border-dashed border flex items-center justify-center font-mono text-[9px] text-muted">
+                          <div className="w-0.5 h-6 bg-primary/30 dark:bg-primary/20 border-dashed border flex items-center justify-center font-mono text-[9px] text-muted">
                             ↓
                           </div>
                         )}
-                        <div className="w-full max-w-sm p-4 rounded-xl border border-border bg-white dark:bg-[#0c1220] flex items-center justify-between gap-3 shadow-sm hover:border-indigo-500 transition-all">
+                        <div className="w-full max-w-sm p-4 rounded-xl border border-border bg-white dark:bg-[#0c1220] flex items-center justify-between gap-3 shadow-sm hover:border-primary transition-all">
                           <div className="flex items-center gap-3">
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                               node.type === "trigger" ? "bg-blue-500/10 text-blue-500" :
@@ -996,7 +992,7 @@ export default function DashboardPage() {
 
                   <button
                     type="submit"
-                    className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5"
+                    className="w-full py-2 bg-primary hover:opacity-90 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5"
                   >
                     <Plus className="w-3.5 h-3.5" /> Append Step Node
                   </button>
@@ -1025,7 +1021,7 @@ export default function DashboardPage() {
                         <h4 className="text-sm font-bold text-foreground truncate">{item.name}</h4>
                         <p className="text-[10px] text-muted-foreground font-mono mt-0.5">SKU: {item.sku}</p>
                       </div>
-                      <span className="text-xs bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded font-mono font-semibold">{item.variants}</span>
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-mono font-semibold">{item.variants}</span>
                     </div>
 
                     <div className="flex justify-between items-center text-xs">
@@ -1079,7 +1075,7 @@ export default function DashboardPage() {
                       {ragFiles.map((file, idx) => (
                         <div key={idx} className="flex items-center justify-between p-3 border rounded-xl text-xs">
                           <div className="flex items-center gap-3">
-                            <FileText className="w-4 h-4 text-indigo-500 shrink-0" />
+                            <FileText className="w-4 h-4 text-primary shrink-0" />
                             <div>
                               <p className="font-bold text-foreground">{file.name}</p>
                               <p className="text-[10px] text-muted-foreground mt-0.5">Chunks: {file.chunks} | Size: {file.size}</p>
@@ -1109,9 +1105,9 @@ export default function DashboardPage() {
                   </form>
 
                   {ragResult && (
-                    <div className="p-3.5 border border-indigo-500/20 bg-indigo-500/5 rounded-xl space-y-2 text-xs">
+                    <div className="p-3.5 border border-primary/20 bg-primary/5 rounded-xl space-y-2 text-xs">
                       <div className="flex justify-between items-center text-[10px] font-mono text-muted-foreground font-bold">
-                        <span>Confidence: <strong className="text-indigo-500">{(ragResult.confidence * 100).toFixed(0)}%</strong></span>
+                        <span>Confidence: <strong className="text-primary">{(ragResult.confidence * 100).toFixed(0)}%</strong></span>
                         <span>{ragResult.source}</span>
                       </div>
                       <p className="text-muted-foreground leading-relaxed text-[11px]">{ragResult.answer}</p>
@@ -1146,17 +1142,16 @@ export default function DashboardPage() {
                       <path
                         d="M 10 130 C 80 120, 100 80, 160 90 C 220 100, 280 40, 390 15"
                         fill="none"
-                        stroke="url(#indigo-grad)"
+                        stroke="url(#brand-grad)"
                         strokeWidth="3.5"
                         strokeLinecap="round"
                       />
 
                       {/* Gradients */}
                       <defs>
-                        <linearGradient id="indigo-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#6366F1" />
-                          <stop offset="50%" stopColor="#818CF8" />
-                          <stop offset="100%" stopColor="#EC4899" />
+                        <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="var(--primary)" />
+                          <stop offset="100%" stopColor="var(--secondary)" />
                         </linearGradient>
                       </defs>
                     </svg>
@@ -1181,10 +1176,10 @@ export default function DashboardPage() {
                       <div key={idx} className="space-y-1.5">
                         <div className="flex justify-between text-xs font-semibold">
                           <span>{bar.chan}</span>
-                          <span className="text-indigo-500">{bar.val}% Deflected</span>
+                          <span className="text-primary">{bar.val}% Deflected</span>
                         </div>
                         <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full" style={{ width: `${bar.val}%` }} />
+                          <div className="h-full bg-gradient-to-r from-primary to-secondary rounded-full" style={{ width: `${bar.val}%` }} />
                         </div>
                       </div>
                     ))}

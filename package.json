@@ -3,17 +3,19 @@
   "version": "3.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 11223",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start -p 11223",
+    "lint": "next lint",
+    "db:init": "node scripts/create_sellgrow_db.js"
   },
   "dependencies": {
     "next": "^14.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "lucide-react": "^0.378.0",
-    "framer-motion": "^11.1.7"
+    "framer-motion": "^11.1.7",
+    "mongodb": "^6.5.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
