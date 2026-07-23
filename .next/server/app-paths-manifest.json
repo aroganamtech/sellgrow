@@ -1,4 +1,10 @@
 {
+  "/sg-admin/[role]/page": "app/sg-admin/[role]/page.js",
   "/page": "app/page.js",
-  "/api/detect-region/route": "app/api/detect-region/route.js"
+  "/api/admin/team/route": "app/api/admin/team/route.js",
+  "/api/admin/employees/route": "app/api/admin/employees/route.js",
+  "/pricing/page": "app/pricing/page.js",
+  "/api/admin/services/route": "app/api/admin/services/route.js",
+  "/api/admin/stats/route": "app/api/admin/stats/route.js",
+  "/sg-superadmin/admin-growth/page": "app/sg-superadmin/admin-growth/page.js"
 }

@@ -393,10 +393,22 @@ export default function HomePage() {
   return (
     <div className="relative min-h-screen flex flex-col">
       <OnboardingModal />
+      {/* Script to block hydration flash for returning users */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            try {
+              if (sessionStorage.getItem('sellgrow_loaded') === 'true') {
+                document.documentElement.classList.add('sellgrow-already-loaded');
+              }
+            } catch (e) {}
+          `
+        }}
+      />
       {/* Loading Splash Screen Overlay */}
       {(!hasCheckedSession || pageLoading) && (
         <div 
-          className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#070b13] space-y-8 select-none transition-all duration-700 ${
+          className={`loading-overlay fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#070b13] space-y-8 select-none transition-all duration-700 ${
             pageLoading ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
         >
@@ -404,6 +416,9 @@ export default function HomePage() {
           {pageLoading && <CanvasParticles />}
 
           <style>{`
+            html.sellgrow-already-loaded .loading-overlay {
+              display: none !important;
+            }
             @keyframes shimmer-travel {
               0% { left: -30%; }
               100% { left: 110%; }
@@ -747,7 +762,7 @@ export default function HomePage() {
             <MessageSquare className="w-6 h-6" />
           </button>
         ) : (
-          <div className="w-80 sm:w-96 rounded-2xl border border-border bg-white dark:bg-[#0d1322] shadow-2xl overflow-hidden flex flex-col justify-between max-h-[480px]">
+          <div data-lenis-prevent className="w-80 sm:w-96 rounded-2xl border border-border bg-white dark:bg-[#0d1322] shadow-2xl overflow-hidden flex flex-col justify-between max-h-[480px]">
             {/* Chat header */}
             <div className="bg-gradient-to-r from-primary to-secondary p-4 text-white flex justify-between items-center">
               <div className="flex items-center gap-2">
