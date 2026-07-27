@@ -42,6 +42,12 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex gap-8">
             <Link
+              href="/products"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              {t("products")}
+            </Link>
+            <Link
               href="/#footer-features"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
             >
@@ -231,6 +237,13 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden glass-panel border-b border-opacity-5 animate-fade-in p-4 space-y-4">
           <nav className="flex flex-col space-y-3">
+            <Link
+              href="/products"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-base font-medium text-muted-foreground hover:text-foreground py-1"
+            >
+              {t("products")}
+            </Link>
             <Link
               href="/#footer-features"
               onClick={() => setMobileMenuOpen(false)}

@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/sg-superadmin/'],
     },
-    sitemap: 'https://sellgrow.co/sitemap.xml',
+    sitemap: 'https://sellgrow.io/sitemap.xml',
   };
 }

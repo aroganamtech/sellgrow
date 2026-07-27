@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
 
-export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
@@ -41,7 +40,6 @@ export async function GET() {
         backendStatus = `Healthy (${responseTime}ms)`;
       }
     } catch (err) {
-      console.warn("FastAPI backend is offline (connection refused).");
     }
     
     // 5. Fetch actual users list from users collection

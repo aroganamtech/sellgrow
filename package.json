@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 11223",
     "build": "next build",
+    "postbuild": "node scripts/export-out-folder.js",
     "start": "next start -p 11223",
     "lint": "next lint",
     "db:init": "node scripts/create_sellgrow_db.js"

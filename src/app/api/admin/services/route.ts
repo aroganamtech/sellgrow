@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
 import { ObjectId } from 'mongodb';
 
-export const dynamic = 'force-dynamic';
 
 const DEFAULT_SERVICES = [
   { id: "srv_1", name: "WhatsApp business", description: "WhatsApp Business API gateway and chat broadcast engine", status: "Active", successRate: 99.1, latency: 45, requests24h: 12580 },

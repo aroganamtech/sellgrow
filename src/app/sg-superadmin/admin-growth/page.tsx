@@ -50,10 +50,13 @@ import {
   Package,
   Camera,
   Trash2,
-  ImageIcon
+  ImageIcon,
+  Bell,
+  BellRing
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import Logo from "@/components/layout/Logo";
+import { PRODUCTS_DATA, ProductItem, CATEGORIES } from "@/data/productsData";
 
 // Interfaces
 interface UserRecord {
@@ -216,25 +219,25 @@ export default function AdminGrowthPage() {
 
   // Navigation state (Sidebar options)
   const [activeView, setActiveView] = useState<
-    "dashboard" | "sub-admins" | "clients" | "payments" | "services" | "settings" | "profile" | "control-flags"
+    "dashboard" | "products" | "sub-admins" | "clients" | "payments" | "services" | "settings" | "profile" | "control-flags"
   >("dashboard");
 
   // Team management states
   const [teamMembers, setTeamMembers] = useState([
-    { id: "tm-1", name: "Naveen S", email: "naveen@sellgrow.co", role: "SuperAdmin", status: "Active", permissions: "Full Access", password: "sellgrow123" },
-    { id: "tm-2", name: "Operator Main", email: "operator@sellgrow.co", role: "Operator", status: "Active", permissions: "Read/Write", password: "sellgrow123" },
-    { id: "tm-3", name: "AI Dev Team", email: "ai-dev@sellgrow.co", role: "Developer", status: "Active", permissions: "Read/Write", password: "sellgrow123" },
-    { id: "tm-4", name: "Support Agent", email: "support@sellgrow.co", role: "Support", status: "Active", permissions: "Read Only", password: "sellgrow123" },
+    { id: "tm-1", sgId: "SG-SA-100", name: "Naveen S", email: "naveen@sellgrow.io", role: "SuperAdmin", status: "Active", permissions: "Full Access", password: "sellgrow123" },
+    { id: "tm-2", sgId: "SG-A-101", name: "Operator Main", email: "operator@sellgrow.io", role: "Operator", status: "Active", permissions: "Read/Write", password: "sellgrow123" },
+    { id: "tm-3", sgId: "SG-A-102", name: "AI Dev Team", email: "ai-dev@sellgrow.io", role: "Developer", status: "Active", permissions: "Read/Write", password: "sellgrow123" },
+    { id: "tm-4", sgId: "SG-A-103", name: "Support Agent", email: "support@sellgrow.io", role: "Support", status: "Active", permissions: "Read Only", password: "sellgrow123" },
   ]);
   const [newTeamMemberName, setNewTeamMemberName] = useState("");
   const [newTeamMemberEmail, setNewTeamMemberEmail] = useState("");
   const [newTeamMemberRole, setNewTeamMemberRole] = useState("Operator");
   const [teamsActiveSubTab, setTeamsActiveSubTab] = useState<"sub-admin" | "employees">("sub-admin");
   const [employees, setEmployees] = useState([
-    { id: "emp-1", name: "Naveen S", email: "717824i605@kce.in.ac", work: "Voice AI Integration", status: "Active", access: "Full Access", assignedSubAdmin: "Operator Main" },
-    { id: "emp-2", name: "Karthik R", email: "karthik@sellgrow.co", work: "CRM Automation", status: "Active", access: "Read & Write", assignedSubAdmin: "AI Dev Team" },
-    { id: "emp-3", name: "Priya K", email: "priya@sellgrow.co", work: "Landing Page Editor", status: "Active", access: "View Only", assignedSubAdmin: "Support Agent" },
-    { id: "emp-4", name: "Amit Shah", email: "amit@sellgrow.co", work: "Customer Support", status: "Suspended", access: "View Only", assignedSubAdmin: "Unassigned" },
+    { id: "emp-1", name: "Naveen S", email: "717824i605@kce.in.ac", work: "Voice AI Integration", status: "Active", access: "Read & Write", assignedSubAdmin: "Operator Main" },
+    { id: "emp-2", name: "Karthik R", email: "karthik@sellgrow.io", work: "CRM Automation", status: "Active", access: "Read & Write", assignedSubAdmin: "AI Dev Team" },
+    { id: "emp-3", name: "Priya K", email: "priya@sellgrow.io", work: "Landing Page Editor", status: "Active", access: "View Only", assignedSubAdmin: "Support Agent" },
+    { id: "emp-4", name: "Amit Shah", email: "amit@sellgrow.io", work: "Customer Support", status: "Suspended", access: "View Only", assignedSubAdmin: "Unassigned" },
   ]);
 
   const [invitationSuccessModal, setInvitationSuccessModal] = useState<{
@@ -244,6 +247,9 @@ export default function AdminGrowthPage() {
     tempPass: string;
     loginUrl: string;
   } | null>(null);
+
+  const [selectedSubAdminModal, setSelectedSubAdminModal] = useState<any | null>(null);
+  const [selectedEmployeeModal, setSelectedEmployeeModal] = useState<any | null>(null);
 
   const handleUpdateEmployee = (id: string, field: string, value: string) => {
     setEmployees(employees.map(emp => emp.id === id ? { ...emp, [field]: value } : emp));
@@ -264,7 +270,9 @@ export default function AdminGrowthPage() {
     const roleSlug = newTeamMemberRole === "SuperAdmin" ? "superadmin" : newTeamMemberRole.toLowerCase();
     const loginUrl = window.location.origin + "/sg-admin/" + roleSlug;
 
+    const generatedSgId = `SG-A-${101 + teamMembers.length}`;
     const newMemberDoc = {
+      sgId: generatedSgId,
       name: newTeamMemberName,
       email: newTeamMemberEmail,
       role: newTeamMemberRole,
@@ -316,6 +324,32 @@ export default function AdminGrowthPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, [field]: value })
     }).catch(console.error);
+  };
+
+  const handleSaveSubAdminDetails = (member: any) => {
+    setSavingMemberId(member.id);
+    fetch("/api/admin/team", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: member.id,
+        name: member.name,
+        role: member.role,
+        permissions: member.permissions,
+        status: member.status,
+        assignedServices: member.assignedServices || [],
+      })
+    })
+      .then((res) => res.json())
+      .then(() => {
+        setSavingMemberId(null);
+        setNotificationToast(`Saved ${member.name}'s details successfully to database!`);
+        setTimeout(() => setNotificationToast(null), 3500);
+      })
+      .catch((err) => {
+        setSavingMemberId(null);
+        console.error(err);
+      });
   };
 
   const handleAssignService = (memberId: string, serviceId: string, checked: boolean) => {
@@ -442,7 +476,7 @@ export default function AdminGrowthPage() {
   const [terminalHistory, setTerminalHistory] = useState<string[]>([
     "SellGrow Diagnostic Control Terminal [v2.4.0]",
     "Initializing connection to backend gateway...",
-    "Connected to api.sellgrow.co/v2 successfully.",
+    "Connected to api.sellgrow.io/v2 successfully.",
     "Type 'help' to list available developer diagnostics commands.",
     ""
   ]);
@@ -460,14 +494,319 @@ export default function AdminGrowthPage() {
     "SellGrow guarantees a 99.9% uptime for core platform services including API gateways, WhatsApp triggers, and AI agent execution pipelines. SLA credits are calculated monthly. Maintenance operations are scheduled during low-traffic windows (2:00 AM - 4:00 AM IST) and announced 48 hours in advance."
   );
   const [saveToast, setSaveToast] = useState(false);
+  // Super Admin Product Catalog State
+  const [adminCatalogProducts, setAdminCatalogProducts] = useState<ProductItem[]>(PRODUCTS_DATA);
+  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [productSearchQuery, setProductSearchQuery] = useState("");
+  const [productCategoryFilter, setProductCategoryFilter] = useState("All");
 
-  // Sub Admin Sub-Tab state
-  const [subAdminActiveTab, setSubAdminActiveTab] = useState<"sub-admins" | "employees">("sub-admins");
+  const [prodForm, setProdForm] = useState({
+    name: "",
+    category: "BRUSH CUTTER",
+    brand: "GEORGE MAIJO EQUIPMENT",
+    shortDesc: "",
+    fullDesc: "",
+    engine: "2-Stroke Air-Cooled Engine",
+    displacement: "42.7 cc",
+    power: "1.25 kW / 1.7 HP @ 7000 RPM",
+    weight: "7.5 kg",
+    cuttingWidth: "430 mm",
+    fuelCapacity: "1.2 L",
+    highlightsText: "Powerful Engine, High Efficiency, Durable Build",
+    image: "",
+  });
+
+  const handleProductImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProdForm((prev) => ({ ...prev, image: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  useEffect(() => {
+    const fetchDbProducts = async () => {
+      try {
+        const res = await fetch('/api/admin/products');
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.status === 'success' && Array.isArray(json.data) && json.data.length > 0) {
+            const merged = PRODUCTS_DATA.map((defaultItem) => {
+              const savedItem = json.data.find((p: ProductItem) => p.id === defaultItem.id);
+              if (!savedItem) return defaultItem;
+              return {
+                ...defaultItem,
+                ...savedItem,
+                image: savedItem.image || defaultItem.image,
+              };
+            });
+            const customNewProducts = json.data.filter(
+              (p: ProductItem) => !PRODUCTS_DATA.some((d) => d.id === p.id)
+            );
+            setAdminCatalogProducts([...merged, ...customNewProducts]);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("sellgrow_catalog_products");
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              const merged = PRODUCTS_DATA.map((defaultItem) => {
+                const savedItem = parsed.find((p: ProductItem) => p.id === defaultItem.id);
+                if (!savedItem) return defaultItem;
+                return {
+                  ...defaultItem,
+                  ...savedItem,
+                  image: savedItem.image || defaultItem.image,
+                };
+              });
+
+              const customNewProducts = parsed.filter(
+                (p: ProductItem) => !PRODUCTS_DATA.some((d) => d.id === p.id)
+              );
+
+              setAdminCatalogProducts([...merged, ...customNewProducts]);
+              return;
+            }
+          } catch (e) {
+            setAdminCatalogProducts(PRODUCTS_DATA);
+          }
+        } else {
+          localStorage.setItem("sellgrow_catalog_products", JSON.stringify(PRODUCTS_DATA));
+          setAdminCatalogProducts(PRODUCTS_DATA);
+        }
+      }
+    };
+
+    fetchDbProducts();
+  }, []);
+
+  const saveCatalogState = async (newProducts: ProductItem[]) => {
+    setAdminCatalogProducts(newProducts);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("sellgrow_catalog_products", JSON.stringify(newProducts));
+      window.dispatchEvent(new Event("storage"));
+    }
+  };
+
+  const handleOpenAddProduct = () => {
+    setEditingProductId(null);
+    setProdForm({
+      name: "",
+      category: "BRUSH CUTTER",
+      brand: "GEORGE MAIJO EQUIPMENT",
+      shortDesc: "",
+      fullDesc: "",
+      engine: "2-Stroke Air-Cooled Engine",
+      displacement: "42.7 cc",
+      power: "1.25 kW / 1.7 HP @ 7000 RPM",
+      weight: "7.5 kg",
+      cuttingWidth: "430 mm",
+      fuelCapacity: "1.2 L",
+      highlightsText: "Powerful Engine, High Efficiency, Durable Build",
+      image: "",
+    });
+    setIsAddProductModalOpen(true);
+  };
+
+  const handleOpenEditProduct = (prod: ProductItem) => {
+    setEditingProductId(prod.id);
+    setProdForm({
+      name: prod.name,
+      category: prod.category as any,
+      brand: prod.brand,
+      shortDesc: prod.shortDesc,
+      fullDesc: prod.fullDesc,
+      engine: prod.engine,
+      displacement: prod.displacement,
+      power: prod.power,
+      weight: prod.weight,
+      cuttingWidth: prod.cuttingWidth,
+      fuelCapacity: prod.fuelCapacity,
+      highlightsText: (prod.highlights || []).join(", "),
+      image: prod.image || "",
+    });
+    setIsAddProductModalOpen(true);
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    if (confirm("Are you sure you want to remove this product from the live catalog database?")) {
+      const updated = adminCatalogProducts.filter((p) => p.id !== id);
+      saveCatalogState(updated);
+      try {
+        await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
+      } catch (e) {}
+    }
+  };
+
+  const handleRemoveProductImage = async (id: string) => {
+    const updated = adminCatalogProducts.map((p) => {
+      if (p.id === id) {
+        return { ...p, image: "" };
+      }
+      return p;
+    });
+    saveCatalogState(updated);
+    try {
+      await fetch(`/api/admin/products/image?productId=${id}`, { method: 'DELETE' });
+    } catch (e) {}
+  };
+
+  const handleSaveProductForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!prodForm.name.trim()) return;
+
+    const highlightsList = prodForm.highlightsText
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    if (editingProductId) {
+      let updatedItem: ProductItem | null = null;
+      const updated = adminCatalogProducts.map((p) => {
+        if (p.id === editingProductId) {
+          updatedItem = {
+            ...p,
+            name: prodForm.name,
+            category: prodForm.category as any,
+            brand: prodForm.brand || "GEORGE MAIJO EQUIPMENT",
+            shortDesc: prodForm.shortDesc,
+            fullDesc: prodForm.fullDesc,
+            engine: prodForm.engine,
+            displacement: prodForm.displacement,
+            power: prodForm.power,
+            weight: prodForm.weight,
+            cuttingWidth: prodForm.cuttingWidth,
+            fuelCapacity: prodForm.fuelCapacity,
+            image: prodForm.image,
+            highlights: highlightsList.length > 0 ? highlightsList : p.highlights,
+          };
+          return updatedItem;
+        }
+        return p;
+      });
+      saveCatalogState(updated);
+      if (updatedItem) {
+        try {
+          await fetch('/api/admin/products', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedItem),
+          });
+          if (prodForm.image !== undefined) {
+            await fetch('/api/admin/products/image', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ productId: editingProductId, image: prodForm.image }),
+            });
+          }
+        } catch (err) {}
+      }
+    } else {
+      const newProd: ProductItem = {
+        id: `custom-prod-${Date.now()}`,
+        name: prodForm.name,
+        category: prodForm.category as any,
+        brand: prodForm.brand || "GEORGE MAIJO EQUIPMENT",
+        shortDesc: prodForm.shortDesc || "Heavy duty agricultural equipment.",
+        fullDesc: prodForm.fullDesc || "Designed for maximum field efficiency, durability, and operator comfort.",
+        engine: prodForm.engine || "Air-Cooled Engine",
+        displacement: prodForm.displacement || "N/A",
+        power: prodForm.power || "N/A",
+        weight: prodForm.weight || "N/A",
+        cuttingWidth: prodForm.cuttingWidth || "N/A",
+        fuelCapacity: prodForm.fuelCapacity || "N/A",
+        imageBgColor: "#eefbf2",
+        image: prodForm.image || "",
+        highlights: highlightsList.length > 0 ? highlightsList : ["High Performance Engine", "Durable Build Quality"],
+        specs: {
+          "Engine Type": prodForm.engine || "Air-Cooled",
+          "Displacement": prodForm.displacement || "N/A",
+          "Power": prodForm.power || "N/A",
+          "Weight": prodForm.weight || "N/A",
+        },
+        voiceGreeting: {
+          en: `Hello! I am the AI Assistant for ${prodForm.name}. Powered by ${prodForm.engine}. How can I assist?`,
+          ta: `வணக்கம்! ${prodForm.name} AI குரல் உதவியாளர். விவரங்களைக் கேட்கலாம்!`,
+        },
+      };
+      saveCatalogState([newProd, ...adminCatalogProducts]);
+      try {
+        await fetch('/api/admin/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newProd),
+        });
+      } catch (err) {}
+    }
+
+    setIsAddProductModalOpen(false);
+  };
+
+  // Sub Admin & Team Sub-Tab state (Super Admin, Sub Admin, Employees)
+  const [subAdminActiveTab, setSubAdminActiveTab] = useState<"super-admin" | "sub-admins" | "employees">("super-admin");
   const [openScopePopover, setOpenScopePopover] = useState<string | null>(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+  const [inviteModalRole, setInviteModalRole] = useState<"SuperAdmin" | "SubAdmin">("SubAdmin");
+  const [expandedSubAdminId, setExpandedSubAdminId] = useState<string | null>(null);
+  const [expandedEmployeeId, setExpandedEmployeeId] = useState<string | null>(null);
+  const [serviceScopeModalTarget, setServiceScopeModalTarget] = useState<any | null>(null);
+  const [savingMemberId, setSavingMemberId] = useState<string | null>(null);
+
+  // Notification option states for Super Admin, Sub Admin, and Employee
+  const [notificationModalTarget, setNotificationModalTarget] = useState<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    category: "Super Admin" | "Sub Admin" | "Employee";
+  } | null>(null);
+  const [notificationSubject, setNotificationSubject] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationType, setNotificationType] = useState("System Alert");
+  const [notificationChannel, setNotificationChannel] = useState("Email & In-App");
+  const [notificationToast, setNotificationToast] = useState<string | null>(null);
+  const [notifyOnInvite, setNotifyOnInvite] = useState(true);
+  const [userNotificationStatus, setUserNotificationStatus] = useState<Record<string, boolean>>({
+    "tm-1": true,
+    "tm-2": true,
+    "tm-3": true,
+    "tm-4": false,
+    "emp-1": true,
+    "emp-2": true,
+    "emp-3": false,
+    "emp-4": false,
+  });
+
+  const toggleUserNotification = (id: string) => {
+    setUserNotificationStatus(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const handleSendNotification = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!notificationModalTarget) return;
+    setNotificationToast(`Notification alert sent to ${notificationModalTarget.name} (${notificationModalTarget.email})`);
+    setNotificationModalTarget(null);
+    setNotificationSubject("");
+    setNotificationMessage("");
+    setTimeout(() => setNotificationToast(null), 4000);
+  };
 
   // Profile fields state
   const [profileName, setProfileName] = useState("Admin Growth");
-  const [profileEmail, setProfileEmail] = useState("admin@sellgrow.co");
+  const [profileEmail, setProfileEmail] = useState("admin@sellgrow.io");
   const [profilePasscode, setProfilePasscode] = useState("sellgrow123");
   const [profileAuthKey, setProfileAuthKey] = useState("Level-5 Master");
   const [profileAdminLevel, setProfileAdminLevel] = useState("Platform Creator");
@@ -1007,6 +1346,7 @@ export default function AdminGrowthPage() {
   // Sidebar Menu Array
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "products", label: "Product", icon: Package, badge: "Catalog" },
     { id: "services", label: "Services", icon: Cpu, badge: `${services.filter(s => s.status === "Active").length} Live` },
     { id: "sub-admins", label: "Sub Admin", icon: Users, badge: "Team" },
     { id: "control-flags", label: "Control Flags", icon: Sliders, badge: "Live" },
@@ -1386,44 +1726,263 @@ export default function AdminGrowthPage() {
           {/* ======================================= */}
           {activeView === "sub-admins" && (
             <div className="space-y-6">
-              {/* Premium Sub-Tab toggles */}
-              <div className="flex border-b border-slate-150 dark:border-slate-800 pb-3 gap-2">
+              {/* Notification Toast Confirmation */}
+              {notificationToast && (
+                <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-slate-900 text-white text-xs font-bold rounded-2xl shadow-2xl border border-slate-700 animate-pulse">
+                  <BellRing className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>{notificationToast}</span>
+                </div>
+              )}
+
+              {/* Direct Notification Modal for Super Admin, Sub Admin, or Employee */}
+              {notificationModalTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setNotificationModalTarget(null)}>
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                  <div
+                    className="relative w-full max-w-md p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-2xl space-y-5"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={() => setNotificationModalTarget(null)}
+                      className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 rounded-2xl bg-primary/10 text-primary">
+                        <Bell className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-extrabold text-slate-900 dark:text-white font-display flex items-center gap-2">
+                          Send Notification
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-primary/15 text-primary border border-primary/20">
+                            {notificationModalTarget.category}
+                          </span>
+                        </h3>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                          To: <span className="font-bold text-slate-800 dark:text-slate-200">{notificationModalTarget.name}</span> ({notificationModalTarget.email})
+                        </p>
+                      </div>
+                    </div>
+
+                    <form onSubmit={handleSendNotification} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                            Notification Type
+                          </label>
+                          <select
+                            value={notificationType}
+                            onChange={(e) => setNotificationType(e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-primary"
+                          >
+                            <option value="System Alert">System Alert</option>
+                            <option value="Access Update">Access Update</option>
+                            <option value="Security Notice">Security Notice</option>
+                            <option value="Task Notification">Task Notification</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                            Delivery Channel
+                          </label>
+                          <select
+                            value={notificationChannel}
+                            onChange={(e) => setNotificationChannel(e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-primary"
+                          >
+                            <option value="Email & In-App">Email & In-App</option>
+                            <option value="Email Only">Email Only</option>
+                            <option value="In-App Push">In-App Push</option>
+                            <option value="Priority SMS">Priority SMS</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                          Subject
+                        </label>
+                        <input
+                          type="text"
+                          value={notificationSubject}
+                          onChange={(e) => setNotificationSubject(e.target.value)}
+                          placeholder="Enter notification subject..."
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary"
+                          required
+                          autoFocus
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                          Message Body
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={notificationMessage}
+                          onChange={(e) => setNotificationMessage(e.target.value)}
+                          placeholder="Enter message details for this account..."
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary resize-none"
+                          required
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-2.5 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-95 transition-opacity shadow-md shadow-primary/10 flex items-center justify-center gap-2"
+                      >
+                        <BellRing className="w-4 h-4" />
+                        Send Direct Notification
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* Assigned Services Scope Modal */}
+              {serviceScopeModalTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setServiceScopeModalTarget(null)}>
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                  <div
+                    className="relative w-full max-w-md max-h-[85vh] p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-2xl flex flex-col space-y-4 overflow-hidden"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={() => setServiceScopeModalTarget(null)}
+                      className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors z-10"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="p-2.5 rounded-2xl bg-primary/10 text-primary">
+                        <Package className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-extrabold text-slate-900 dark:text-white font-display">
+                          Assign Service Scope
+                        </h3>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                          For: <span className="font-bold text-slate-800 dark:text-slate-200">{serviceScopeModalTarget.name}</span> ({serviceScopeModalTarget.role})
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2.5 overflow-y-auto max-h-[55vh] pr-2 flex-1 touch-pan-y scrollbar-thin">
+                      {services.map((srv: any) => {
+                        const memberInState = teamMembers.find(m => m.id === serviceScopeModalTarget.id) || serviceScopeModalTarget;
+                        const assigned: string[] = (memberInState as any).assignedServices || [];
+                        const isChecked = assigned.includes(srv.id);
+                        return (
+                          <label
+                            key={srv.id}
+                            className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all cursor-pointer ${
+                              isChecked
+                                ? "bg-primary/5 dark:bg-primary/10 border-primary/40 shadow-sm"
+                                : "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={`w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 transition-all ${
+                                isChecked
+                                  ? "bg-primary border-primary text-white"
+                                  : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-950"
+                              }`}>
+                                {isChecked && <Check className="w-3.5 h-3.5" />}
+                              </div>
+                              <input
+                                type="checkbox"
+                                className="sr-only"
+                                checked={isChecked}
+                                onChange={(e) => handleAssignService(serviceScopeModalTarget.id, srv.id, e.target.checked)}
+                              />
+                              <div>
+                                <span className="text-xs font-bold text-slate-900 dark:text-white block">{srv.name}</span>
+                                <span className="text-[10px] text-slate-400 font-mono block">Status: {srv.status || "Active"}</span>
+                              </div>
+                            </div>
+                            {isChecked && (
+                              <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                Active Scope
+                              </span>
+                            )}
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      onClick={() => setServiceScopeModalTarget(null)}
+                      className="w-full py-2.5 bg-primary text-white text-xs font-bold rounded-xl shadow-lg shadow-primary/25 hover:opacity-90 transition-opacity shrink-0"
+                    >
+                      Save Service Scope
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 3 Sub-Tab Options: Super Admin | Sub Admin | Employees */}
+              <div className="flex flex-wrap items-center gap-2 pb-1 border-b border-slate-200/80 dark:border-slate-800/80">
+                <button
+                  onClick={() => setSubAdminActiveTab("super-admin")}
+                  className={`px-3.5 sm:px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                    subAdminActiveTab === "super-admin"
+                      ? "bg-primary text-white shadow-md shadow-primary/20"
+                      : "bg-slate-50 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  Super Admin
+                </button>
                 <button
                   onClick={() => setSubAdminActiveTab("sub-admins")}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                  className={`px-3.5 sm:px-4 py-2 text-xs font-bold rounded-xl transition-all ${
                     subAdminActiveTab === "sub-admins"
-                      ? "bg-primary text-white"
-                      : "bg-slate-50 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800"
+                      ? "bg-primary text-white shadow-md shadow-primary/20"
+                      : "bg-slate-50 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   Sub Admin
                 </button>
                 <button
                   onClick={() => setSubAdminActiveTab("employees")}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                  className={`px-3.5 sm:px-4 py-2 text-xs font-bold rounded-xl transition-all ${
                     subAdminActiveTab === "employees"
-                      ? "bg-primary text-white"
-                      : "bg-slate-50 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800"
+                      ? "bg-primary text-white shadow-md shadow-primary/20"
+                      : "bg-slate-50 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   Employees
                 </button>
               </div>
 
-              {subAdminActiveTab === "sub-admins" ? (
-                <div className="flex flex-col lg:flex-row gap-6">
-                  {/* Invite Sub Admin Form */}
-                  <div className="w-full lg:w-80 shrink-0 p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-xl space-y-6 h-fit">
+              {/* Invite User Modal */}
+              {showInviteModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" onClick={() => setShowInviteModal(false)}>
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                  <div
+                    className="relative w-full max-w-sm p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-2xl space-y-6"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={() => setShowInviteModal(false)}
+                      className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+
                     <div>
                       <h3 className="text-sm font-extrabold text-slate-900 dark:text-white font-display">
-                        Invite Sub Admin
+                        Invite {inviteModalRole === "SuperAdmin" ? "Super Admin" : "Sub Admin"}
                       </h3>
-                      <p className="text-[10px] text-slate-550 dark:text-slate-400">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
                         Grant administrators or operators access to this master console.
                       </p>
                     </div>
 
-                    <form onSubmit={handleInviteTeamMember} className="space-y-4">
+                    <form onSubmit={(e) => { handleInviteTeamMember(e); setShowInviteModal(false); }} className="space-y-4">
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                           Full Name
@@ -1433,13 +1992,14 @@ export default function AdminGrowthPage() {
                           value={newTeamMemberName}
                           onChange={(e) => setNewTeamMemberName(e.target.value)}
                           placeholder="Enter name..."
-                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-450 focus:outline-none focus:border-primary"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary"
                           required
+                          autoFocus
                         />
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-extrabold text-slate-505 dark:text-slate-400 uppercase tracking-wider block">
+                        <label className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                           Email Address
                         </label>
                         <input
@@ -1447,25 +2007,41 @@ export default function AdminGrowthPage() {
                           value={newTeamMemberEmail}
                           onChange={(e) => setNewTeamMemberEmail(e.target.value)}
                           placeholder="Enter email..."
-                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-450 focus:outline-none focus:border-primary"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary"
                           required
                         />
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-extrabold text-slate-505 dark:text-slate-400 uppercase tracking-wider block">
+                        <label className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                           Role Profile
                         </label>
                         <select
                           value={newTeamMemberRole}
                           onChange={(e) => setNewTeamMemberRole(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-primary"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-primary"
                         >
                           <option value="SuperAdmin">Super Admin (Full Access)</option>
                           <option value="Developer">Developer (Read/Write)</option>
                           <option value="Manager">Manager (Read/Write)</option>
                           <option value="Operator">Operator (Read Only)</option>
                         </select>
+                      </div>
+
+                      {/* Notification Preference Option */}
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <Bell className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                            Notification Alerts
+                          </span>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={notifyOnInvite}
+                          onChange={(e) => setNotifyOnInvite(e.target.checked)}
+                          className="w-4 h-4 accent-primary rounded cursor-pointer"
+                        />
                       </div>
 
                       <button
@@ -1477,16 +2053,32 @@ export default function AdminGrowthPage() {
                       </button>
                     </form>
                   </div>
+                </div>
+              )}
 
-                  {/* Sub Admins List Directory */}
+              {/* ========================================= */}
+              {/* OPTION 1: SUPER ADMIN TAB                 */}
+              {/* ========================================= */}
+              {subAdminActiveTab === "super-admin" && (
+                <div className="flex flex-col gap-6">
                   <div className="flex-1 min-w-0 p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-xl space-y-6">
-                    <div>
-                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-white font-display">
-                        Administrative Team Directory
-                      </h3>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                        Manage roles, permissions scopes, and status of all operators.
-                      </p>
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h3 className="text-sm font-extrabold text-slate-900 dark:text-white font-display flex items-center gap-2">
+                          Super Admin Directory
+                          <Crown className="w-4 h-4 text-amber-500" />
+                        </h3>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                          Manage master platform owners, security scopes, and notification alerts.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => { setInviteModalRole("SuperAdmin"); setNewTeamMemberRole("SuperAdmin"); setShowInviteModal(true); }}
+                        className="shrink-0 flex items-center gap-1.5 px-3.5 py-2 bg-primary text-white text-[11px] font-bold rounded-xl hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        Invite Super Admin
+                      </button>
                     </div>
 
                     <div className="overflow-x-auto border border-slate-150 dark:border-slate-800/60 rounded-2xl">
@@ -1496,15 +2088,15 @@ export default function AdminGrowthPage() {
                             <th className="px-5 py-3.5">Name</th>
                             <th className="px-5 py-3.5">Email</th>
                             <th className="px-5 py-3.5">Role</th>
-                            <th className="px-5 py-3.5">Scope</th>
-                            <th className="px-5 py-3.5">Assigned Services</th>
+                            <th className="px-5 py-3.5">Permissions</th>
                             <th className="px-5 py-3.5">Status</th>
+                            <th className="px-5 py-3.5">Notifications</th>
                             <th className="px-5 py-3.5">Portal Link</th>
                             <th className="px-5 py-3.5 text-right">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-150 dark:divide-slate-800/50 text-xs">
-                          {teamMembers.map((member) => (
+                          {teamMembers.filter(m => m.role === "SuperAdmin").map((member) => (
                             <tr key={member.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20 transition-colors">
                               <td className="px-5 py-4 font-bold text-slate-900 dark:text-white">
                                 {member.name}
@@ -1513,152 +2105,60 @@ export default function AdminGrowthPage() {
                                 {member.email}
                               </td>
                               <td className="px-5 py-4">
-                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold ${
-                                  member.role === "SuperAdmin" 
-                                    ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                                    : member.role === "Developer"
-                                    ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
-                                    : "bg-slate-500/10 text-slate-550 border border-slate-500/20"
-                                }`}>
-                                  {member.role}
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center gap-1 w-fit">
+                                  <Crown className="w-2.5 h-2.5" />
+                                  SuperAdmin
                                 </span>
                               </td>
-                              <td className="px-5 py-4">
-                                {member.role === "SuperAdmin" ? (
-                                  <span className="font-bold text-slate-700 dark:text-slate-300 text-[11px]">{member.permissions}</span>
-                                ) : (
-                                  <select
-                                    value={member.permissions}
-                                    onChange={(e) => handleUpdateTeamMember(member.id, "permissions", e.target.value)}
-                                    className="px-2 py-1 rounded-xl bg-slate-55 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-800 dark:text-slate-200 focus:outline-none"
-                                  >
-                                    <option value="Full Access">Full Access</option>
-                                    <option value="Read/Write">Read/Write</option>
-                                    <option value="Read Only">Read Only</option>
-                                  </select>
-                                )}
-                              </td>
-                              {/* ── ASSIGNED SERVICES POPOVER ── */}
-                              <td className="px-5 py-4">
-                                {member.role === "SuperAdmin" ? (
-                                  <span className="text-[10px] text-slate-400 font-mono">All Services</span>
-                                ) : (
-                                  <div className="relative">
-                                    <button
-                                      onClick={() => setOpenScopePopover(openScopePopover === member.id ? null : member.id)}
-                                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-700 dark:text-slate-300 hover:border-primary/50 transition-all min-w-[110px]"
-                                    >
-                                      <Package className="w-3 h-3 text-primary shrink-0" />
-                                      <span className="flex-1 text-left">
-                                        {((member as any).assignedServices || []).length === 0
-                                          ? "None"
-                                          : `${((member as any).assignedServices || []).length} Service${((member as any).assignedServices || []).length > 1 ? "s" : ""}`}
-                                      </span>
-                                      <ChevronDown className={`w-3 h-3 transition-transform ${openScopePopover === member.id ? "rotate-180" : ""}`} />
-                                    </button>
-                                    {openScopePopover === member.id && (
-                                      <div className="absolute left-0 top-full mt-1.5 z-50 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl p-2 space-y-0.5">
-                                        <div className="px-2 py-1.5 text-[9px] font-extrabold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 mb-1">
-                                          Assign Service Scope
-                                        </div>
-                                        {services.map((srv: any) => {
-                                          const assigned: string[] = (member as any).assignedServices || [];
-                                          const isChecked = assigned.includes(srv.id);
-                                          return (
-                                            <label
-                                              key={srv.id}
-                                              className="flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer group transition-colors"
-                                            >
-                                              <div className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-all ${
-                                                isChecked
-                                                  ? "bg-primary border-primary"
-                                                  : "border-slate-300 dark:border-slate-600 group-hover:border-primary/50"
-                                              }`}>
-                                                {isChecked && <Check className="w-2.5 h-2.5 text-white" />}
-                                              </div>
-                                              <input
-                                                type="checkbox"
-                                                className="sr-only"
-                                                checked={isChecked}
-                                                onChange={(e) => handleAssignService(member.id, srv.id, e.target.checked)}
-                                              />
-                                              <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 leading-tight">{srv.name}</span>
-                                              {isChecked && (
-                                                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                              )}
-                                            </label>
-                                          );
-                                        })}
-                                        <div className="pt-1 border-t border-slate-100 dark:border-slate-800 mt-1">
-                                          <button
-                                            onClick={() => setOpenScopePopover(null)}
-                                            className="w-full py-1.5 text-[10px] font-bold text-primary hover:bg-primary/5 rounded-xl transition-colors"
-                                          >
-                                            Done
-                                          </button>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
+                              <td className="px-5 py-4 font-bold text-slate-700 dark:text-slate-300 text-[11px]">
+                                {member.permissions}
                               </td>
                               <td className="px-5 py-4">
-                                <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold ${
-                                  member.status === "Active" ? "text-emerald-500" : "text-amber-500"
-                                }`}>
-                                  <span className={`w-1.5 h-1.5 rounded-full ${
-                                    member.status === "Active" ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
-                                  }`} />
+                                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-500">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                   {member.status}
                                 </span>
                               </td>
+                              {/* NOTIFICATION OPTION COLUMN FOR SUPER ADMIN */}
                               <td className="px-5 py-4">
-                                {member.role === "SuperAdmin" ? (
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="font-mono text-[10px] text-slate-500 select-all">/sg-superadmin</span>
-                                    <button 
-                                      onClick={() => {
-                                        const url = `${window.location.origin}/sg-superadmin`;
-                                        navigator.clipboard.writeText(url);
-                                      }}
-                                      className="text-slate-400 hover:text-primary"
-                                      title="Copy link"
-                                    >
-                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                                    </button>
-                                    <a href="/sg-superadmin" target="_blank" className="text-slate-400 hover:text-primary" title="Open Portal">
-                                      <ExternalLink className="w-3 h-3" />
-                                    </a>
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="font-mono text-[10px] text-slate-550 select-all">/sg-admin/{member.role.toLowerCase()}</span>
-                                    <button 
-                                      onClick={() => {
-                                        const url = `${window.location.origin}/sg-admin/${member.role.toLowerCase()}`;
-                                        navigator.clipboard.writeText(url);
-                                      }}
-                                      className="text-slate-400 hover:text-primary"
-                                      title="Copy link"
-                                    >
-                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                                    </button>
-                                    <a href={`/sg-admin/${member.role.toLowerCase()}`} target="_blank" className="text-slate-400 hover:text-primary" title="Open Portal">
-                                      <ExternalLink className="w-3 h-3" />
-                                    </a>
-                                  </div>
-                                )}
+                                <button
+                                  onClick={() => toggleUserNotification(member.id)}
+                                  className={`px-2.5 py-1 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-1.5 ${
+                                    userNotificationStatus[member.id] !== false
+                                      ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                                      : "bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700"
+                                  }`}
+                                >
+                                  <Bell className="w-3 h-3" />
+                                  {userNotificationStatus[member.id] !== false ? "Enabled" : "Muted"}
+                                </button>
+                              </td>
+                              <td className="px-5 py-4">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-mono text-[10px] text-slate-500 select-all">/sg-superadmin</span>
+                                  <button
+                                    onClick={() => {
+                                      const url = `${window.location.origin}/sg-superadmin`;
+                                      navigator.clipboard.writeText(url);
+                                    }}
+                                    className="text-slate-400 hover:text-primary"
+                                    title="Copy link"
+                                  >
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                  </button>
+                                  <a href="/sg-superadmin" target="_blank" className="text-slate-400 hover:text-primary" title="Open Portal">
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                </div>
                               </td>
                               <td className="px-5 py-4 text-right">
-                                {member.role !== "SuperAdmin" && (
-                                  <button
-                                    onClick={() => handleRemoveTeamMember(member.id)}
-                                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"
-                                    title="Revoke access"
-                                  >
-                                    <Trash className="w-4 h-4" />
-                                  </button>
-                                )}
+                                <button
+                                  onClick={() => setNotificationModalTarget({ id: member.id, name: member.name, email: member.email, role: member.role, category: "Super Admin" })}
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors"
+                                  title="Send direct notification to Super Admin"
+                                >
+                                  <BellRing className="w-4 h-4" />
+                                </button>
                               </td>
                             </tr>
                           ))}
@@ -1667,20 +2167,146 @@ export default function AdminGrowthPage() {
                     </div>
                   </div>
                 </div>
-              ) : (
-                <div className="flex flex-col lg:flex-row gap-6">
-                  {/* Add New Employee Form */}
-                  <div className="w-full lg:w-80 shrink-0 p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-xl space-y-6 h-fit">
+              )}
+
+              {/* ========================================= */}
+              {/* OPTION 2: SUB ADMIN TAB                   */}
+              {/* ========================================= */}
+              {subAdminActiveTab === "sub-admins" && (
+                <div className="flex flex-col gap-6">
+                  {/* Sub Admins List Directory */}
+                  <div className="flex-1 min-w-0 p-4 sm:p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-xl space-y-5 sm:space-y-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                      <div>
+                        <h3 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white font-display">
+                          Administrative Team Directory
+                        </h3>
+                        <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
+                          Click any Sub Admin card to view or manage permissions, roles, and notification details.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => { setInviteModalRole("SubAdmin"); setNewTeamMemberRole("Operator"); setShowInviteModal(true); }}
+                        className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 bg-primary text-white text-[11px] font-bold rounded-xl hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        Invite Sub Admin
+                      </button>
+                    </div>
+
+                    {/* Grid of Sub Admin Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3.5 sm:gap-4">
+                      {teamMembers.filter(m => m.role !== "SuperAdmin").map((member, idx) => {
+                        const sgId = (member as any).sgId || `SG-A-${101 + idx}`;
+                        const firstLetter = member.name ? member.name.trim().charAt(0).toUpperCase() : "A";
+
+                        return (
+                          <div
+                            key={member.id}
+                            className="rounded-2xl border transition-all duration-300 bg-white dark:bg-[#0a0f1d] p-4 sm:p-5 flex flex-col justify-between space-y-4 border-slate-200 dark:border-slate-800/80 shadow-md hover:shadow-xl hover:-translate-y-1"
+                          >
+                            {/* TOP: Sub Admin ID & Role Badge */}
+                            <div className="flex items-center justify-between gap-2 shrink-0">
+                              <span className="px-2.5 py-1 rounded-md bg-primary/10 text-primary font-mono text-[11px] font-extrabold border border-primary/20">
+                                {sgId}
+                              </span>
+                              <span className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold ${
+                                member.role === "Developer"
+                                  ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
+                                  : member.role === "Manager"
+                                  ? "bg-purple-500/10 text-purple-500 border border-purple-500/20"
+                                  : member.role === "Support"
+                                  ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                                  : "bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20"
+                              }`}>
+                                {member.role}
+                              </span>
+                            </div>
+
+                            {/* MIDDLE: First Letter Avatar & Sub Admin Name */}
+                            <div className="flex flex-col items-center justify-center py-2 space-y-2 text-center">
+                              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-primary to-indigo-600 text-white font-extrabold text-xl sm:text-2xl flex items-center justify-center shadow-lg shadow-primary/20 ring-4 ring-primary/10 shrink-0">
+                                {firstLetter}
+                              </div>
+                              <div className="w-full min-w-0">
+                                <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white font-display truncate w-full">
+                                  {member.name}
+                                </h4>
+                                <p className="text-[10px] text-slate-400 font-mono truncate w-full mt-0.5">
+                                  {member.email}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* BELOW: Access Scope & Action Buttons */}
+                            <div className="pt-3 border-t border-slate-150 dark:border-slate-800/80 flex flex-col space-y-2.5 shrink-0">
+                              <div className="flex items-center justify-between gap-1 text-[10px]">
+                                <span className="font-extrabold text-slate-400 uppercase tracking-wider">Access Scope:</span>
+                                <span className="px-2 py-0.5 rounded-md font-extrabold bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                                  {member.permissions}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedSubAdminModal(member)}
+                                  className="flex-1 py-1.5 rounded-md text-xs font-bold transition-all text-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary hover:text-white shadow-sm"
+                                >
+                                  View Options
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (confirm(`Are you sure you want to delete ${member.name} and remove all full details from the database?`)) {
+                                      handleRemoveTeamMember(member.id);
+                                    }
+                                  }}
+                                  className="p-1.5 rounded-md bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 transition-all shrink-0"
+                                  title={`Delete ${member.name}`}
+                                >
+                                  <Trash className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ========================================= */}
+              {/* OPTION 3: EMPLOYEES TAB                   */}
+              {/* ========================================= */}
+              {/* Add New Employee Modal */}
+              {showEmployeeModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowEmployeeModal(false)}>
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                  <div
+                    className="relative w-full max-w-sm p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-2xl space-y-6"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={() => setShowEmployeeModal(false)}
+                      className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+
                     <div>
                       <h3 className="text-sm font-extrabold text-slate-900 dark:text-white font-display">
                         Add New Employee
                       </h3>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
                         Register a new employee and assign them to an operational sub-admin.
                       </p>
                     </div>
 
-                    <form onSubmit={handleCreateEmployee} className="space-y-4">
+                    <form onSubmit={(e) => { handleCreateEmployee(e); setShowEmployeeModal(false); }} className="space-y-4">
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                           Full Name
@@ -1690,8 +2316,9 @@ export default function AdminGrowthPage() {
                           value={newEmpName}
                           onChange={(e) => setNewEmpName(e.target.value)}
                           placeholder="Enter employee name..."
-                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-450 focus:outline-none focus:border-primary"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary"
                           required
+                          autoFocus
                         />
                       </div>
 
@@ -1704,7 +2331,7 @@ export default function AdminGrowthPage() {
                           value={newEmpEmail}
                           onChange={(e) => setNewEmpEmail(e.target.value)}
                           placeholder="Enter employee email..."
-                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-450 focus:outline-none focus:border-primary"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary"
                           required
                         />
                       </div>
@@ -1716,7 +2343,7 @@ export default function AdminGrowthPage() {
                         <select
                           value={newEmpWork}
                           onChange={(e) => setNewEmpWork(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-805 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-primary"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-primary"
                         >
                           <option value="Voice AI Integration">Voice AI Integration</option>
                           <option value="CRM Automation">CRM Automation</option>
@@ -1727,28 +2354,29 @@ export default function AdminGrowthPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-extrabold text-slate-550 dark:text-slate-400 uppercase tracking-wider block">
+                        <label className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                           Access Scope
                         </label>
                         <select
                           value={newEmpAccess}
                           onChange={(e) => setNewEmpAccess(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-805 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-primary"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-primary"
                         >
-                          <option value="Full Access">Full Access</option>
+                          <option value="Read">Read</option>
+                          <option value="Write">Write</option>
                           <option value="Read & Write">Read & Write</option>
                           <option value="View Only">View Only</option>
                         </select>
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-extrabold text-slate-550 dark:text-slate-400 uppercase tracking-wider block">
+                        <label className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                           Assign Sub Admin
                         </label>
                         <select
                           value={newEmpSubAdmin}
                           onChange={(e) => setNewEmpSubAdmin(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-805 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-primary"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-primary"
                         >
                           <option value="Unassigned">Unassigned</option>
                           {teamMembers.filter(tm => tm.role !== "SuperAdmin").map((tm) => (
@@ -1759,143 +2387,130 @@ export default function AdminGrowthPage() {
                         </select>
                       </div>
 
+                      {/* Notification Preference Option */}
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <Bell className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                            Notification Alerts
+                          </span>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={notifyOnInvite}
+                          onChange={(e) => setNotifyOnInvite(e.target.checked)}
+                          className="w-4 h-4 accent-primary rounded cursor-pointer"
+                        />
+                      </div>
+
                       <button
                         type="submit"
                         className="w-full py-2.5 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-95 transition-opacity shadow-md shadow-primary/10 flex items-center justify-center gap-1.5"
                       >
                         <Plus className="w-4 h-4" />
-                        Add Employee
+                        Add New Employee
                       </button>
                     </form>
                   </div>
+                </div>
+              )}
 
+              {/* ========================================= */}
+              {/* OPTION 3: EMPLOYEES TAB                   */}
+              {/* ========================================= */}
+              {subAdminActiveTab === "employees" && (
+                <div className="flex flex-col gap-6">
                   {/* Employees Directory List */}
-                  <div className="flex-1 min-w-0 p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-xl space-y-6">
-                    <div>
-                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-white font-display">
-                        Employee Directory
-                      </h3>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                        Manage tasks, permissions access, status and assignments of all employees.
-                      </p>
+                  <div className="flex-1 min-w-0 p-4 sm:p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-xl space-y-5 sm:space-y-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                      <div>
+                        <h3 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white font-display">
+                          Employee Directory
+                        </h3>
+                        <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
+                          Manage tasks, permissions access, status, notification options and assignments of all employees.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setShowEmployeeModal(true)}
+                        className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 bg-primary text-white text-[11px] font-bold rounded-xl hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        Add New Employee
+                      </button>
                     </div>
 
-                    <div className="overflow-x-auto border border-slate-150 dark:border-slate-800/60 rounded-2xl">
-                      <table className="w-full text-left border-collapse">
-                        <thead>
-                          <tr className="bg-slate-50 dark:bg-slate-900/40 text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-150 dark:border-slate-800/60">
-                            <th className="px-5 py-3.5">Name</th>
-                            <th className="px-5 py-3.5">Email</th>
-                            <th className="px-5 py-3.5">Work / Project</th>
-                            <th className="px-5 py-3.5">Access Scope</th>
-                            <th className="px-5 py-3.5">Status</th>
-                            <th className="px-5 py-3.5">Assigned Sub Admin</th>
-                            <th className="px-5 py-3.5">Portal Link</th>
-                            <th className="px-5 py-3.5 text-right">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-150 dark:divide-slate-800/50 text-xs">
-                          {employees.map((emp) => (
-                            <tr key={emp.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20 transition-colors">
-                              <td className="px-5 py-4 font-bold text-slate-900 dark:text-white">
-                                {emp.name}
-                              </td>
-                              <td className="px-5 py-4 text-slate-500 dark:text-slate-400 font-mono text-[11px]">
-                                {emp.email}
-                              </td>
-                              <td className="px-5 py-4">
-                                <select
-                                  value={emp.work}
-                                  onChange={(e) => handleUpdateEmployee(emp.id, "work", e.target.value)}
-                                  className="px-2 py-1 rounded-xl bg-slate-55 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-800 dark:text-slate-200 focus:outline-none"
-                                >
-                                  <option value="Voice AI Integration">Voice AI Integration</option>
-                                  <option value="CRM Automation">CRM Automation</option>
-                                  <option value="Landing Page Editor">Landing Page Editor</option>
-                                  <option value="Customer Support">Customer Support</option>
-                                  <option value="Broadcasting Engine">Broadcasting Engine</option>
-                                </select>
-                              </td>
-                              <td className="px-5 py-4">
-                                <select
-                                  value={emp.access}
-                                  onChange={(e) => handleUpdateEmployee(emp.id, "access", e.target.value)}
-                                  className="px-2 py-1 rounded-xl bg-slate-55 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-800 dark:text-slate-200 focus:outline-none"
-                                >
-                                  <option value="Full Access">Full Access</option>
-                                  <option value="Read & Write">Read & Write</option>
-                                  <option value="View Only">View Only</option>
-                                </select>
-                              </td>
-                              <td className="px-5 py-4">
-                                <select
-                                  value={emp.status}
-                                  onChange={(e) => handleUpdateEmployee(emp.id, "status", e.target.value)}
-                                  className={`px-2 py-1 rounded-xl bg-slate-55 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[10px] font-bold focus:outline-none ${
-                                    emp.status === "Active" ? "text-emerald-500" : "text-amber-500"
-                                  }`}
-                                >
-                                  <option value="Active">Active</option>
-                                  <option value="Suspended">Suspended</option>
-                                </select>
-                              </td>
-                              <td className="px-5 py-4">
-                                <select
-                                  value={emp.assignedSubAdmin}
-                                  onChange={(e) => handleUpdateEmployee(emp.id, "assignedSubAdmin", e.target.value)}
-                                  className="px-2.5 py-1 rounded-xl bg-slate-55 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-850 dark:text-slate-200 focus:outline-none"
-                                >
-                                  <option value="Unassigned">Unassigned</option>
-                                  {teamMembers.filter(tm => tm.role !== "SuperAdmin").map((tm) => (
-                                    <option key={tm.id} value={tm.name}>
-                                      {tm.name} ({tm.role})
-                                    </option>
-                                  ))}
-                                </select>
-                              </td>
-                              <td className="px-5 py-4">
-                                {emp.assignedSubAdmin === "Unassigned" ? (
-                                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-600">Unassigned</span>
-                                ) : (
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="font-mono text-[10px] text-slate-500 select-all">
-                                      /sg-admin/{(teamMembers.find(tm => tm.name === emp.assignedSubAdmin)?.role || "operator").toLowerCase()}
-                                    </span>
-                                    <button 
-                                      onClick={() => {
-                                        const role = (teamMembers.find(tm => tm.name === emp.assignedSubAdmin)?.role || "operator").toLowerCase();
-                                        const url = `${window.location.origin}/sg-admin/${role}`;
-                                        navigator.clipboard.writeText(url);
-                                      }}
-                                      className="text-slate-400 hover:text-primary"
-                                      title="Copy link"
-                                    >
-                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                                    </button>
-                                    <a 
-                                      href={`/sg-admin/${(teamMembers.find(tm => tm.name === emp.assignedSubAdmin)?.role || "operator").toLowerCase()}`} 
-                                      target="_blank" 
-                                      className="text-slate-400 hover:text-primary" 
-                                      title="Open Portal"
-                                    >
-                                      <ExternalLink className="w-3 h-3" />
-                                    </a>
-                                  </div>
-                                )}
-                              </td>
-                              <td className="px-5 py-4 text-right">
+                    {/* Grid of Employee Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3.5 sm:gap-4">
+                      {employees.map((emp, idx) => {
+                        const firstLetter = emp.name ? emp.name.trim().charAt(0).toUpperCase() : "E";
+
+                        return (
+                          <div
+                            key={emp.id}
+                            className="rounded-2xl border transition-all duration-300 bg-white dark:bg-[#0a0f1d] p-4 sm:p-5 flex flex-col justify-between space-y-4 border-slate-200 dark:border-slate-800/80 shadow-md hover:shadow-xl hover:-translate-y-1"
+                          >
+                            {/* TOP: Work Badge & Assigned Sub Admin */}
+                            <div className="flex items-center justify-between gap-2 shrink-0">
+                              <span className="px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-500 font-extrabold text-[10px] border border-indigo-500/20 truncate max-w-[110px]" title={emp.work}>
+                                {emp.work}
+                              </span>
+                              <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-extrabold text-[9px] border border-slate-200 dark:border-slate-700 truncate max-w-[90px]" title={emp.assignedSubAdmin}>
+                                {emp.assignedSubAdmin}
+                              </span>
+                            </div>
+
+                            {/* MIDDLE: First Letter Avatar & Employee Name */}
+                            <div className="flex flex-col items-center justify-center py-2 space-y-2 text-center">
+                              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-extrabold text-xl sm:text-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20 ring-4 ring-indigo-500/10 shrink-0">
+                                {firstLetter}
+                              </div>
+                              <div className="w-full min-w-0">
+                                <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white font-display truncate w-full">
+                                  {emp.name}
+                                </h4>
+                                <p className="text-[10px] text-slate-400 font-mono truncate w-full mt-0.5">
+                                  {emp.email}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* BELOW: Access Scope & Action Buttons */}
+                            <div className="pt-3 border-t border-slate-150 dark:border-slate-800/80 flex flex-col space-y-2.5 shrink-0">
+                              <div className="flex items-center justify-between gap-1 text-[10px]">
+                                <span className="font-extrabold text-slate-400 uppercase tracking-wider">Access Scope:</span>
+                                <span className="px-2 py-0.5 rounded-md font-extrabold bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                                  {emp.access}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2">
                                 <button
-                                  onClick={() => handleDeleteEmployee(emp.id)}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"
-                                  title="Remove employee"
+                                  type="button"
+                                  onClick={() => setSelectedEmployeeModal(emp)}
+                                  className="flex-1 py-1.5 rounded-md text-xs font-bold transition-all text-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white shadow-sm"
                                 >
-                                  <Trash className="w-4 h-4" />
+                                  View Options
                                 </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (confirm(`Are you sure you want to delete ${emp.name} and remove all full details from the database?`)) {
+                                      handleDeleteEmployee(emp.id);
+                                    }
+                                  }}
+                                  className="p-1.5 rounded-md bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 transition-all shrink-0"
+                                  title={`Delete ${emp.name}`}
+                                >
+                                  <Trash className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -2200,6 +2815,405 @@ export default function AdminGrowthPage() {
                   </table>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ======================================= */}
+          {/* TAB: PRODUCTS MANAGEMENT                */}
+          {activeView === "products" && (
+            <div className="space-y-6">
+              
+              {/* Top Banner Header */}
+              <div className="p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-xl flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                      Super Admin Catalog Controller
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-extrabold text-slate-900 dark:text-white font-display">
+                    Product Catalog & Live Management
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Add new products, update specifications, manage catalog items, and view live changes synced instantly to the main customer page (<code className="text-primary font-mono">/products</code>).
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleOpenAddProduct}
+                    className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all active:scale-95"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add New Product
+                  </button>
+                  <a
+                    href="/products"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Preview Live /products
+                  </a>
+                </div>
+              </div>
+
+              {/* Metrics Summary Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-sm space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-slate-400">Total Models Live</span>
+                  <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{adminCatalogProducts.length} Equipment Models</p>
+                </div>
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-sm space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-emerald-500">Categories</span>
+                  <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{new Set(adminCatalogProducts.map(p => p.category)).size} Active Groups</p>
+                </div>
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-sm space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-sky-500">AI Voice Assistant</span>
+                  <p className="text-2xl font-extrabold text-slate-900 dark:text-white">Active (EN & TA)</p>
+                </div>
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-sm space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-purple-500">3D Hologram Stage</span>
+                  <p className="text-2xl font-extrabold text-slate-900 dark:text-white">360° Rotatable</p>
+                </div>
+              </div>
+
+              {/* Product Catalog Grid Card */}
+              <div className="p-6 rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800/80 shadow-xl space-y-6">
+                
+                {/* Header + Filter + Search + Add Button */}
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                  <div>
+                    <h4 className="text-sm font-extrabold uppercase tracking-wider text-slate-900 dark:text-white font-display">
+                      All Catalog Equipment Models ({adminCatalogProducts.length})
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      Manage live models, specs, and custom equipment images.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    {/* Category Filter Dropdown */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-500 shrink-0">Category:</span>
+                      <select
+                        value={productCategoryFilter}
+                        onChange={(e) => setProductCategoryFilter(e.target.value)}
+                        className="px-3 py-2 bg-slate-100 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-bold focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="All">All Categories ({adminCatalogProducts.length})</option>
+                        {CATEGORIES.filter((c) => c !== "All").map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Search Input */}
+                    <div className="relative w-full sm:w-56">
+                      <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+                      <input
+                        type="text"
+                        value={productSearchQuery}
+                        onChange={(e) => setProductSearchQuery(e.target.value)}
+                        placeholder="Search models..."
+                        className="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+
+                    {/* Add New Model Button */}
+                    <button
+                      onClick={handleOpenAddProduct}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5 shrink-0"
+                    >
+                      <Plus className="w-4 h-4" /> Add New Model
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {adminCatalogProducts
+                    .filter(p => {
+                      const matchCat = productCategoryFilter === "All" || p.category === productCategoryFilter;
+                      const matchQ = p.name.toLowerCase().includes(productSearchQuery.toLowerCase()) || p.category.toLowerCase().includes(productSearchQuery.toLowerCase());
+                      return matchCat && matchQ;
+                    })
+                    .map((p) => (
+                      <div
+                        key={p.id}
+                        className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 flex flex-col justify-between space-y-4 hover:border-emerald-500/50 transition-all shadow-sm"
+                      >
+                        <div className="space-y-2">
+                          {p.image ? (
+                            <div className="relative w-full h-36 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 mb-2 group/img flex items-center justify-center p-2">
+                              <img src={p.image} alt={p.name} className="max-h-full max-w-full object-contain" />
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveProductImage(p.id)}
+                                title="Remove Custom Image"
+                                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-md transition-transform active:scale-95 z-10"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="relative w-full h-36 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 mb-2 flex items-center justify-center p-2">
+                              <img
+                                src={PRODUCTS_DATA.find((d) => d.id === p.id)?.image || "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png"}
+                                alt={p.name}
+                                className="max-h-full max-w-full object-contain"
+                              />
+                            </div>
+                          )}
+
+                          <div className="flex items-center justify-between">
+                            <span className="px-2.5 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              {p.category}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-semibold">{p.brand}</span>
+                          </div>
+
+                          <h5 className="text-base font-extrabold text-slate-900 dark:text-white">{p.name}</h5>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{p.shortDesc}</p>
+
+                          <div className="p-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] space-y-1">
+                            <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                              <span className="font-bold">Engine:</span>
+                              <span className="truncate max-w-[150px]">{p.engine}</span>
+                            </div>
+                            <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                              <span className="font-bold">Power Output:</span>
+                              <span>{p.power}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                          <button
+                            onClick={() => handleOpenEditProduct(p)}
+                            className="flex-1 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-emerald-600 hover:text-white text-slate-800 dark:text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                          >
+                            <Edit className="w-3.5 h-3.5" /> Edit Model
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(p.id)}
+                            className="px-3 py-2 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 rounded-xl text-xs font-bold transition-all"
+                            title="Delete Product"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* ADD / EDIT PRODUCT MODAL FORM */}
+              {isAddProductModalOpen && (
+                <div className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 bg-slate-950/80 backdrop-blur-sm flex items-start sm:items-center justify-center min-h-screen py-8">
+                  <div className="relative w-full max-w-2xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto my-auto">
+                    
+                    <div className="sticky top-0 z-20 bg-white/95 dark:bg-[#0a0f1d]/95 backdrop-blur-md pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                      <div>
+                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                          {editingProductId ? "Edit Catalog Product" : "Add New Catalog Product"}
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          This product will instantly display live on the main customer-facing <code className="text-emerald-500 font-mono">/products</code> page.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setIsAddProductModalOpen(false)}
+                        className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleSaveProductForm} className="space-y-4 text-xs">
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Product Name *</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. George Maijo BC 520 2SP"
+                            value={prodForm.name}
+                            onChange={(e) => setProdForm({ ...prodForm, name: e.target.value })}
+                            className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Category *</label>
+                          <select
+                            value={prodForm.category}
+                            onChange={(e) => setProdForm({ ...prodForm, category: e.target.value as any })}
+                            className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold focus:outline-none focus:border-emerald-500"
+                          >
+                            <option value="BRUSH CUTTER">BRUSH CUTTER</option>
+                            <option value="COMBINE HARVESTER">COMBINE HARVESTER</option>
+                            <option value="POWER TILLER">POWER TILLER</option>
+                            <option value="POWER WEEDER">POWER WEEDER</option>
+                            <option value="REAPER">REAPER</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                          <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Brand Name</label>
+                          <input
+                            type="text"
+                            value={prodForm.brand}
+                            onChange={(e) => setProdForm({ ...prodForm, brand: e.target.value })}
+                            className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Engine Specs</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 42.7cc 2-Stroke"
+                            value={prodForm.engine}
+                            onChange={(e) => setProdForm({ ...prodForm, engine: e.target.value })}
+                            className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Power Output</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 1.25 kW @ 7000 RPM"
+                            value={prodForm.power}
+                            onChange={(e) => setProdForm({ ...prodForm, power: e.target.value })}
+                            className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                          <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Displacement</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 42.7 cc"
+                            value={prodForm.displacement}
+                            onChange={(e) => setProdForm({ ...prodForm, displacement: e.target.value })}
+                            className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Weight</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 7.5 kg"
+                            value={prodForm.weight}
+                            onChange={(e) => setProdForm({ ...prodForm, weight: e.target.value })}
+                            className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Cutting / Tilling Width</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 430 mm"
+                            value={prodForm.cuttingWidth}
+                            onChange={(e) => setProdForm({ ...prodForm, cuttingWidth: e.target.value })}
+                            className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Local Image Upload Option */}
+                      <div className="p-3 bg-slate-50 dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
+                        <label className="font-bold text-slate-700 dark:text-slate-300 block">
+                          Product Image (Upload from Local Storage)
+                        </label>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleProductImageUpload}
+                            className="text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer"
+                          />
+                          {prodForm.image && (
+                            <button
+                              type="button"
+                              onClick={() => setProdForm({ ...prodForm, image: "" })}
+                              className="text-xs text-red-500 font-bold hover:underline"
+                            >
+                              Remove Image
+                            </button>
+                          )}
+                        </div>
+                        {prodForm.image && (
+                          <div className="mt-2 w-24 h-24 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                            <img src={prodForm.image} alt="Preview" className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Short Summary Description</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="Brief 1-line overview of the product..."
+                          value={prodForm.shortDesc}
+                          onChange={(e) => setProdForm({ ...prodForm, shortDesc: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Full Detailed Description</label>
+                        <textarea
+                          rows={3}
+                          placeholder="Comprehensive features, application fields, and performance overview..."
+                          value={prodForm.fullDesc}
+                          onChange={(e) => setProdForm({ ...prodForm, fullDesc: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Key Highlights (Comma Separated)</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Powerful Engine, 430mm Cutting Width, Low Vibration, Lightweight"
+                          value={prodForm.highlightsText}
+                          onChange={(e) => setProdForm({ ...prodForm, highlightsText: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+
+                      <div className="sticky bottom-0 z-20 bg-white/95 dark:bg-[#0a0f1d]/95 backdrop-blur-md pt-3 pb-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setIsAddProductModalOpen(false)}
+                          className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs hover:bg-slate-200 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20 active:scale-95 transition-all"
+                        >
+                          Save & Publish to Live /products
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
             </div>
           )}
 
@@ -2918,6 +3932,310 @@ export default function AdminGrowthPage() {
               Done & Close
             </button>
           </motion.div>
+        </div>
+      )}
+
+      {/* SUB ADMIN DETAILS & OPTIONS MODAL POPUP */}
+      {selectedSubAdminModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-2xl w-full p-6 space-y-6 relative my-8">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-3">
+                <span className="px-3 py-1 rounded-md bg-primary/10 text-primary font-mono text-xs font-extrabold border border-primary/20">
+                  {selectedSubAdminModal.sgId || `SG-A-101`}
+                </span>
+                <div>
+                  <h3 className="text-lg font-extrabold text-slate-900 dark:text-white font-display">
+                    {selectedSubAdminModal.name} Details
+                  </h3>
+                  <p className="text-xs text-slate-400 font-mono">
+                    {selectedSubAdminModal.email}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedSubAdminModal(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Editable Fields Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Sub Admin ID */}
+              <div className="space-y-1 bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                  Sub Admin ID No
+                </span>
+                <input
+                  type="text"
+                  value={selectedSubAdminModal.sgId || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedSubAdminModal({ ...selectedSubAdminModal, sgId: val });
+                    handleUpdateTeamMember(selectedSubAdminModal.id, "sgId", val);
+                  }}
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono font-extrabold text-primary focus:outline-none focus:border-primary"
+                  placeholder="SG-A-101..."
+                />
+              </div>
+
+              {/* Sub Admin Name */}
+              <div className="space-y-1 bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                  Sub Admin Name
+                </span>
+                <input
+                  type="text"
+                  value={selectedSubAdminModal.name || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedSubAdminModal({ ...selectedSubAdminModal, name: val });
+                    handleUpdateTeamMember(selectedSubAdminModal.id, "name", val);
+                  }}
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-primary"
+                  placeholder="Edit Name..."
+                />
+              </div>
+
+              {/* Email Address */}
+              <div className="space-y-1 bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                  Email Address
+                </span>
+                <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200 block truncate pt-1">
+                  {selectedSubAdminModal.email}
+                </span>
+              </div>
+
+              {/* Role Profile */}
+              <div className="space-y-1 bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                  Role Profile
+                </span>
+                <select
+                  value={selectedSubAdminModal.role}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedSubAdminModal({ ...selectedSubAdminModal, role: val });
+                    handleUpdateTeamMember(selectedSubAdminModal.id, "role", val);
+                  }}
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-primary cursor-pointer"
+                >
+                  <option value="Operator">Operator</option>
+                  <option value="Developer">Developer</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Support">Support</option>
+                </select>
+              </div>
+
+              {/* Access Scope */}
+              <div className="space-y-1 bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 col-span-1 sm:col-span-2">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                  Access Scope
+                </span>
+                <select
+                  value={selectedSubAdminModal.permissions}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedSubAdminModal({ ...selectedSubAdminModal, permissions: val });
+                    handleUpdateTeamMember(selectedSubAdminModal.id, "permissions", val);
+                  }}
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-primary cursor-pointer"
+                >
+                  <option value="Full Access">Full Access</option>
+                  <option value="Read/Write">Read/Write</option>
+                  <option value="Read Only">Read Only</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Footer Controls */}
+            <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800 gap-3 flex-wrap">
+              <button
+                onClick={() => {
+                  handleSaveSubAdminDetails(selectedSubAdminModal);
+                  setSelectedSubAdminModal(null);
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2"
+              >
+                <Check className="w-4 h-4" />
+                <span>Save Changes to Database</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  if (confirm(`Are you sure you want to delete ${selectedSubAdminModal.name}?`)) {
+                    handleRemoveTeamMember(selectedSubAdminModal.id);
+                    setSelectedSubAdminModal(null);
+                  }
+                }}
+                className="px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 text-xs font-bold transition-all flex items-center gap-1.5"
+              >
+                <Trash className="w-4 h-4" />
+                <span>Delete Sub Admin</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EMPLOYEE DETAILS & OPTIONS MODAL POPUP */}
+      {selectedEmployeeModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-2xl w-full p-6 space-y-6 relative my-8">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-3">
+                <span className="px-3 py-1 rounded-md bg-indigo-500/10 text-indigo-500 font-extrabold text-xs border border-indigo-500/20">
+                  {selectedEmployeeModal.work}
+                </span>
+                <div>
+                  <h3 className="text-lg font-extrabold text-slate-900 dark:text-white font-display">
+                    {selectedEmployeeModal.name} Details
+                  </h3>
+                  <p className="text-xs text-slate-400 font-mono">
+                    {selectedEmployeeModal.email}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedEmployeeModal(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Editable Fields Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Employee Full Name */}
+              <div className="space-y-1 bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                  Employee Full Name
+                </span>
+                <input
+                  type="text"
+                  value={selectedEmployeeModal.name || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedEmployeeModal({ ...selectedEmployeeModal, name: val });
+                    handleUpdateEmployee(selectedEmployeeModal.id, "name", val);
+                  }}
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-primary"
+                  placeholder="Edit Name..."
+                />
+              </div>
+
+              {/* Email Address */}
+              <div className="space-y-1 bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                  Email Address
+                </span>
+                <input
+                  type="text"
+                  value={selectedEmployeeModal.email || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedEmployeeModal({ ...selectedEmployeeModal, email: val });
+                    handleUpdateEmployee(selectedEmployeeModal.id, "email", val);
+                  }}
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-primary"
+                  placeholder="Edit Email..."
+                />
+              </div>
+
+              {/* Assigned Sub Admin */}
+              <div className="space-y-1 bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                  Assigned Sub Admin
+                </span>
+                <select
+                  value={selectedEmployeeModal.assignedSubAdmin}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedEmployeeModal({ ...selectedEmployeeModal, assignedSubAdmin: val });
+                    handleUpdateEmployee(selectedEmployeeModal.id, "assignedSubAdmin", val);
+                  }}
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-primary cursor-pointer"
+                >
+                  <option value="Unassigned">Unassigned</option>
+                  {teamMembers.filter(tm => tm.role !== "SuperAdmin").map(tm => (
+                    <option key={tm.id} value={tm.name}>{tm.name} ({tm.role})</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Assigned Work Task */}
+              <div className="space-y-1 bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                  Assigned Work Task
+                </span>
+                <input
+                  type="text"
+                  value={selectedEmployeeModal.work || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedEmployeeModal({ ...selectedEmployeeModal, work: val });
+                    handleUpdateEmployee(selectedEmployeeModal.id, "work", val);
+                  }}
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-primary"
+                  placeholder="Task description..."
+                />
+              </div>
+
+              {/* Access Scope */}
+              <div className="space-y-1 bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 col-span-1 sm:col-span-2">
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                  Access Scope
+                </span>
+                <select
+                  value={selectedEmployeeModal.access}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedEmployeeModal({ ...selectedEmployeeModal, access: val });
+                    handleUpdateEmployee(selectedEmployeeModal.id, "access", val);
+                  }}
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-primary cursor-pointer"
+                >
+                  <option value="Read">Read</option>
+                  <option value="Write">Write</option>
+                  <option value="Read & Write">Read & Write</option>
+                  <option value="View Only">View Only</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Footer Controls */}
+            <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800 gap-3 flex-wrap">
+              <button
+                onClick={() => {
+                  setSelectedEmployeeModal(null);
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2"
+              >
+                <Check className="w-4 h-4" />
+                <span>Save Changes to Database</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  if (confirm(`Are you sure you want to delete ${selectedEmployeeModal.name}?`)) {
+                    handleDeleteEmployee(selectedEmployeeModal.id);
+                    setSelectedEmployeeModal(null);
+                  }
+                }}
+                className="px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 text-xs font-bold transition-all flex items-center gap-1.5"
+              >
+                <Trash className="w-4 h-4" />
+                <span>Delete Employee</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

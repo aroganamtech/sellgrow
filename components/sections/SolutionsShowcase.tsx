@@ -14,6 +14,7 @@ import {
   Calendar,
 } from "lucide-react";
 import BookingModal from "./BookingModal";
+import SolutionModal from "./SolutionModal";
 
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -41,6 +42,9 @@ export default function SolutionsShowcase() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingId, setBookingId] = useState<string>("voice");
   const [bookingTitle, setBookingTitle] = useState<string>("AI Assistant");
+
+  const [isSolutionModalOpen, setIsSolutionModalOpen] = useState(false);
+  const [selectedSolution, setSelectedSolution] = useState<SolutionItem | null>(null);
 
   const solutionsData: SolutionItem[] = [
     {
@@ -117,6 +121,11 @@ export default function SolutionsShowcase() {
     setBookingId(id);
     setBookingTitle(title);
     setIsBookingOpen(true);
+  };
+
+  const openSolutionModal = (solution: SolutionItem) => {
+    setSelectedSolution(solution);
+    setIsSolutionModalOpen(true);
   };
 
   // Smooth scroll handler with offset for sticky navbar + subheader
@@ -251,6 +260,7 @@ export default function SolutionsShowcase() {
                 item={solution}
                 isReversed={isReversed}
                 onBookDemo={openBooking}
+                onOpenSolutionModal={openSolutionModal}
               />
             );
           })}
@@ -264,6 +274,13 @@ export default function SolutionsShowcase() {
         solutionId={bookingId}
         solutionTitle={bookingTitle}
       />
+
+      <SolutionModal
+        isOpen={isSolutionModalOpen}
+        onClose={() => setIsSolutionModalOpen(false)}
+        solution={selectedSolution}
+        onBookDemo={openBooking}
+      />
     </section>
   );
 }
@@ -273,9 +290,10 @@ interface SolutionBlockProps {
   item: SolutionItem;
   isReversed: boolean;
   onBookDemo: (id: string, title: string) => void;
+  onOpenSolutionModal: (solution: SolutionItem) => void;
 }
 
-function SolutionBlock({ item, isReversed, onBookDemo }: SolutionBlockProps) {
+function SolutionBlock({ item, isReversed, onBookDemo, onOpenSolutionModal }: SolutionBlockProps) {
   const { t } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -369,8 +387,16 @@ function SolutionBlock({ item, isReversed, onBookDemo }: SolutionBlockProps) {
             />
           </div>
 
-          {/* Book Demo Button (Compact, aligned to right side under video) */}
-          <div className="flex justify-end pt-1">
+          {/* Action Buttons (Solution & Book Demo, aligned to right side under video) */}
+          <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
+            <button
+              onClick={() => onOpenSolutionModal(item)}
+              className="px-5 py-2.5 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold transition-all flex items-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 shrink-0 border border-slate-200 dark:border-slate-700/60 shadow-sm"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-primary" />
+              <span>{t("solutionBtn")} - {item.title}</span>
+            </button>
+
             <button
               onClick={() => onBookDemo(item.id, item.title)}
               className="px-5 py-2.5 bg-gradient-to-r from-primary to-secondary hover:opacity-95 text-white rounded-xl text-xs font-bold shadow-md shadow-primary/20 transition-all flex items-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 shrink-0"

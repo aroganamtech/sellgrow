@@ -163,12 +163,17 @@ const getDefaultPrices = (name: string, id: string) => {
 };
 
 const STATIC_FALLBACK_SERVICES = [
-  { id: "whatsapp-business", name: "WhatsApp Business", description: "WhatsApp Business API gateway and chat broadcast engine", status: "Active", priceMonthlyINR: 1999, priceMonthlyUSD: 29, priceYearlyINR: 19999, priceYearlyUSD: 299 },
-  { id: "website-business", name: "Website Business", description: "Live tracking of client web traffic and active sessions dashboard", status: "Active", priceMonthlyINR: 999, priceMonthlyUSD: 15, priceYearlyINR: 9999, priceYearlyUSD: 149 },
-  { id: "app-business", name: "App Business", description: "Mobile application interface logs and native session tracker", status: "Active", priceMonthlyINR: 1499, priceMonthlyUSD: 19, priceYearlyINR: 14999, priceYearlyUSD: 199 },
-  { id: "3d-viewing", name: "3D Viewing", description: "Immersive 3D model visualization and rendering engine component", status: "Active", priceMonthlyINR: 3999, priceMonthlyUSD: 59, priceYearlyINR: 39999, priceYearlyUSD: 599 },
-  { id: "ai-assistant", name: "AI Assistant", description: "Generative AI customer service assistant bot for apps and websites", status: "Active", priceMonthlyINR: 2999, priceMonthlyUSD: 39, priceYearlyINR: 29999, priceYearlyUSD: 399 },
-  { id: "sales-crm", name: "Sales CRM", description: "Sales pipeline tracking, lead conversion analytics, and CRM dashboard", status: "Active", priceMonthlyINR: 2499, priceMonthlyUSD: 35, priceYearlyINR: 24999, priceYearlyUSD: 349 }
+  { id: "whatsapp-business", name: "WhatsApp business", description: "WhatsApp Business API gateway and chat broadcast engine", status: "Active", priceMonthlyINR: 1399, priceMonthlyUSD: 25, priceYearlyINR: 13999, priceYearlyUSD: 259, features: ["Official Meta API Broadcasts", "Unified Shared Agent Inbox"] },
+  { id: "website-view", name: "Website View", description: "Live tracking of client web traffic and active sessions dashboard", status: "Active", priceMonthlyINR: 999, priceMonthlyUSD: 15, priceYearlyINR: 9999, priceYearlyUSD: 149, features: ["Live Client Traffic Tracking", "Active Sessions Dashboard"] },
+  { id: "app-view", name: "App view", description: "Mobile application interface logs and native session tracker", status: "Active", priceMonthlyINR: 1499, priceMonthlyUSD: 19, priceYearlyINR: 14999, priceYearlyUSD: 199, features: ["Mobile App Interface Logs", "Native Session Tracker"] },
+  { id: "ai-bot", name: "AI Bot", description: "Generative AI customer service assistant bot for apps and websites", status: "Active", priceMonthlyINR: 2999, priceMonthlyUSD: 39, priceYearlyINR: 29999, priceYearlyUSD: 399, features: ["Generative AI Customer Agent", "Smart Context Responses"] },
+  { id: "3d-view", name: "3D View", description: "Immersive 3D model visualization and rendering engine component", status: "Active", priceMonthlyINR: 5999, priceMonthlyUSD: 59, priceYearlyINR: 39999, priceYearlyUSD: 599, features: ["Immersive 3D Model Rendering", "Interactive WebGL Component"] },
+  { id: "sells-crm", name: "Sells CRM", description: "Sales pipeline tracking, lead conversion analytics, and CRM dashboard", status: "Active", priceMonthlyINR: 2499, priceMonthlyUSD: 35, priceYearlyINR: 24999, priceYearlyUSD: 349, features: ["Lead Conversion Pipeline", "Real-time Analytics Tracker"] },
+  { id: "digital-marketing", name: "Digital Marketing", description: "SEO metrics tracking, ad campaign monitoring, and marketing suite", status: "Active", priceMonthlyINR: 1999, priceMonthlyUSD: 29, priceYearlyINR: 15999, priceYearlyUSD: 299, features: ["SEO Performance Metrics", "Multi-Channel Ad Monitoring"] },
+  { id: "website-creation", name: "Website Creation", description: "Automated premium landing page generation and builder engine", status: "Active", priceMonthlyINR: 4999, priceMonthlyUSD: 69, priceYearlyINR: 49999, priceYearlyUSD: 699, features: ["Automated Premium Layouts", "High-Speed Page Builder"] },
+  { id: "borcher", name: "Borcher", description: "Brochure creator, brand material generation, and catalog PDF builder", status: "Active", priceMonthlyINR: 799, priceMonthlyUSD: 10, priceYearlyINR: 7999, priceYearlyUSD: 99, features: ["Dynamic Digital Brochures", "Exportable PDF Catalogs"] },
+  { id: "logo", name: "Logo", description: "Branding asset builder, vector logo designs generator, and asset hosting", status: "Active", priceMonthlyINR: 499, priceMonthlyUSD: 7, priceYearlyINR: 4999, priceYearlyUSD: 69, features: ["High-Res Vector Formats", "Smart Brand Identity Builder"] },
+  { id: "social-media", name: "Social Media", description: "Social platforms auto-posting gateway and feed synchronization engine", status: "Active", priceMonthlyINR: 1199, priceMonthlyUSD: 16, priceYearlyINR: 11999, priceYearlyUSD: 159, features: ["Scheduled Auto-Posting Engine", "Cross-Platform Feed Sync"] }
 ];
 
 export default function PricingPage() {
@@ -181,18 +186,31 @@ export default function PricingPage() {
 
   useEffect(() => {
     fetch("/api/admin/services")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("API offline");
+        return res.json();
+      })
       .then((data) => {
         if (data.status === "success" && data.data && data.data.length > 0) {
-          // Filter to only display Active services
           const activeOnly = data.data.filter((s: any) => s.status === "Active");
           if (activeOnly.length > 0) {
             setServicesList(activeOnly);
           }
         }
       })
-      .catch((err) => {
-        console.error("Error loading dynamically added services:", err);
+      .catch(() => {
+        const stored = typeof window !== "undefined" ? localStorage.getItem("sg_services_db") : null;
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            const activeOnly = parsed.filter((s: any) => s.status === "Active");
+            if (activeOnly.length > 0) {
+              setServicesList(activeOnly);
+              return;
+            }
+          } catch (e) {}
+        }
+        setServicesList(STATIC_FALLBACK_SERVICES);
       });
   }, []);
 

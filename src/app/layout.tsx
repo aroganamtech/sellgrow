@@ -23,7 +23,7 @@ const inter = Inter({
 
 // Next.js Metadata API - Handles Canonical URLs, OG Tags, Twitter Cards, and Verification tags
 export const metadata: Metadata = {
-  metadataBase: new URL("https://sellgrow.co"),
+  metadataBase: new URL("https://sellgrow.io"),
   title: {
     default: "SellGrow | The Intelligent Sell & Growth Platform",
     template: "%s | SellGrow"
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://sellgrow.co",
+    url: "https://sellgrow.io",
     siteName: "SellGrow",
     title: "SellGrow | The Intelligent Sell & Growth Platform",
     description: "A single unified intelligence ecosystem that automates CRM, omnichannel communications, AI voice assistants, visual workflows, and online store catalogs.",
@@ -74,10 +74,10 @@ export default function RootLayout({
     "@graph": [
       {
         "@type": "Organization",
-        "@id": "https://sellgrow.co/#organization",
+        "@id": "https://sellgrow.io/#organization",
         "name": "SellGrow",
-        "url": "https://sellgrow.co",
-        "logo": "https://sellgrow.co/logos/logo.png",
+        "url": "https://sellgrow.io",
+        "logo": "https://sellgrow.io/logos/logo.png",
         "sameAs": [
           "https://twitter.com/sellgrow",
           "https://linkedin.com/company/sellgrow"
@@ -85,9 +85,9 @@ export default function RootLayout({
       },
       {
         "@type": "LocalBusiness",
-        "@id": "https://sellgrow.co/#localbusiness",
+        "@id": "https://sellgrow.io/#localbusiness",
         "name": "SellGrow Headquarters",
-        "image": "https://sellgrow.co/favicon.png",
+        "image": "https://sellgrow.io/favicon.png",
         "priceRange": "$$",
         "address": {
           "@type": "PostalAddress",
@@ -110,12 +110,12 @@ export default function RootLayout({
       },
       {
         "@type": "WebSite",
-        "@id": "https://sellgrow.co/#website",
-        "url": "https://sellgrow.co",
+        "@id": "https://sellgrow.io/#website",
+        "url": "https://sellgrow.io",
         "name": "SellGrow",
         "potentialAction": {
           "@type": "SearchAction",
-          "target": "https://sellgrow.co/search?q={search_term_string}",
+          "target": "https://sellgrow.io/search?q={search_term_string}",
           "query-input": "required name=search_term_string"
         }
       }

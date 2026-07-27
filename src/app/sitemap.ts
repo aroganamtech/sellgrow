@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://sellgrow.co';
+  const baseUrl = 'https://sellgrow.io';
   
   const publicRoutes = [
     '',

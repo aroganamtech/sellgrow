@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
 import { ObjectId } from 'mongodb';
 
-export const dynamic = 'force-dynamic';
 
 const DEFAULT_TEAM = [
-  { name: "Naveen S", email: "naveen@sellgrow.co", role: "SuperAdmin", status: "Active", permissions: "Full Access", password: "sellgrow123", assignedServices: [] },
-  { name: "Operator Main", email: "operator@sellgrow.co", role: "Operator", status: "Active", permissions: "Read/Write", password: "sellgrow123", assignedServices: [] },
-  { name: "AI Dev Team", email: "ai-dev@sellgrow.co", role: "Developer", status: "Active", permissions: "Read/Write", password: "sellgrow123", assignedServices: [] },
-  { name: "Support Agent", email: "support@sellgrow.co", role: "Support", status: "Active", permissions: "Read Only", password: "sellgrow123", assignedServices: [] },
+  { sgId: "SG-SA-100", name: "Naveen S", email: "naveen@sellgrow.io", role: "SuperAdmin", status: "Active", permissions: "Full Access", password: "sellgrow123", assignedServices: ["srv_1", "srv_2", "srv_3", "srv_4", "srv_5", "srv_6", "srv_7", "srv_8", "srv_9", "srv_10", "srv_11"] },
+  { sgId: "SG-A-101", name: "Operator Main", email: "operator@sellgrow.io", role: "Operator", status: "Active", permissions: "Read/Write", password: "operator123", assignedServices: ["srv_1", "srv_2", "srv_3"] },
+  { sgId: "SG-A-102", name: "AI Dev Team", email: "developer@sellgrow.io", role: "Developer", status: "Active", permissions: "Read/Write", password: "developer123", assignedServices: ["srv_4", "srv_5", "srv_8"] },
+  { sgId: "SG-A-103", name: "Manager Ops", email: "manager@sellgrow.io", role: "Manager", status: "Active", permissions: "Full Access", password: "manager123", assignedServices: ["srv_6", "srv_7", "srv_11"] },
+  { sgId: "SG-A-104", name: "Support Agent", email: "support@sellgrow.io", role: "Support", status: "Active", permissions: "Read Only", password: "support123", assignedServices: ["srv_1", "srv_2"] },
+  { sgId: "SG-A-105", name: "Admin Lead", email: "admin@sellgrow.io", role: "Admin", status: "Active", permissions: "Full Access", password: "admin123", assignedServices: ["srv_1", "srv_2", "srv_3", "srv_6", "srv_7"] }
 ];
 
 export async function GET() {
@@ -22,8 +23,9 @@ export async function GET() {
       list = await collection.find().toArray();
     }
     
-    const formatted = list.map((item: any) => ({
+    const formatted = list.map((item: any, idx: number) => ({
       id: item._id.toString(),
+      sgId: item.sgId || (item.role === 'SuperAdmin' ? 'SG-SA-100' : `SG-A-${101 + idx}`),
       name: item.name,
       email: item.email,
       role: item.role,
@@ -54,7 +56,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ status: 'error', message: 'Name and Email are required' }, { status: 400 });
     }
 
+    const count = await collection.countDocuments();
+    const sgId = body.sgId || `SG-A-${101 + count}`;
+
     const doc = {
+      sgId,
       name,
       email,
       role,
@@ -104,7 +110,7 @@ export async function PUT(req: Request) {
     const collection = db.collection('superadmin/sub-admin');
     
     const body = await req.json();
-    const { id, permissions, role, status, name, email, password, authKey, adminLevel, country, assignedServices } = body;
+    const { id, sgId, permissions, role, status, name, email, password, authKey, adminLevel, country, assignedServices } = body;
     
     if (!id) {
       return NextResponse.json({ status: 'error', message: 'ID is required' }, { status: 400 });
@@ -118,6 +124,7 @@ export async function PUT(req: Request) {
     } catch (e) {}
 
     const updateFields: any = {};
+    if (sgId !== undefined) updateFields.sgId = sgId;
     if (permissions !== undefined) updateFields.permissions = permissions;
     if (role !== undefined) updateFields.role = role;
     if (status !== undefined) updateFields.status = status;

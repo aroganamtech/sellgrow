@@ -2,13 +2,12 @@ import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
 import { ObjectId } from 'mongodb';
 
-export const dynamic = 'force-dynamic';
 
 const DEFAULT_EMPLOYEES = [
   { name: "Naveen S", email: "717824i605@kce.in.ac", work: "Voice AI Integration", status: "Active", access: "Full Access", assignedSubAdmin: "Operator Main" },
-  { name: "Karthik R", email: "karthik@sellgrow.co", work: "CRM Automation", status: "Active", access: "Read & Write", assignedSubAdmin: "AI Dev Team" },
-  { name: "Priya K", email: "priya@sellgrow.co", work: "Landing Page Editor", status: "Active", access: "View Only", assignedSubAdmin: "Support Agent" },
-  { name: "Amit Shah", email: "amit@sellgrow.co", work: "Customer Support", status: "Suspended", access: "View Only", assignedSubAdmin: "Unassigned" },
+  { name: "Karthik R", email: "karthik@sellgrow.io", work: "CRM Automation", status: "Active", access: "Read & Write", assignedSubAdmin: "AI Dev Team" },
+  { name: "Priya K", email: "priya@sellgrow.io", work: "Landing Page Editor", status: "Active", access: "View Only", assignedSubAdmin: "Support Agent" },
+  { name: "Amit Shah", email: "amit@sellgrow.io", work: "Customer Support", status: "Suspended", access: "View Only", assignedSubAdmin: "Unassigned" },
 ];
 
 export async function GET() {
@@ -75,7 +74,7 @@ export async function PUT(req: Request) {
     const collection = db.collection('superadmin/employees');
     
     const body = await req.json();
-    const { id, work, access, status, assignedSubAdmin } = body;
+    const { id, name, email, work, access, status, assignedSubAdmin } = body;
     
     if (!id) {
       return NextResponse.json({ status: 'error', message: 'Employee ID is required' }, { status: 400 });
@@ -89,6 +88,8 @@ export async function PUT(req: Request) {
     } catch (e) {}
 
     const updateFields: any = {};
+    if (name !== undefined) updateFields.name = name;
+    if (email !== undefined) updateFields.email = email;
     if (work !== undefined) updateFields.work = work;
     if (access !== undefined) updateFields.access = access;
     if (status !== undefined) updateFields.status = status;

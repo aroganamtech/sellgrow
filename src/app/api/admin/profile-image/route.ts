@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
 
-export const dynamic = 'force-dynamic';
 
 // GET — fetch the current super admin profile image
 export async function GET() {

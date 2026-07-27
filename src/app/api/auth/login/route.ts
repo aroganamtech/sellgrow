@@ -3,7 +3,6 @@ import { getCollection } from '@/lib/db';
 import { verifyPassword } from '@/lib/auth-utils';
 import { IUser, formatUserResponse } from '@/lib/models/User';
 
-export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {

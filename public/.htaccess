@@ -1,0 +1,29 @@
+# Hostinger Apache Configuration for SellGrow Application
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Force HTTPS on Hostinger
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # 2. Map _next asset requests to unblocked next folder
+  RewriteRule ^_next/(.*)$ next/$1 [L,QSA]
+
+  # 3. Serve existing static files & directories directly
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # 4. Map clean URL requests to corresponding .html files
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.*)$ $1.html [L]
+
+  # 5. Fallback all SPA routes to /index.html
+  RewriteRule ^(.*)$ /index.html [L]
+</IfModule>
+
+# Enable CORS for static assets on Hostinger
+<IfModule mod_headers.c>
+  Header set Access-Control-Allow-Origin "*"
+</IfModule>

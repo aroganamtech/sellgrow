@@ -19,6 +19,7 @@ const translations: Record<Language, Translations> = {
     rag: "Knowledge Base (RAG)",
     analytics: "Business Analytics",
     features: "Features",
+    products: "Products",
     pricing: "Pricing",
     about: "About Us",
     contact: "Contact Support",
@@ -56,6 +57,7 @@ const translations: Record<Language, Translations> = {
     showcaseVoiceFeat3: "Multi-lingual support (English, Hindi, Arabic, Tamil)",
     showcaseVoiceFeat4: "Autonomously schedules CRM meetings & follow-ups",
     bookDemoBtn: "Book Demo",
+    solutionBtn: "Solution",
 
     showcaseWhatsappTitle: "WhatsApp Business",
     showcaseWhatsappTagline: "Official API Chat & Broadcast Inbox",
@@ -156,6 +158,7 @@ const translations: Record<Language, Translations> = {
     rag: "ज्ञान आधार (RAG)",
     analytics: "व्यापार विश्लेषिकी",
     features: "विशेषताएं",
+    products: "उत्पाद",
     pricing: "मूल्य निर्धारण",
     about: "हमारे बारे में",
     contact: "सहायता केंद्र",
@@ -192,6 +195,7 @@ const translations: Record<Language, Translations> = {
     showcaseVoiceFeat3: "बहुभाषी समर्थन (अंग्रेजी, हिंदी, अरबी, तमिल)",
     showcaseVoiceFeat4: "स्वायत्त रूप से सीआरएम बैठकों और फॉलो-अप को शेड्यूल करता है",
     bookDemoBtn: "डेमो बुक करें",
+    solutionBtn: "समाधान",
 
     showcaseWhatsappTitle: "व्हाट्सएप बिजनेस",
     showcaseWhatsappTagline: "आधिकारिक एपीआई चैट और ब्रॉडकास्ट इनबॉक्स",
@@ -287,6 +291,7 @@ const translations: Record<Language, Translations> = {
     rag: "قاعدة المعرفة (RAG)",
     analytics: "تحليلات الأعمال",
     features: "المميزات",
+    products: "المنتجات",
     pricing: "الأسعار",
     about: "من نحن",
     contact: "الدعم الفني",
@@ -323,6 +328,7 @@ const translations: Record<Language, Translations> = {
     showcaseVoiceFeat3: "دعم متعدد اللغات (الإنجليزية، الهندية، العربية، التاميلية)",
     showcaseVoiceFeat4: "جدولة اجتماعات CRM والمتابعات ذاتياً",
     bookDemoBtn: "حجز عرض توضيحي",
+    solutionBtn: "الحل",
 
     showcaseWhatsappTitle: "واتساب الأعمال",
     showcaseWhatsappTagline: "صندوق الوارد الموحد للمحادثات والبث عبر API",
@@ -418,6 +424,7 @@ const translations: Record<Language, Translations> = {
     rag: "அறிவு தளம் (RAG)",
     analytics: "வணிக பகுப்பாய்வு",
     features: "அம்சங்கள்",
+    products: "தயாரிப்புகள்",
     pricing: "கட்டணங்கள்",
     about: "எங்களைப் பற்றி",
     contact: "ஆதரவு மையம்",
@@ -454,6 +461,7 @@ const translations: Record<Language, Translations> = {
     showcaseVoiceFeat3: "பல்மொழி ஆதரவு (ஆங்கிலம், இந்தி, அரபு, தமிழ்)",
     showcaseVoiceFeat4: "சுயமாக CRM சந்திப்புகள் மற்றும் பின்தொடர்தல்களை திட்டமிடுகிறது",
     bookDemoBtn: "டெமோ முன்பதிவு செய்க",
+    solutionBtn: "தீர்வு",
 
     showcaseWhatsappTitle: "வாட்ஸ்அப் வணிகம்",
     showcaseWhatsappTagline: "அதிகாரப்பூர்வ API அரட்டை மற்றும் ஒளிபரப்பு இன்பாக்ஸ்",
