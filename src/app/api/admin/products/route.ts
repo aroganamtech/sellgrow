@@ -29,6 +29,7 @@ export async function GET() {
       fuelCapacity: item.fuelCapacity,
       imageBgColor: item.imageBgColor || "#eefbf2",
       image: item.image || "",
+      hologramVideo: item.hologramVideo || (item.id === "gm-bc-358-4sp" ? "/videos/remove_all_the_background.mp4" : undefined),
       highlights: item.highlights || [],
       specs: item.specs || {},
       voiceGreeting: item.voiceGreeting || {

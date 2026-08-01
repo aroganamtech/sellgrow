@@ -15,6 +15,11 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [regionDropdownOpen, setRegionDropdownOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const languagesList: { code: Language; label: string }[] = [
     { code: "en", label: "English" },
@@ -42,12 +47,6 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex gap-8">
             <Link
-              href="/products"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
-            >
-              {t("products")}
-            </Link>
-            <Link
               href="/#footer-features"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
             >
@@ -58,6 +57,12 @@ export default function Navbar() {
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
             >
               {t("pricing")}
+            </Link>
+            <Link
+              href="/products"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              {t("products")}
             </Link>
             <Link
               href="/about"
@@ -82,7 +87,7 @@ export default function Navbar() {
               aria-label="Toggle Theme"
               title="Toggle Light/Dark Theme"
             >
-              {theme === "dark" ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
+              {mounted && theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5 text-amber-400" />}
             </button>
 
             {/* Region Selector (Auto IP vs Manual) */}
@@ -186,33 +191,15 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Login / Auth */}
-            {user ? (
-              <div className="flex items-center gap-4">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-primary to-secondary rounded-xl hover:opacity-95 shadow-md shadow-primary/10 transition-all duration-200"
-                >
-                  {t("dashboard")}
-                  <ArrowRight className="w-4 h-4 ml-1.5" />
-                </Link>
-                <button
-                  onClick={logout}
-                  className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
-                >
-                  {t("logout")}
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <Link
-                  href="/login"
-                  className="text-sm font-semibold text-muted-foreground hover:text-foreground px-3 py-2 transition-colors"
-                >
-                  {t("login")}
-                </Link>
-              </div>
-            )}
+            {/* Login Link */}
+            <div className="flex items-center gap-3">
+              <Link
+                href="/login"
+                className="text-sm font-semibold text-muted-foreground hover:text-foreground px-3 py-2 transition-colors"
+              >
+                {t("login")}
+              </Link>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -221,7 +208,7 @@ export default function Navbar() {
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground"
             >
-              {theme === "dark" ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
+              {mounted && theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5 text-amber-400" />}
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -238,13 +225,6 @@ export default function Navbar() {
         <div className="md:hidden glass-panel border-b border-opacity-5 animate-fade-in p-4 space-y-4">
           <nav className="flex flex-col space-y-3">
             <Link
-              href="/products"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-base font-medium text-muted-foreground hover:text-foreground py-1"
-            >
-              {t("products")}
-            </Link>
-            <Link
               href="/#footer-features"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-muted-foreground hover:text-foreground py-1"
@@ -257,6 +237,13 @@ export default function Navbar() {
               className="text-base font-medium text-muted-foreground hover:text-foreground py-1"
             >
               {t("pricing")}
+            </Link>
+            <Link
+              href="/products"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-base font-medium text-muted-foreground hover:text-foreground py-1"
+            >
+              {t("products")}
             </Link>
             <Link
               href="/about"
@@ -342,36 +329,15 @@ export default function Navbar() {
           <hr className="border-border opacity-50" />
 
           {/* Mobile Auth Button */}
-          {user ? (
-            <div className="flex flex-col gap-3">
-              <Link
-                href="/dashboard"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2.5 text-sm font-semibold text-white bg-primary rounded-xl shadow-md"
-              >
-                {t("dashboard")}
-              </Link>
-              <button
-                onClick={() => {
-                  logout();
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full text-center py-2 text-sm font-medium text-red-500"
-              >
-                {t("logout")}
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              <Link
-                href="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
-              >
-                {t("login")}
-              </Link>
-            </div>
-          )}
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full text-center py-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
+            >
+              {t("login")}
+            </Link>
+          </div>
         </div>
       )}
     </header>

@@ -29,9 +29,9 @@ const getPageThemeKey = (pathname: string) => {
 };
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>("dark");
   const pathname = usePathname();
   const pageKey = getPageThemeKey(pathname || "");
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -40,8 +40,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     if (savedTheme === "light" || savedTheme === "dark") {
       activeTheme = savedTheme;
     } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      activeTheme = prefersDark ? "dark" : "light";
+      activeTheme = document.documentElement.classList.contains("dark") ? "dark" : "light";
     }
     setTheme(activeTheme);
     document.documentElement.classList.toggle("dark", activeTheme === "dark");

@@ -1,5 +1,13 @@
+# Next.js build & cache directories
+.next
+.next_build
+out
 node_modules
-assets/fonts/image and video/Recording 2026-07-19 191938 Sample 1.mp4
+*.tsbuildinfo
 
+# Environment and Vercel
 .vercel
 .env*
+
+# Assets
+assets/fonts/image and video/Recording 2026-07-19 191938 Sample 1.mp4

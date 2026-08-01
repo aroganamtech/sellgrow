@@ -1,1 +1,1 @@
-{"status":"ok","database":"sellgrow","connected":true,"collections":["system_settings","users","superadmin/employees","superadmin/sub-admin","registered_users","services"]}
+{"status":"ok","database":"sellgrow","connected":true,"collections":["system_settings","products","users","superadmin/employees","superadmin/sub-admin","registered_users","services"]}

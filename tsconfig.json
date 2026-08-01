@@ -15,7 +15,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true,
+    "incremental": false,
     "plugins": [
       {
         "name": "next"
@@ -71,7 +71,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "out/types/**/*.ts"
+    ".next_build/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

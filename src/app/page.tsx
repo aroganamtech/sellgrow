@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import SolutionsShowcase from "@/components/sections/SolutionsShowcase";
 import OnboardingModal from "@/components/modals/OnboardingModal";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import {
   ShieldCheck,
@@ -281,6 +283,13 @@ export default function HomePage() {
     { sender: "ai", text: "Hi there! I am the SellGrow AI. Ask me anything about our Operating System modules!" },
   ]);
   const [chatInput, setChatInput] = useState("");
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (chatOpen && chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages, chatOpen]);
 
   const speak = (text: string) => {
     if (typeof window !== "undefined" && window.speechSynthesis) {
@@ -791,6 +800,7 @@ export default function HomePage() {
                   <p className="leading-relaxed">{msg.text}</p>
                 </div>
               ))}
+              <div ref={chatEndRef} />
             </div>
 
             {/* Chat input */}

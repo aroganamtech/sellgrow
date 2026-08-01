@@ -125,6 +125,36 @@ export default function RootLayout({
   return (
     <html lang="en" className={`dark ${outfit.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
+        {/* Anti-Flicker Early Theme Resolution Script */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var p = window.location.pathname || "";
+                  var key = "theme_public";
+                  if (p.startsWith("/sg-superadmin")) key = "theme_sg_superadmin";
+                  else if (p.startsWith("/sg-admin")) {
+                    var role = p.split("/")[2] || "subadmin";
+                    key = "theme_sg_admin_" + role;
+                  }
+                  else if (p.startsWith("/dashboard")) key = "theme_dashboard";
+                  else if (p.startsWith("/login") || p.startsWith("/register")) key = "theme_auth";
+                  else if (p.startsWith("/service-person")) key = "theme_service_person";
+                  else if (p.startsWith("/pricing") || p.startsWith("/about")) key = "theme_public_content";
+
+                  var saved = localStorage.getItem(key);
+                  var isDark = saved ? (saved === "dark") : true;
+                  if (!isDark) {
+                    document.documentElement.classList.remove("dark");
+                  } else {
+                    document.documentElement.classList.add("dark");
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
         {/* Structured Data Script */}
         <script
           type="application/ld+json"

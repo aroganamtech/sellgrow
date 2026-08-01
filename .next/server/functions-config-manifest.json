@@ -1,1 +1,1 @@
-{"version":1,"functions":{"/sg-admin/[role]":{}}}
+{"version":1,"functions":{"/[company]/login":{},"/[company]/sg-admin/[role]":{},"/[company]/dashboard":{},"/api/detect-region":{},"/[company]/sg-superadmin":{},"/sg-admin/[role]":{},"/[company]/sg-superadmin/admin-growth":{}}}

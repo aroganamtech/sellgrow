@@ -1,7 +1,7 @@
 export interface ProductItem {
   id: string;
   name: string;
-  category: "BRUSH CUTTER" | "COMBINE HARVESTER" | "POWER TILLER" | "POWER WEEDER" | "REAPER";
+  category: string;
   brand: string;
   shortDesc: string;
   fullDesc: string;
@@ -13,6 +13,7 @@ export interface ProductItem {
   fuelCapacity: string;
   imageBgColor: string;
   image?: string;
+  hologramVideo?: string;
   highlights: string[];
   specs: Record<string, string>;
   voiceGreeting: {
@@ -29,6 +30,63 @@ export const CATEGORIES = [
   "POWER WEEDER",
   "REAPER",
 ] as const;
+
+export interface ProductPreset {
+  name: string;
+  category: string;
+  brand: string;
+  group: string;
+}
+
+export const DAY_TO_DAY_PRODUCTS: ProductPreset[] = [
+  // Consumer Electronics & Gadgets
+  { name: "Smartphone (5G Flagship)", category: "ELECTRONICS", brand: "SMART TECH", group: "Consumer Electronics" },
+  { name: "Laptop (High Performance Ultrabook)", category: "ELECTRONICS", brand: "SMART TECH", group: "Consumer Electronics" },
+  { name: "Smart Watch (Fitness & Health Tracker)", category: "ELECTRONICS", brand: "SMART TECH", group: "Consumer Electronics" },
+  { name: "Wireless ANC Earbuds", category: "ELECTRONICS", brand: "AUDIO TECH", group: "Consumer Electronics" },
+  { name: "Portable Bluetooth Speaker", category: "ELECTRONICS", brand: "AUDIO TECH", group: "Consumer Electronics" },
+  { name: "4K UHD Smart LED TV", category: "ELECTRONICS", brand: "SMART VISION", group: "Consumer Electronics" },
+
+  // Home & Kitchen Appliances
+  { name: "Double Door Refrigerator", category: "HOME APPLIANCES", brand: "HOME COOL", group: "Home & Kitchen Appliances" },
+  { name: "Fully Automatic Washing Machine", category: "HOME APPLIANCES", brand: "HOME CARE", group: "Home & Kitchen Appliances" },
+  { name: "Inverter Split Air Conditioner (1.5 Ton)", category: "HOME APPLIANCES", brand: "CLIMATE TECH", group: "Home & Kitchen Appliances" },
+  { name: "Smart Air Purifier (HEPA Filter)", category: "HOME APPLIANCES", brand: "AIR TECH", group: "Home & Kitchen Appliances" },
+  { name: "RO + UV Water Purifier", category: "HOME APPLIANCES", brand: "PURE WATER", group: "Home & Kitchen Appliances" },
+  { name: "Microwave Convection Oven", category: "KITCHEN APPLIANCES", brand: "COOK TECH", group: "Home & Kitchen Appliances" },
+  { name: "High Speed Mixer Grinder 750W", category: "KITCHEN APPLIANCES", brand: "COOK TECH", group: "Home & Kitchen Appliances" },
+  { name: "Induction Cooktop Stove", category: "KITCHEN APPLIANCES", brand: "COOK TECH", group: "Home & Kitchen Appliances" },
+  { name: "Electric Stainless Steel Kettle", category: "KITCHEN APPLIANCES", brand: "COOK TECH", group: "Home & Kitchen Appliances" },
+  { name: "Instant Electric Water Heater Geyser", category: "HOME APPLIANCES", brand: "HOT FLOW", group: "Home & Kitchen Appliances" },
+
+  // Hardware & Power Tools
+  { name: "Cordless Impact Drill Machine", category: "POWER TOOLS", brand: "TOOL MASTER", group: "Hardware & Power Tools" },
+  { name: "Electric High Pressure Car & Yard Washer", category: "PRESSURE WASHER", brand: "GEORGE MAIJO EQUIPMENT", group: "Hardware & Power Tools" },
+  { name: "Portable Air Compressor & Inflator", category: "POWER TOOLS", brand: "TOOL MASTER", group: "Hardware & Power Tools" },
+  { name: "Handheld Electric Wood Chainsaw", category: "CHAINSAW", brand: "GEORGE MAIJO EQUIPMENT", group: "Hardware & Power Tools" },
+  { name: "Professional Mechanics Tool Kit", category: "HAND TOOLS", brand: "TOOL MASTER", group: "Hardware & Power Tools" },
+
+  // Automotive & Mobility
+  { name: "Electric Smart Scooter", category: "AUTOMOTIVE", brand: "ECO DRIVE", group: "Automotive & Mobility" },
+  { name: "Portable Digital Tire Pressure Inflator", category: "AUTOMOTIVE", brand: "AUTO CARE", group: "Automotive & Mobility" },
+  { name: "Car Handheld Cordless Vacuum Cleaner", category: "AUTOMOTIVE", brand: "AUTO CARE", group: "Automotive & Mobility" },
+
+  // Agriculture, Farm & Gardening Equipment
+  { name: "George Maijo BC 520 2SP Side Pack Brush Cutter", category: "BRUSH CUTTER", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "George Maijo BC 520 2SPR Backpack Brush Cutter", category: "BRUSH CUTTER", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "George Maijo BC 358 4SP 4-Stroke Brush Cutter", category: "BRUSH CUTTER", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "Heavy Duty Petrol Power Weeder 7HP", category: "POWER WEEDER", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "Multi-Crop Combine Harvester 3000", category: "COMBINE HARVESTER", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "Diesel Engine Power Tiller 15HP", category: "POWER TILLER", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "Paddy & Wheat Crop Reaper Machine", category: "REAPER", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "Electric Lawn Mower (Yard Care)", category: "LAWN MOWER", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "High Pressure Water Sprayer Pump", category: "WATER PUMP", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "Earth Drilling Soil Auger Machine", category: "EARTH AUGER", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "Portable Silent Petrol Power Generator (3.5 KW)", category: "POWER GENERATOR", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "Rechargeable 16L Battery Knapsack Sprayer", category: "BATTERY SPRAYER", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "Thermal Mosquito Fogging Machine", category: "FOGGING MACHINE", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+  { name: "Automatic Solar Water Heater System", category: "SOLAR EQUIPMENT", brand: "GEORGE MAIJO EQUIPMENT", group: "Agriculture & Gardening" },
+];
 
 export const PRODUCTS_DATA: ProductItem[] = [
   // BRUSH CUTTERS
@@ -118,6 +176,7 @@ export const PRODUCTS_DATA: ProductItem[] = [
     fuelCapacity: "0.65 L",
     imageBgColor: "#eefbf2",
     image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/Brush-Cutter-4SP@2x.png",
+    hologramVideo: "/videos/remove_all_the_background.mp4",
     highlights: [
       "Pure Petrol Operation – No petrol-oil mixing required.",
       "Low Smoke & Quiet Engine – Eco-friendly 4-stroke technology.",
@@ -582,6 +641,189 @@ export const PRODUCTS_DATA: ProductItem[] = [
     voiceGreeting: {
       en: "Hello! Maijo 7PR is our 1.5M wide heavy diesel crop reaper. How can I assist?",
       ta: "வணக்கம்! மைஜோ 7PR 1.5 மீட்டர் அகலம் கொண்ட சக்திவாய்ந்த ரீப்பர்."
+    }
+  },
+  // NOMO STORE CLIENT PRODUCTS (Retail Grocery & Organic Inventory)
+  {
+    id: "gr-1",
+    name: "Organic Extra Virgin Olive Oil 1L",
+    category: "Oils & Spices",
+    brand: "NOMO STORE",
+    shortDesc: "Cold-pressed 100% organic Italian extra virgin olive oil in a dark UV protective glass bottle.",
+    fullDesc: "Cold-pressed 100% organic Italian extra virgin olive oil in a dark UV protective glass bottle. Sourced directly from certified organic olive groves.",
+    engine: "Single Variant Pack",
+    displacement: "1 Litre Glass Bottle",
+    power: "$18.50 / Unit",
+    weight: "1.2 kg",
+    cuttingWidth: "N/A",
+    fuelCapacity: "1.0 L",
+    imageBgColor: "#fefce8",
+    image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=600&auto=format&fit=crop&q=80",
+    highlights: [
+      "100% Organic Cold-Pressed Olive Oil",
+      "UV-Protective Glass Bottle",
+      "Rich in Antioxidants & Healthy Fats"
+    ],
+    specs: {
+      "Volume": "1 Litre",
+      "Packaging": "Dark Glass Bottle",
+      "Origin": "Italy",
+      "Certification": "USDA Organic Certified"
+    },
+    voiceGreeting: {
+      en: "Hello! This is NOMO AI Assistant for Organic Extra Virgin Olive Oil. Cold-pressed 100% organic Italian olive oil. How can I help you?",
+      ta: "வணக்கம்! NOMO ஆர்கானிக் ஆலிவ் எண்ணெய் உதவியாளர் பேசுகிறேன். 100% இயற்கை முறையில் தயாரிக்கப்பட்டது."
+    }
+  },
+  {
+    id: "gr-2",
+    name: "Himalayan Long Grain Basmati Rice 5kg",
+    category: "Grains & Rice",
+    brand: "NOMO STORE",
+    shortDesc: "Aged 2 years, aromatic long-grain premium royal Basmati rice sourced directly from Himalayan foothills.",
+    fullDesc: "Aged 2 years, aromatic long-grain premium royal Basmati rice sourced directly from Himalayan foothills. Exceptional aroma and non-sticky fluffy texture.",
+    engine: "5kg Pack",
+    displacement: "5 kg Jute Bag",
+    power: "$24.90 / Pack",
+    weight: "5.0 kg",
+    cuttingWidth: "N/A",
+    fuelCapacity: "5.0 kg",
+    imageBgColor: "#fefce8",
+    image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80",
+    highlights: [
+      "Aged for 2 Years for Maximum Aroma",
+      "Extra Long Grain Length",
+      "Sourced from Himalayan Foothills"
+    ],
+    specs: {
+      "Weight": "5 kg",
+      "Grain Length": "Extra Long",
+      "Aging": "2 Years Aged",
+      "Origin": "Himalayan Foothills"
+    },
+    voiceGreeting: {
+      en: "Hello! Welcome to NOMO Basmati Rice. Aged 2 years for superior aroma. Ask me any questions!",
+      ta: "வணக்கம்! 2 ஆண்டுகள் பழமையான பாஸ்மதி அரிசி பற்றிய தகவல்களை கேட்கலாம்!"
+    }
+  },
+  {
+    id: "gr-3",
+    name: "Fresh Organic Avocados (Pack of 4)",
+    category: "Produce",
+    brand: "NOMO STORE",
+    shortDesc: "Farm-fresh ripe Hass organic avocados, nutrient-dense and perfect for salads, dips, or toast.",
+    fullDesc: "Farm-fresh ripe Hass organic avocados, nutrient-dense and perfect for salads, dips, or toast.",
+    engine: "Pack of 4",
+    displacement: "4 Fresh Avocados",
+    power: "$6.99 / Pack",
+    weight: "0.8 kg",
+    cuttingWidth: "N/A",
+    fuelCapacity: "N/A",
+    imageBgColor: "#f0fdf4",
+    image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=600&auto=format&fit=crop&q=80",
+    highlights: [
+      "Ripe Hass Avocado Variety",
+      "Rich in Omega-3 Healthy Fats",
+      "100% Pesticide Free Farm Fresh"
+    ],
+    specs: {
+      "Quantity": "Pack of 4",
+      "Variety": "Hass Organic",
+      "Storage": "Refrigerate after ripening"
+    },
+    voiceGreeting: {
+      en: "Hello! Fresh Organic Hass Avocados from NOMO Farms. Ask me about nutritional value or pricing!",
+      ta: "வணக்கம்! NOMO புதிய ஆர்கானிக் வெண்ணெய் பழங்கள் பற்றிய தகவல்களை அறியலாம்!"
+    }
+  },
+  {
+    id: "gr-4",
+    name: "Artisan Whole Wheat Sourdough Bread",
+    category: "Bakery",
+    brand: "NOMO STORE",
+    shortDesc: "Naturally fermented 24-hour sourdough loaf baked fresh daily with organic whole wheat flour.",
+    fullDesc: "Naturally fermented 24-hour sourdough loaf baked fresh daily with organic whole wheat flour.",
+    engine: "Fresh Loaf",
+    displacement: "450g Sourdough Loaf",
+    power: "$4.50 / Loaf",
+    weight: "0.45 kg",
+    cuttingWidth: "N/A",
+    fuelCapacity: "N/A",
+    imageBgColor: "#fff7ed",
+    image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80",
+    highlights: [
+      "24-Hour Slow Fermentation",
+      "100% Organic Whole Wheat",
+      "Crispy Crust with Soft Interior"
+    ],
+    specs: {
+      "Weight": "450g",
+      "Flour": "Organic Whole Wheat",
+      "Fermentation": "24 Hours Natural Starter"
+    },
+    voiceGreeting: {
+      en: "Hello! Freshly baked Artisan Sourdough Bread from NOMO Bakery. Ask me about fresh deliveries!",
+      ta: "வணக்கம்! NOMO புதிய சாம்பல் ரொட்டி பற்றிய தகவல்களை அறியலாம்!"
+    }
+  },
+  {
+    id: "gr-5",
+    name: "Gourmet Arabica Coffee Beans 500g",
+    category: "Beverages",
+    brand: "NOMO STORE",
+    shortDesc: "Single-origin medium roasted 100% Arabica coffee beans with notes of dark chocolate and hazelnut.",
+    fullDesc: "Single-origin medium roasted 100% Arabica coffee beans with notes of dark chocolate and hazelnut.",
+    engine: "Whole Bean",
+    displacement: "500g Roasted Beans",
+    power: "$15.80 / Bag",
+    weight: "0.5 kg",
+    cuttingWidth: "N/A",
+    fuelCapacity: "N/A",
+    imageBgColor: "#fef3c7",
+    image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&auto=format&fit=crop&q=80",
+    highlights: [
+      "100% Single-Origin Arabica",
+      "Medium Roasted in Small Batches",
+      "Notes of Dark Chocolate & Hazelnut"
+    ],
+    specs: {
+      "Weight": "500g",
+      "Roast Level": "Medium Roast",
+      "Bean Type": "Arabica 100%"
+    },
+    voiceGreeting: {
+      en: "Hello! NOMO Gourmet Arabica Coffee Beans. Medium roasted single origin. Ask me about flavor profile!",
+      ta: "வணக்கம்! NOMO காபி கொட்டைகள் பற்றிய தகவல்களை அறியலாம்!"
+    }
+  },
+  {
+    id: "gr-6",
+    name: "Farm Fresh Organic Whole Milk 2L",
+    category: "Dairy & Eggs",
+    brand: "NOMO STORE",
+    shortDesc: "Pasteurized organic full-cream milk from grass-fed cows with no added preservatives or hormones.",
+    fullDesc: "Pasteurized organic full-cream milk from grass-fed cows with no added preservatives or hormones.",
+    engine: "2 Litre Bottle",
+    displacement: "2L Bottle",
+    power: "$5.20 / Bottle",
+    weight: "2.0 kg",
+    cuttingWidth: "N/A",
+    fuelCapacity: "2.0 L",
+    imageBgColor: "#eff6ff",
+    image: "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=600&auto=format&fit=crop&q=80",
+    highlights: [
+      "100% Grass-Fed Cow Milk",
+      "No Added Hormones or Antibiotics",
+      "Rich Full-Cream Flavor"
+    ],
+    specs: {
+      "Volume": "2 Litres",
+      "Fat Content": "3.5% Full Cream",
+      "Processing": "Pasteurized Fresh"
+    },
+    voiceGreeting: {
+      en: "Hello! NOMO Organic Whole Milk. Fresh from grass-fed cows. Ask me about daily subscription!",
+      ta: "வணக்கம்! NOMO ஆர்கானிக் பால் பற்றிய தகவல்களை கேட்கலாம்!"
     }
   }
 ];

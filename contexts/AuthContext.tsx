@@ -44,13 +44,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const savedUser = localStorage.getItem("sg_user");
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsed = JSON.parse(savedUser);
+        if (parsed && typeof parsed === "object" && (parsed.id || parsed.email)) {
+          setUser(parsed);
+        } else {
+          localStorage.removeItem("sg_user");
+          setUser(null);
+        }
       } catch (e) {
         localStorage.removeItem("sg_user");
+        setUser(null);
       }
     }
     setIsLoading(false);
   }, []);
+
+  const getCompanySlug = (u: User | null) => {
+    if (!u || !u.businessName) return "client";
+    return u.businessName
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "") || "client";
+  };
 
   const login = async (email: string, password?: string) => {
     setIsLoading(true);
@@ -70,7 +87,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(data.user);
       localStorage.setItem("sg_user", JSON.stringify(data.user));
       setIsLoading(false);
-      router.push("/dashboard");
+      const slug = getCompanySlug(data.user);
+      router.push(`/${slug}/dashboard`);
     } catch (err: any) {
       setIsLoading(false);
       throw err;
@@ -96,7 +114,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(data.user);
       localStorage.setItem("sg_user", JSON.stringify(data.user));
       setIsLoading(false);
-      router.push("/dashboard");
+      const slug = getCompanySlug(data.user);
+      router.push(`/${slug}/dashboard`);
     } catch (err: any) {
       setIsLoading(false);
       throw err;

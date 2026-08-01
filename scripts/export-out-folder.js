@@ -1,8 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const rootDir = path.join(__dirname, '..');
-const nextDir = path.join(rootDir, '.next');
+const altNextDir = path.join(rootDir, '.next_build');
+const nextDir = fs.existsSync(altNextDir) ? altNextDir : path.join(rootDir, '.next');
+const localNextDir = path.join(rootDir, '.next');
 const outDir = path.join(rootDir, 'out');
 const publicDir = path.join(rootDir, 'public');
 
@@ -72,6 +75,13 @@ function fixHtmlAssetPaths(dir) {
 }
 
 console.log('Building Hostinger-compatible out folder with full page URL aliases...');
+
+// 0. If built in .next_build, mirror to local .next
+if (fs.existsSync(altNextDir)) {
+  try {
+    copyRecursiveSync(altNextDir, localNextDir);
+  } catch (e) {}
+}
 
 // 1. Copy public assets into out
 if (fs.existsSync(publicDir)) {
