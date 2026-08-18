@@ -1,0 +1,22 @@
+﻿FLIGHT LOF
+DEPARTED FROM
+ARRIVED AT____
+CLIPPER_______
+DISTANCE______
+COMMENTS______
+__________DATE________19___
+__________DATE________19___
+__________FARE_____________
+TIME______DAYS________HRS. _
+DEPARTED FROM
+ARRIVED AT____
+CLIPPER_______
+DISTANCE......
+COMMENTS
+TIME
+DATE.
+.DATE
+.FARE
+.DAYS
+HRS._
+8

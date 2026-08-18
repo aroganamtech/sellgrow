@@ -1,0 +1,23 @@
+﻿Boeing 707-121 Compared with DC-7C
+B-707	DC-7C
+Cruising Speed ....... 575 miles per hour 353 miles per hour
+Passenger Capacity .. 86 first-class	56 first-class
+143 tourist-class	76 tourist-class
+165 Economy-class	104 Economy-class
+Engines ..............4-Pratt & Whitney J-57 4 Curtiss-Wright turbo-
+13,000-pound thrust	compound 3,400 horse-
+each	power each at takeoff
+Overall Length .......144 feet, 6 inches	113 feet, 4 inches
+Wingspan .............130 feet, 10 inches	127 feet, 6 inches
+Height of tail .......38 feet, 3 inches	31 feet, 8 inches
+Fuel Capacity ........17,398 U.S. gallons	7,824 U.S. gallons
+Maximum gross weight
+(takeoff) .........247,000 pounds*	143,000 pounds
+Cargo Space ..........1,670 cubic feet	651 cubic feet
+Payload ..............40,000 pounds	20,000 pounds
+Operating Altitudes ..25,000 to 40,000 feet 20,000 to 25,000 feet Range ................4,400 miles	5,000 miles
+*Subject to Certification
+advantage of the 13,000 pounds of thrust built into its Pratt & Whitney J-57 engines.
+Another comfort factor of a jet transport is the lack of vibration inherent in jet power. Propellers rotating at high speeds, along with the many moving parts of the piston engine, create vibration.
+The jet engines which utilize their tremendous power in thrust eliminate much of this vibration. As an example, a glass can be balanced on the arm of a seat at normal cruising speed without spilling its contents. The passenger cabin also will have a noise level lower than most propeller-driven airliners.
+8

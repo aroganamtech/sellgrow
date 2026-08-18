@@ -1,0 +1,136 @@
+﻿	/A\ Abbey Road A2	Bourne Street G4
+	u U Abbey Street F11	Bourne Terrace Cl
+	Abercorn Place A2	Bouverie Street D8
+	Aberdeen Place B2	Bramham Gardens G1
+	Abingdon Road FI	Brandon Street G10
+	Abingdon Street F7	Bread Street D9
+	Abingdon Villas F1	Brewer Street D6
+	. Acacia Road A3	Brick Lane B11
+	Acton Street B7	Bridge Street A1
+	Addington Street E8.	Bridport Place A10
+	Adeline Place C6 ■	Broadley Street C3
+	Albany Street A5-B5	Broad Walk, The E2
+	Albert Bridge H3	Broadway F6
+	Albert Bridge Road H3	Broadwick Street D6. si I
+	Albert Embankment G7	Brompton Road F3
+	Albert Street A5	Brook Drive F8-9
+	Albion Street D3	Brook Street C8
+	Aldenham Street A6	Brunswick Gardens E1
+	Alderney Street G5	Brunswick Place B10
+	Aldersgate Street C9	Brunswick Square B7
+	Aldgate High Street D11	Brushfield Street C11
+	Aldwych D7-8	Bruton Street D5
+	Alexander Place F3	Bryanston Square C4
+	Alexander Street Cl	Buckingham Gate F6
+	Alfred Road a	Buckingham Palace Road
+	Alie Street D11	F5
+	Allen Street FI	Bunhill Row B10
+	Allsop Place B4	Burlington Arcade D6
+	Alma Square A2	Burlington Gardens D6
+	Alscott Road F11	Burne Street C3
+	Amberley Road B1	Bute Street G3
+2	Ambrosden Avenue F6	Buttesland Street A10
+	Amwell Street B8	1 Byng Place B6
+J	Anderson Street G4	
+	Appold Street C10	if Cabbell Street C3
+. 2	Argyle Street B7	Cadogan Gardens
+I	Argyll Road E1	G4
+1	Arlington Road A5	Cadogan Lane F4
+	Arnold Circus B11	Cadogan Place F4
+FMI	Artesian Road D1	Cadogan Square F4
+P. m 1	Arthur Street D10	Cadogan Street G4
+H ■	Artillery Row F6	Caledonian Road A7
+	Arundel Street D8	Cale Street G3
+	Ashburn Place H2	Calshot Street A7
+5	Ashley Place F6	Calthorpe Street B8
+	• Andley Street C5	Calvert Avenue B11
+BB	Attneave Street B8	Camberwell New Road H8
+?	Austin Street B11	Cambridge Road A1
+	, Avenue Road A3	Cambridge Square C3
+h~ ü)	Aylesbury Street B9	Camden High Street A5
+	. • Aylesford Street G6	Camden Passage A9
+{if	Id)	Camomile Street C11
+: mm	I—Baker Street C4 K • I —v Balaclava Road G11	Campden Grove E1
+MB		Campden Hill Road E1
+	Balcombe Street B4	Campden Street E1
+o	.Balfe Street A7	Canning Place F2
+3	Balfour Street F10 ■	Cannon Street D10
+	Bankside D9	- Canterbury Road A1
+■	Barkston Gardens G1	Carburton Street B5
+	Barnsbury Road A8	Cardington Street B6
+	Baroness Road A1.1 -j&	Carey Street C8
+a-' ' < - S	Baron Street A8	Carlisle Place F6
+k	Bartholomew Street F10	Carlos Place D5
+	Basil Street F4	Carlton Hill A2
+	Batchelor Street A8	Carlton Vale At, y
+oc ' <t	Bateman's Row B11	Carnaby Street D6
+o	Bath Street B10 :	Carriage Road, The E3-4
+	Bath Terrace F9	Carter Lane D9
+2	Battersea Bridge H3	Cartwright Gardens B7
+	Bayham Street A6	Castellain Road B1
+m I	Bay I is RoadFS	Catesbury Street G10
+t	■ Bayswater Road D2-3-4	Cathcart Road H2
+	Beak Street D6	Causton Street GS
+1	Beauchamp Place F4	Cavendish Avenue A3
+	Beaufort Street H3'	Cavendish Place C5
+	Beaumont Street C5 '	Cavendish Square C5
+	Bedford Gardens E1	Caxton Street F6
+	Bedford Place C7	Central Street B9
+	Bedford Row C8	Chadwell Street A8
+	Bedford Square C6	Chalton Street A6
+	Bedford Street D7	Chancery Lane C8
+tvi: :	Bedford Way B7	Chandos Street C5
+	Beech Street C9	Chapel Market A8
+	, ' Beeston Place F5	Chapel Street C3
+	Belgrave Place F5	Chapel Street F5
+	Belgrave Road G6 -	Chapter Street G6
+	Belgrave Square F4	Charing Cross E7
+.CO	pQ|| 1 «no PI 1	Phnrinn Procc PnnH 7
+	ben Lane ui i Bell Street C3I,	Uiiaiiny olObo nodu L70-/ Charibert Street A3
+	Belvedere Road E8	Charles Street D6
+	: Bentinck Street C5	Charlotte Street C6
+	, ... Berkeley Gardens E1 ';-	Charrington Street A6
+	' Berkeley Square D5	Charterhouse Square C9
+“*•0	Berkeley Street DS ’	Charterhouse Street C9
+	Bermondsey Street E11	Chatham Street G10
+	Bernard Street B7	Cheapside C9-D10
+	Berwick Street D6	Chelsea Bridge H5
+	Bethnal Green Road B11	Chelsea Bridge Road GS
+	Bevis Marks C11	Chelsea Embankment H4
+	Birdcage Walk E6	Chenies Street C6
+	Bishop's Bridge Road C2	Cheniston Gardens F1
+	Bishopsgate C10-11	Chepstow Crescent D1
+	Blackfriars Bridge D9	Chepstow Place D1
+	Blackfriars Road F9	Chepstow Road C1
+	Black Prince Road G8	Chepstow Villas Q1
+	Blandford Street C4	Chesham Place F4
+	Blantyre Street H2	Chesham Street F4
+	Blomfield Road B2	Chesterfield Hill D5
+	Blomfield Street C10	Chester Road B5
+	Bloomsbury Square C7	Chester Row G5
+	■ Bloomsbury Street C7 ■	, . Chester Square F5
+	Bloomsbury Way C7	: Chester Street F5 • •.
+	Bolsover Street B5	Chester Way G8 ;
+	Bolton Gardens G2	Cheval Place F3
+i	Boltons, The G2	Cheyne Walk H3 ~(
+jo	Boltons, The Little G2 >,	Chicheley Street E8
+	‘ Bolton Street E5 v	Chichester Street G6
+	Borough High Street E10	Chiltern Street C4
+Q.	Borough Road F9	Chilworth Street D2
+E	Boston Place B4	Chippenham Road B1
+	Boswell Street C7	Chiswell Street C10
+	Boundary Row E9	Churchill Gardens Road H5
+o> i. §	Boundary Street B11	Church Street C3 Churchway B6 ”
+Churton Street G6 Circus Road A3 City Road A9-B10 Clapham Road H8 Claremont Square A8 Clarence Gardens B5 Clarendon Place D3 Clarendon Street G5 Claverton Street G6 Clerkenwell Road B8 Cleveland Square D2 Cleveland Street C6 Cleveland Terrace C2 CliTtbrf Gardens B2 Clifton Hill A2 Clifton Road B2 Clifton Street B10 Clifton Villas C2 Club Row B11 Cockspur Street E6 Colebrooke Row A9 Collier Street A7-8 Collingham Gardens G2 Collingham Road G2 Columbia Road A11 Commercial Street C11 Compton Street B9 Conduit Street DS Congreve Street G10 Connaught Square D4 Connaught Street D3 Constitution Hill E5 Conway Street B5 Cornhill D10 Cornwall Gardens F2 Cornwall Road E8 Corporation Row B8 Courtfield Gardens G2 Courtfield Road G2 Covent Garden D7 Cowcross Street C9 Cranleigh Street A6 Cranley Gardens G2 Craven Hill D2 Craven Road D2 Craven Street E7 Craven Terrace D2 Crawford Place C3 Crawford Street C4 Cremer Street A11 Cremorne Road H2 Crispin Street C11 Cromer Street B7 Cromwell Crescent G1 Cromwell Road F2 Crondall Street A10 Cropley Street A10 Crosby Row E10 Crosswall D11 Crowndale Road A6 Crucifix Lane E11 Crutched Friars D11
+Cubitt Street B8 Cursitor Street C8 Curtain Road B11 Curzon Street E5 Cut The E8
+0 Danbury Street A9 Dante Road G9 Danvers Street H3 Dartmouth Street F6 Darwin Street G10 Davies Street D5 Dawson Place D1 Deacon Street G9 Deanery Street E5 Dean Street D6 Delamere Terrace C2 Delaware Road B1 Denbigh Street G6 Denmark Street C6 Derry Street F1 Deverell Street F10 Devonshire Place C5 Devonshire Street C5 Devonshire Terrace D2 Dingley Road B9 Diss Street A11 Dolben Street E9 Donegal Street A8 Dorset Square B4 Dorset Street C4 Doughty Street B8 Douglas Street G6 Dovehouse Street G3 Dover Street D5 Dowgate Hill D10 Downing Street E7 Down Street E5 D'Oyley Street G4 Draycott Avenue G3 Draycott Place G4 Drayton Gardens G2 Druid Street E11-F11 Drummond Crescent A6 Drummond Street B6 Drury Lane C7 Duchess of Bedford's Walk E1
+Dufferin Street B10 Duke Street E6 Duke Street Hill E10 Duncan Street A9 Dunloe Street A11 Dunton Road G11
+Eagle Street C7 Eagle Wharf Road
+A10
+Earl's Court Road F1 -G1 Earl's Court Square G1 Eastbourne Terrace C2 Eastcastle Street C6
+Eastcheap D10 East Road A10 East Smithfield D1f-E1 • Eaton Place F4-5 Eaton Square F5 Eaton Terrace G4 Ebury Bridge G5 Ebury Bridge Road G5 Ebury Street G5 Eccleston Bridge F5 Eccleston Place F5 Eccleston Square GS Eccleston Street F8 Edgware Road C3-4 Edith Grove H2 Edwardes Square FI Egerton Gardens F3 Egerton Terrace F3 Eldon Road F2 Eldon Street C10 Elephant Road F9 Elgin Avenue B1 Elizabeth Street F5 Elm Park Gardens G3 Elm Park Road H3 Elvaston Place F2 Elystan Place G4 Emerson Street E9 Endell Street D7 Endsleigh Gardens B6 Endsleigh Place B6 Endsleigh Street B6 Ennismore Gardens F3 Epworth Street B10 Erasmus Street G6 Essendine Road B1 Essex Villas F1 Euston Road B6 Eversholt Street A6 Exhibition Road F3 Exton Street E8
+F Falkirk Street A11 Falmouth Road F10 Fann Street B9 Fanshaw Street A10 Farm Street D5 Farringdon Road B8 Farringdon Street C9 Fenchurch Street D11 Fentiman Road H7 Fetter Lane C8 Finborough Road G1 Finsbury Circus C10 Finsbury Square B10 First Street F3 Fitzalan Street F8 Fitzhardinge Street C4 Fitzroy Square B6 Fleet Street D8 Flood Street H4 Fore Street C10
+Formosa Street B2 Fortune Street B9 Frampton Street B3 Francis Street F6 Franklin's Row G4 Frederick Street B7 Frith Street D6 Fulham Road G2-H2 Furnival Street C8
+0 Garden Row F9 Garrick Street D7 Garway Road D1 Gee Street B9 Geffrye Street A11 George Street C4 Gillingham Street G5 Gilston Road G2 Giltspur Street C9 Gladstone Street F9 Glasshouse Street D6 Glentworth Street B4 Globe Street F10 Gloucester Gate AS Gloucester Road F2 Gloucester Square D3 Gloucester Street G6 Gloucester Terrace C2-D2 Golden Lane B9 Golden Square D6 Goldington Crescent A6 Goodge Street C6 Goods Way A7 Gordon Square B6 Gordon Street B6 Gosset Street B11 Goswell Road A9-B9 Goulston Street C11 Gower Place B6 Gower Street B6 Gracechurch Street D10 Grafton Street D5 Grafton Way B6 Graham Street A9 Granby Terrace A5 Grange Road F11 .
+Grange, The F11 Granville Place D4 Granville Road A1 Gray's Inn Road B7-C8 Gray Street E8 Great College Street F7 Great Cumberland Place C4 Great Dover Street F10 Great Eastern Street B10 Great George Street E7 Great Guildford Street E9 Great James Street C8 Great Marlborough Street D6
+Great Ormond Street B7 Great Percy Street A8

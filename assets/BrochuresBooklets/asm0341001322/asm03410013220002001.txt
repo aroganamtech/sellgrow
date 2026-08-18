@@ -1,0 +1,19 @@
+﻿from
+-NGISCO
+(only)
+Total Mail .......................1,337 lbs.
+Number of Bags......................... 53
+Numbers of Letters..............   110,865
+for Honolulu .................... 46,561
+for Guam ......................... 19,958
+for Manila .....................  44,346
+Number of Stamps Sold............. 206,414
+from MANILA
+(only)
+Total Mail ........................1,739 lbs.
+Numbers of Bags......................... 49
+Numbers of Letters.................. 98,480
+for Guam ......................... 5,093
+for Honolulu .................... 18,663
+for San Francisco................ 74,719
+Number of Stamps Sold.............. 231,033

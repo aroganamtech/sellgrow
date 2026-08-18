@@ -1,0 +1,125 @@
+﻿Su	FEBRUARY 1982 Mo Tu We Th Fr					Sa	Su	MARCH 1982 Mo Tu We Th Fr					Sa
+	1	2	3	4	5	6		1	2	3	4	5	6
+7	8	9	10	11	12	13	7	8	9	10	11	12	13
+14	15	16	17	18	19	20	14	15	16	17	18	19	20
+21	22	23	24	25	26	27	21	22	23	24	25	26	27
+28							28	29	30	31			
+		APRIL 1982							MAY 1982				
+Su	Mo	Tu	We	Th	Fr	Sa	Su	Mo	Tu	We	Th	Fr	Sa
+				1	2	3							1
+4	5	6	7	8	9	10	2	3	4	5	6	7	8
+11	12	13	14	15	16	17	9	10	11	12	13	14	15
+18	19	20	21	22	23	24	16	17	18	19	20	21	22
+25	26	27	28	29	30		23	24	25	26	27	28	29
+							30	31					
+Washington, DC
+Reservations: 833-1000
+Airports N-National D-Dulles
+	Freq.	Leave	Arrive	Flight No.	Stops or Connecting City Aircraft t Meals	
+To Abidjan*^	Th	N 155p	1145a +1	217/184	New York	747 £ DBS
+From Abidjan	Th	720p N 912a+1		191/889	New York	747 SBS
+Res. 442132						
+To Accra	Su	N 745p	535p +1	992/188	New York	747 &DBS
+From Accra	Mo	750p N 912a+1		185/889	New York	747 SBS
+Res. 21151						
+To Bahrain*:*	Mo	N 400p	755p +1	72/2	Frankfurt	747 £DSL
+From Bahrain	We	515a N 413p		1/67	Frankfurt	747 &BLS
+Res. 258-850						
+To Bangkok*:*	TuWeFrSa N 945a		1135p +1	801/1	Tokyo	st* & LSD
+	WeFrSaSuN 400p		730a +2	72/2	Frankfurt	747 &DSL
+	FrSaSu	D 720p	730a +2	106/2	London	747 & DSL
+From Bangkok	MoThFrSu 1235a N 413p			1/67	Frankfurt	747 &SBL
+Res. 252-2121	ThFrSu	1235a D 530p		1/107	London	747 £SBL
+	MoTuFrSu 830a N 827p			2/800	Tokyo	st* &BLD
+To Beijing	WeSa	N 945a	1010p+1	801/15	Tokyo	st* & LSD
+From Beijing	MoFr	1035a N 827p		16/800	Tokyo	st* &LDB
+Res. 52-1756						
+To Berlin*:*	Daily	N 400p	940a +1	72	Two-Stop	747 &DS
+	ThFrSaSu D 720p		100p +1	106/2/638	London/Frankft	747 &DSS
+	ThFrSaSuD 720p		225p +1	106/104	London	747 &DSS
+From Berlin	ThFrSaSu 745a D 530p			101/107	London	747 &SLS
+Res. 88-10-11	Daily	815a	N 413p	67	Two-Stop	747 £LS
+	SaSu	1125a N 827p		73/800	New York	1011 &LS
+To Bombay*	WeSu	N 400p	105a +2	72/2	Frankfurt	747 55-DSL
+	Su	D 720p	105a +2	106/2	London	747 &DSL
+From Bombay	MoTh	445a N 413p		1/67	Frankfurt	747 &SBL
+Res. 244020	Th	445a	D 530p	1/107	London	747 &SBL
+To Buenos Aires*:*	ThSa	N 645p	920a +1	391/453	Miami	747 &DDS
+Ezeiza Airport	Mo	N 645p	155p +1	391/441	Miami	747 &DBL
+	TuWeFrSu N 745p		155p +1	992/201	New York	st* &DBL
+From Buenos Aires tu		630p N 912a +1 440/202/889			Rio/NewYork	st* £ DBS
+Res. 45-0111	MoWeThSa 630p N 912a+1			202/889	New York	st* &DBS
+	Tu	630p N 1150a +1		440/394	Miami	747 DBS
+	FrSu	1150p N 1150a+1		454/394	Miami	747 &DSS
+To Caracas*	Daily	N 900a	635p	349/445	Miami	747 BL
+	Daily	N 155p	935p	217	One-Stop	DC10 & D
+From Caracas	Daily	830a N 317p		442/330	Miami	747 BL
+Res. 284-9911	Daily	930a N 413p		218	One-Stop	DC10 & L
+To Dakar	Th	N 155p	530a +1	217/184	New York	747 £D
+	Su	N 745p	1100a +1	992/188	New York	747 ftD
+From Dakar	Fr	145a	N 912a	191/889	New York	747 BS
+Res. 265-86	Tu	215a N 912a		185/889	New York	747 BS
+To Delhi*	FrSa	N 400p	120a +2	72/2	Frankfurt	747 & DSL
+	MoTuTh N 400p		320a +2	72/2	Frankfurt	747 5?- DSL
+	FrSa	D 720p	120a +2	106/2	London	747 53-DSL
+	Th	D 720p	320a +2	106/2	London	747 &DSL
+From Delhi	TuWeSa 240a N 413p			1/67	Frankfurt	747 &SBL
+Res. 322273	Sa	240a	D 530p	1/107	London	747 &SBL
+	FrSu	420a N 413p		1/67	Frankfurt	747 &SBL
+	FrSu	420a D 530p		1/107	London	747 &SBL
+A plus (+) or minus (-) sign after the arrival	MEAL COOES:
+time indicates arrival the day(s) following departure	S-Snack L-Lunch
+or the day previous to departure.	B-Breakfast D-Dinner
+Flight numbers in Bold are operated by Wide Cabin aircraft. All times shown are locally observed
+Standard or Daylight Saving Time.
+Washington, DC
+Reservations: 833-1000
+Airports N-National D-Dulles
+	Freq.	Leave	Arrive	Flight No.	Stops or Connecting City	Aircraftt Meals	
+To Dhahran	ExSaSu N 745p		630p +1	992/24	New York	St* 55-DB	
+From Dhahran	ExMoSu 1159p N 912a+1			25/889	New York	st* ffi-DSB	
+Res. 8642977							
+To Ft. Lauderdale/	Daily	N1050a	105p	397	NON-STOP	727	L
+Hollywood, FL	Daily	N 645p	905p	391	NON-STOP	727	D
+From Ft.	Daily	945a N1150a		394	NON-STOP	727	S
+Lauderdale/	Daily	300p N 510p		390	NON-STOP	727	S
+Hollywood, FL							
+Res. 462-6600							
+To Frankfurt*^	Daily	N 400p	735a +1	72	One-Stop	747	$DS
+	ThFrSaSuD 720p		1110a +1	106/2	London	747	£DSS
+From Frankfurt	ThFrSaSu 1055a D 530p			1/107	London	747	&SLS
+Res. 23-05-91	Daily	1100a N 413p		67	One-Stop	747	£LS
+	SaSu	120p N 827p		73/800	New York	1011 & LS	
+To Guam	ExMoTu N 155p		555a +2 217/811/841		NewYork/Honolutu	747	&DSB
+From Guam	Consult your Travel Agent or Pan Am						
+Res. 477-8841							
+To Guatemala City Daily		N 900a	255p	349/403	Miami	727	BL
+	Daily	N 340p	1010p	991/415	Houston	727	SD
+From Guatemala	Daily	745a N 317p		404/330	Miami	727	BL
+City							
+Res. 22144							
+To Hamburg*	Daily	N 500p	110p +1	116/104	New York	747	&DSS
+	ThFrSaSuD 720p		110p +1	106/104	London	747	£DSS
+From Hamburg	Daily	905a N 413p		101/67	New York	747	S-SLS
+Res. 500-9281	ThFrSaSu 905a D 530p			101/107	London	747	£SLS
+To Hong Kong*	Daily	N 945a	845p +1	801/1	Tokyo	st* 55- LSD	
+From Hong Kong	Daily	120p N 827p		2/800	Tokyo	st* 5?- LDB	
+Res. 5-231111							
+To Honolulu, HI	Daily	N 155p	1227a +1	217/811	New York	747	&DD
+From Honolulu, HI	Consult your Travel Agent or Pan Am						
+Res. 955-9111							
+To Houston, TX	Dally	N 340p	7 OOp	991	One-Stop	727	S
+Intercontinental Airport							
+From Houston, TX	Daily	150p N 646p		992	One-Stop	727	D
+Res. 447-0088							
+To Karachi*	TuTh	N 400p	1145p+1	72/2	Frankfurt	747	&DSL
+	Th	D 720p	1145p +1	106/2	London	747	&DSL
+From Karachi	TuSa	510a	N 413p	1/67	Frankfurt	747	S-BLS
+Res. 510121/24	Sa	510a D 530p		1/107	London	747	£BSL
+To Lagos	Tu	N 155p	1135a +1	217/190	New York	747	&DSB
+	Th	N 155p	325p +1	217/184	New York	747	£DBS
+From Lagos	Th	535p N 912a +1		191/889	New York	747	SBS
+Res. 661761/771	Sa	1005p N 912a +1		189/889	New York	747	SBS
+¿»‘/'-Operates with long-range Special Performance 747	t-Enroute plane change from or to another
+A-Throughalrcraftwithenroutechangeofflightnumber aircrafttypeonsomeflights 5-Theatre-in-the-Air® movie flight	O-Inter • Continental Hotel
+*-Airport transfer required	fy-Forum Hotel

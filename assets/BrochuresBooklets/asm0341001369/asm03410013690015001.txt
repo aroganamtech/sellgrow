@@ -1,0 +1,15 @@
+﻿MONTHS ’ MESES
+English—Ingles	Spanlsh— Español	Phonetical Pronunciation—Spanish	Pronunciación fonética—Inglés
+January.	Enero.	Ay-nay'-roh.	yan'iú-eri.
+February.	Febrero.	Feb-ray'-roh.	Feb'riú-eri.
+March.	Marzo.	Mahr'-zoh.	Martch.
+April.	Abril.	Ah-breel'.	Ei'-pril.
+May.	Mayo.	My'-oh.	Mei.
+June.	Jumo.	Hoo'-nee-oh.	F un.
+"7uty:	Julio.	Hoo'-lee-oh.	Fu-lai'.
+August.	Agosto.	Ah-gohss'-toh.	O'-guest.
+September.	Septiémbre.	Sep-tee-ém'-bray.	Sep-terri'-ber.
+October.	Octubre.	Ohc-too'-bray.	Ac-tó-ber.
+November.	Noviembre.	Noh-vee-ém'-bray.	No-vem'-bér.
+December.	Diciembre.	Dee-see-ém'-bray.	Di-sem'-ber.
+-M

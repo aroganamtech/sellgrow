@@ -1,0 +1,4 @@
+﻿
+BURNERS
+WHAT ARE ITS ADVANTAGES?
+The simplicity of the jet engine is one of its strong points. There are only two moving parts in the engine proper, the front compressor-turbine unit and the rear compressor-turbine unit. These spin silently and smoothly without the explosive back-and-forth movement of the pistons in a piston engine. This difference is responsible for the vibrationless ride of a jet aircraft. The fewer moving parts means fewer trouble spots and the lack of vibration means less wear on the engine and longer periods between overhaul. A Pratt & Whitney Aircraft J-57 jet engine installed in a B-52 bomber has already completed the equivalent of twenty flights around the world and accumulated a flight time of 1,000 hours before overhaul. In commercial service, after a few years of experience, jet engines are expected to exceed greatly this figure.

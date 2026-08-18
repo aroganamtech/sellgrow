@@ -1,0 +1,20 @@
+﻿LATERAN MUSEUM - Piazza S. Giovanni in Laterano.
+(g 9)
+ART GALLERIES
+BORGHESE GALLERY AND MUSEUM - Villa Umberto I (f 4)
+FARNESINA - Lungotevere Farnesina 10. (c 7)
+NATIONAL ART GALLERY - Palazzo Barberini, Via delle 4 Fontane, (f 6)
+NATIONAL CABINET OF PRINTS - Via della Lun-gara 230. (c 7)
+NATIONAL GALLERY OF MODERN ART - Valle Giulia
+(e 4)
+CORSINI - Via della Lungara 230. (c 7)
+SPADA - Piazza Capodiferro 13 (c 7)
+PRIVATE COLLECTIONS
+GALLERIA COLONNA - Via della Pilotta 17 (open Sturday morning). (e 7)
+GALLERIA DORIA - Piazza del Collegio Romano 1 (Tues. Fri. mornings). (d 6)
+GALLERIA ROSPIGLIOSI PALLAVICINI - Via XXIV Maggio 43. (c 7)
+MQNUMENTS
+AfcA PACIS AND MAUSOLEUM OF AUGUSTUS - Near Ponte Cavour, (d 6)
+CASTEL SANT'ANGELO (Hadrian's Tomb) - Lungotevere Castello, (c 6)
+COLOSSEUM. (f 8)
+DOMUS AUREA - Via Labicana, Colle Oppio, (f 8)

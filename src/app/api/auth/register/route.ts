@@ -7,7 +7,7 @@ import { IUser, formatUserResponse } from '@/lib/models/User';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { firstName, name, email, phone, password, businessName, businessCategory, businessType } = body;
+    const { firstName, name, email, phone, password, businessName, businessCategory, businessType, companyLogo } = body;
 
     const userFirstName = (firstName || name || '').trim();
     const userBusinessCat = (businessCategory || businessType || 'Retail Shop').trim();
@@ -57,6 +57,7 @@ export async function POST(request: Request) {
       businessName: businessName.trim(),
       businessType: userBusinessCat,
       businessCategory: userBusinessCat,
+      companyLogo: (companyLogo || '').trim(),
       isEmailVerified: true,
       role: 'admin',
       status: 'active',

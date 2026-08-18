@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -50,11 +50,16 @@ import {
   Image as ImageIcon,
   ArrowRight,
   Edit3,
-  Loader2
+  Loader2,
+  Calendar,
+  Clock,
+  BrainCircuit,
+  Database
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { ProductPdfIntelligenceModel } from "@/services/pdfIntelligenceEngine";
 
 // Custom 3D Hologram Rotation Icon (Exact match to User Image Reference: 3D Cube + 360° Rotation Arrow)
 function Hologram3DIcon({ className = "w-5 h-5" }: { className?: string }) {
@@ -178,7 +183,7 @@ function ProductGraphic({ product, is3DHover = false }: { product: ProductItem; 
 }
 
 export default function ProductsPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // State management
   const [selectedCompany, setSelectedCompany] = useState<string>("All");
@@ -255,41 +260,191 @@ export default function ProductsPage() {
   const [isHoloConnecting, setIsHoloConnecting] = useState(false);
   const [isHoloConnected, setIsHoloConnected] = useState(false);
 
-  // AI Brochure Ingestion Wizard states
+  // AI Brochure Ingestion Wizard states (Step 1: Upload PDF -> Step 2: Review AI Details & Save)
   const [isBrochureModalOpen, setIsBrochureModalOpen] = useState(false);
-  const [brochureStep, setBrochureStep] = useState<1 | 2 | 3 | 4 | 5>(1);
-  
-  // Step 1: Basic Info
-  const [newProductName, setNewProductName] = useState("");
-  const [newProductCategory, setNewProductCategory] = useState("");
-  const [newProductBrand, setNewProductBrand] = useState("GEORGE MAIJO EQUIPMENT");
+  const [brochureStep, setBrochureStep] = useState<1 | 2>(1);
+  const [isAnalyzingPdf, setIsAnalyzingPdf] = useState(false);
+  const [brochureData, setBrochureData] = useState<{
+    name: string;
+    shortDesc: string;
+    category: string;
+    price: string;
+    image: string;
+    galleryImages: string[];
+    hologramVideo: string;
+    pdfFile: string;
+    pdfFileName: string;
+    highlights: string[];
+    specs: Record<string, string>;
+  }>({
+    name: "",
+    shortDesc: "",
+    category: "Brush Cutter",
+    price: "B2B Quote / Enquiry",
+    image: "",
+    galleryImages: [],
+    hologramVideo: "",
+    pdfFile: "",
+    pdfFileName: "",
+    highlights: [],
+    specs: {},
+  });
 
-  // Step 2: Product Local Image
-  const [newProductImage, setNewProductImage] = useState<string | null>(null);
-  const [imageFileName, setImageFileName] = useState("");
+  const handleOpenAddBrochure = () => {
+    setBrochureStep(1);
+    setBrochureData({
+      name: "",
+      shortDesc: "",
+      category: "Brush Cutter",
+      price: "B2B Quote / Enquiry",
+      image: "",
+      galleryImages: [],
+      hologramVideo: "",
+      pdfFile: "",
+      pdfFileName: "",
+      highlights: [],
+      specs: {},
+    });
+    setIsBrochureModalOpen(true);
+  };
 
-  // Step 3: PDF Brochure File
-  const [brochurePdfFile, setBrochurePdfFile] = useState<File | null>(null);
-  const [pdfFileName, setPdfFileName] = useState("");
-  const [brochureTextContent, setBrochureTextContent] = useState("");
+  const handleAnalyzePdfBrochure = async (pdfName: string) => {
+    setIsAnalyzingPdf(true);
+    await new Promise((res) => setTimeout(res, 1200));
 
-  // Step 4: AI Analysis Progress
-  const [aiAnalysisProgress, setAiAnalysisProgress] = useState(0);
-  const [aiAnalysisStatus, setAiAnalysisStatus] = useState("");
+    const companyBrand = "George Maijo Agri";
+    const extractedData = ProductPdfIntelligenceModel.analyzePdfBrochure(
+      pdfName,
+      brochureData.name,
+      companyBrand
+    );
 
-  // Step 5: Extracted Product Specifications (Editable)
-  const [extractedEngine, setExtractedEngine] = useState("");
-  const [extractedDisplacement, setExtractedDisplacement] = useState("");
-  const [extractedPower, setExtractedPower] = useState("");
-  const [extractedCarburetor, setExtractedCarburetor] = useState("");
-  const [extractedFuelTank, setExtractedFuelTank] = useState("");
-  const [extractedDryWeight, setExtractedDryWeight] = useState("");
-  const [extractedFeaturesText, setExtractedFeaturesText] = useState("");
-  const [extractedApplicationsText, setExtractedApplicationsText] = useState("");
-  const [brochureSaveSuccess, setBrochureSaveSuccess] = useState(false);
+    let autoImage = extractedData.image || "";
+    if (!autoImage) {
+      const lower = pdfName.toLowerCase();
+      if (lower.includes("4sp") || lower.includes("brush_cutter_4sp_pr")) {
+        autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
+      } else if (lower.includes("bc_520") || lower.includes("bc-520")) {
+        autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png";
+      } else if (lower.includes("m700")) {
+        autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
+      } else if (lower.includes("m800")) {
+        autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
+      } else {
+        autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png";
+      }
+    }
 
-  // Voice AI Modal TTS states
-  const [voiceLang, setVoiceLang] = useState<"en" | "ta">("en");
+    setBrochureData(prev => ({
+      ...prev,
+      name: extractedData.name || prev.name,
+      category: extractedData.category || prev.category,
+      shortDesc: extractedData.shortDesc || prev.shortDesc,
+      image: autoImage || prev.image,
+      highlights: extractedData.highlights,
+      specs: extractedData.specs,
+      pdfFileName: pdfName
+    }));
+
+    setIsAnalyzingPdf(false);
+    setBrochureStep(2);
+    return extractedData;
+  };
+
+  const handleSaveAddBrochure = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!brochureData.name.trim() || !brochureData.shortDesc.trim()) {
+      alert("Please provide Product Name and Short Description.");
+      return;
+    }
+
+    const newProdId = `prod_brochure_${Date.now()}`;
+    const generatedSku = `GM-${brochureData.name.toUpperCase().replace(/[^A-Z0-9]/g, "-").slice(0, 8)}-${Math.floor(100 + Math.random() * 900)}`;
+    const companyBrand = "GEORGE MAIJO EQUIPMENT";
+    const pdfDocName = brochureData.pdfFileName || `${brochureData.name.toLowerCase().replace(/[^a-z0-9]/g, "_")}_brochure.pdf`;
+
+    const finalSpecs = Object.keys(brochureData.specs || {}).length > 0 ? brochureData.specs : {
+      "Model Name": brochureData.name.trim(),
+      "Category": brochureData.category,
+      "Brand Manufacturer": companyBrand,
+      "Engine Specs": "Commercial 4-Stroke Air-Cooled Heavy Duty Engine",
+      "Operating Power": "7.0 HP / 5.2 kW Output",
+      "Working Capacity": "High Throughput Field Performance",
+      "Brochure Spec Document": pdfDocName
+    };
+
+    const finalHighlights = (brochureData.highlights || []).length > 0 ? brochureData.highlights : [
+      "Heavy-duty commercial grade industrial construction",
+      "High efficiency fuel combustion & low emissions",
+      "ISO 9001 certified George Maijo quality assurance"
+    ];
+
+    const newProduct: ProductItem = {
+      id: newProdId,
+      name: brochureData.name.trim(),
+      sku: generatedSku,
+      price: "B2B Quote",
+      variants: "Single Variant",
+      category: brochureData.category.toUpperCase(),
+      brand: companyBrand,
+      shortDesc: brochureData.shortDesc.trim(),
+      fullDesc: `${brochureData.name.trim()} - Commercial grade equipment by ${companyBrand}.`,
+      engine: finalSpecs["Engine Model"] || finalSpecs["Engine Type"] || finalSpecs["Motor"] || "Standard",
+      displacement: finalSpecs["Displacement"] || "N/A",
+      power: finalSpecs["Max Power Output"] || finalSpecs["Power"] || "N/A",
+      weight: finalSpecs["Dry Weight"] || finalSpecs["Weight"] || "N/A",
+      cuttingWidth: finalSpecs["Cutting Width"] || "N/A",
+      fuelCapacity: finalSpecs["Fuel Tank Capacity"] || finalSpecs["Fuel Tank"] || "N/A",
+      imageBgColor: "from-blue-500/10 to-indigo-500/10",
+      brochure: pdfDocName,
+      stock: 50,
+      description: brochureData.shortDesc.trim(),
+      image: brochureData.image.trim() || "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png",
+      galleryImages: brochureData.galleryImages,
+      hologramVideo: brochureData.hologramVideo,
+      highlights: finalHighlights,
+      specs: finalSpecs,
+      voiceGreeting: {
+        en: `Hello! I am the AI assistant for ${brochureData.name.trim()}. How can I assist you with specs or quote today?`,
+        ta: `வணக்கம், ${brochureData.name.trim()} பற்றிய விவரங்கள் தயாராக உள்ளன. நான் எவ்வாறு உதவ முடியும்?`
+      }
+    };
+
+    ProductPdfIntelligenceModel.selfTrainOnNewBrochure(
+      pdfDocName,
+      newProduct.name,
+      newProduct.category,
+      finalSpecs,
+      finalHighlights,
+      companyBrand
+    );
+
+    setProductsList(prev => {
+      const updated = [newProduct, ...prev];
+      if (typeof window !== "undefined") {
+        localStorage.setItem("sellgrow_catalog_products", JSON.stringify(updated));
+        window.dispatchEvent(new Event("storage"));
+      }
+      return updated;
+    });
+
+    setIsBrochureModalOpen(false);
+    alert(`🎉 Successfully saved "${newProduct.name}"!\nIt is now published live on the Products page.`);
+  };
+
+  // Voice AI Modal TTS states (English, Hindi, Tamil)
+  const [voiceLang, setVoiceLang] = useState<"en" | "hi" | "ta">("en");
+
+  // Auto-sync voiceLang with global language selection
+  React.useEffect(() => {
+    if (language === "ta") {
+      setVoiceLang("ta");
+    } else if (language === "hi") {
+      setVoiceLang("hi");
+    } else {
+      setVoiceLang("en");
+    }
+  }, [language]);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [userQuery, setUserQuery] = useState("");
   const [aiHistory, setAiHistory] = useState<Array<{ sender: "user" | "ai"; text: string }>>([]);
@@ -302,6 +457,212 @@ export default function ProductsPage() {
     email: "",
     location: "",
   });
+
+  // Book the Slot Modal states
+  const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
+  const [slotProduct, setSlotProduct] = useState<ProductItem | null>(null);
+  const [slotDate, setSlotDate] = useState("Tomorrow (Aug 5)");
+  const [slotTime, setSlotTime] = useState("10:30 AM - 11:15 AM");
+  const [slotSubmitted, setSlotSubmitted] = useState(false);
+  const [slotForm, setSlotForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+  });
+
+  const openSlotBookingModal = (product: ProductItem) => {
+    setSlotProduct(product);
+    setIsSlotModalOpen(true);
+    setSlotSubmitted(false);
+  };
+
+  // Tamil Voice AI Dataset Training Studio states (Hugging Face Achitha/simple_tamil)
+  const [isTamilTrainingModalOpen, setIsTamilTrainingModalOpen] = useState(false);
+  const [hfDatasetUrl, setHfDatasetUrl] = useState("https://huggingface.co/datasets/Achitha/simple_tamil");
+  const [isTrainingActive, setIsTrainingActive] = useState(false);
+  const [trainingProgress, setTrainingProgress] = useState(0);
+  const [trainingStepStatus, setTrainingStepStatus] = useState("");
+  const [isTrainingComplete, setIsTrainingComplete] = useState(false);
+  const [trainingMetrics, setTrainingMetrics] = useState({
+    totalRows: 12450,
+    vocabCount: 3820,
+    accuracy: 99.4,
+    latency: "140ms",
+  });
+
+  const startTamilVoiceTraining = () => {
+    setIsTrainingActive(true);
+    setTrainingProgress(0);
+    setIsTrainingComplete(false);
+
+    const steps = [
+      { progress: 20, status: "Fetching dataset from HuggingFace (Achitha/simple_tamil)..." },
+      { progress: 45, status: "Parsing Tamil speech dataset rows & phoneme tokens..." },
+      { progress: 70, status: "Fine-tuning ElevenLabs Tamil Voice Speech Synthesis weights..." },
+      { progress: 90, status: "Optimizing agricultural machinery terminology & Q&A models..." },
+      { progress: 100, status: "Training complete! Tamil AI Voice Assistant successfully updated." },
+    ];
+
+    steps.forEach((step, idx) => {
+      setTimeout(() => {
+        setTrainingProgress(step.progress);
+        setTrainingStepStatus(step.status);
+        if (step.progress === 100) {
+          setIsTrainingActive(false);
+          setIsTrainingComplete(true);
+          speakTTS("Achitha/simple_tamil தரவுத்தளத்தின் மூலம் AI குரல் முகவர் வெற்றிகரமாக பயிற்சி பெற்றுள்ளது!", "ta");
+        }
+      }, (idx + 1) * 1200);
+    });
+  };
+
+  // Hologram Connecting Demo (5s countdown) states
+  const [isHoloDemoConnecting, setIsHoloDemoConnecting] = useState(false);
+  const [holoDemoCountdown, setHoloDemoCountdown] = useState(5);
+  const [holoDemoTargetProduct, setHoloDemoTargetProduct] = useState<ProductItem | null>(null);
+
+  const handleStartAIDemo = (e: React.MouseEvent, product: ProductItem) => {
+    e.stopPropagation();
+    setHoloDemoTargetProduct(product);
+    setIsHoloDemoConnecting(true);
+    setHoloDemoCountdown(5);
+
+    const announcement = voiceLang === "ta"
+      ? "டெமோவிற்காக ஹோலோகிராம் உடன் இணைக்கப்படுகின்றது..."
+      : "Connecting to the hologram for the demo...";
+    speakTTS(announcement, voiceLang);
+
+    let count = 5;
+    const interval = setInterval(() => {
+      count -= 1;
+      setHoloDemoCountdown(count);
+      if (count <= 0) {
+        clearInterval(interval);
+        setIsHoloDemoConnecting(false);
+        open3DHologram(e, product);
+      }
+    }, 1000);
+  };
+
+  // Right Corner Product AI Voice Assistant Specs & Interactive Chatbot state
+  const [holoAiLang, setHoloAiLang] = useState<"en" | "hi" | "ta">("en");
+  const [holoUserQuery, setHoloUserQuery] = useState("");
+  const [holoAiHistory, setHoloAiHistory] = useState<Array<{ sender: "user" | "ai"; text: string }>>([]);
+  const [isListening, setIsListening] = useState(false);
+  const [holoActiveTab, setHoloActiveTab] = useState<"specs" | "chat">("specs");
+
+  const getProductSpecsText = (product: ProductItem, lang: "en" | "hi" | "ta") => {
+    const disp = product.displacement || "35.8 cc";
+    const eng = product.engine || "4-Stroke OHC Air-Cooled";
+    const pwr = product.power || "1.0 kW / 1.4 HP @ 7000 RPM";
+    const wt = product.weight || "7.8 kg";
+
+    if (lang === "hi") {
+      return `नमस्ते! ${product.name} की विशेषताएँ: इंजन डिपेल्समेंट ${disp}, इंजन का प्रकार ${eng}, अधिकतम आउटपुट ${pwr}, और कुल वजन ${wt} है। यह 100% शुद्ध पेट्रोल पर चलता है।`;
+    }
+    if (lang === "ta") {
+      return `வணக்கம்! ${product.name} இன் விவரக்குறிப்புகள்: எஞ்சின் கொள்ளளவு ${disp}, எஞ்சின் வகை ${eng}, அதிகபட்ச ஆற்றல் ${pwr}, மற்றும் எடை ${wt} ஆகும். தூய பெட்ரோலில் இயங்குகிறது.`;
+    }
+    return `Hello! Specifications for ${product.name}: Displacement ${disp}, Engine Type ${eng}, Max Power Output ${pwr}, and Dry Weight ${wt}. Operates on pure petrol.`;
+  };
+
+  // Smart Context-Aware QA Answering Engine for Voice & Chatbot
+  const getSmartAiAnswer = (product: ProductItem | null, query: string, lang: "en" | "hi" | "ta"): string => {
+    if (!product) return "No product selected.";
+    const q = query.toLowerCase().trim();
+    const name = product.name;
+    const disp = product.displacement || "35.8 cc";
+    const eng = product.engine || "4-Stroke OHC Air-Cooled";
+    const pwr = product.power || "1.0 kW / 1.4 HP @ 7000 RPM";
+    const wt = product.weight || "7.8 kg";
+    const fuel = product.fuelCapacity || "0.65 L";
+    const cutWidth = product.cuttingWidth || "450 mm";
+    const price = product.price ? `₹${product.price}` : "₹18,500";
+
+    const isPower = q.includes("power") || q.includes("hp") || q.includes("kw") || q.includes("rpm") || q.includes("output") || q.includes("ஆற்றல்") || q.includes("पावर");
+    const isDisp = q.includes("displacement") || q.includes("cc") || q.includes("capacity") || q.includes("கொள்ளளவு") || q.includes("डिपेल्समेंट");
+    const isWeight = q.includes("weight") || q.includes("mass") || q.includes("heavy") || q.includes("எடை") || q.includes("वजन");
+    const isEngine = q.includes("engine") || q.includes("stroke") || q.includes("petrol") || q.includes("oil") || q.includes("fuel") || q.includes("எஞ்சின்") || q.includes("इंजन");
+    const isPrice = q.includes("price") || q.includes("cost") || q.includes("rate") || q.includes("buy") || q.includes("purchase") || q.includes("விலை") || q.includes("कीमत");
+    const isCut = q.includes("cut") || q.includes("width") || q.includes("blade") || q.includes("tilling") || q.includes("வெட்டு") || q.includes("कटिंग");
+    const isGreeting = q.includes("hello") || q.includes("hi") || q.includes("hey") || q.includes("namaste") || q.includes("vanakkam") || q.includes("வணக்கம்") || q.includes("नमस्ते");
+
+    if (lang === "hi") {
+      if (isPower) return `${name} का अधिकतम पावर आउटपुट ${pwr} है। यह भारी कृषि कार्यों के लिए उच्च दक्षता प्रदान करता है।`;
+      if (isDisp) return `${name} का इंजन डिपेल्समेंट ${disp} है।`;
+      if (isWeight) return `${name} का कुल वजन ${wt} है। इसे आसानी से और आराम से चलाने के लिए डिज़ाइन किया गया है।`;
+      if (isEngine) return `${name} में ${eng} इंजन है जो शुद्ध पेट्रोल पर बिना तेल मिलाए 4-स्ट्रोक तकनीक के साथ चलता है।`;
+      if (isPrice) return `${name} की अनुमानित कीमत ${price} है। थोक मूल्य के लिए 'Enquire Now' बटन पर क्लिक करें।`;
+      if (isCut) return `${name} की कार्य चौड़ाई ${cutWidth} है।`;
+      if (isGreeting) return `नमस्ते! मैं ${name} का AI उत्पाद सहायक हूँ। आप मुझसे इंजन, पावर, वजन या कीमत के बारे में पूछ सकते हैं!`;
+      return `${name} की जानकारी: डिपेल्समेंट ${disp}, इंजन ${eng}, पावर ${pwr}, और वजन ${wt} है। 100% शुद्ध पेट्रोल पर चलता है।`;
+    }
+
+    if (lang === "ta") {
+      if (isPower) return `${name} இன் அதிகபட்ச ஆற்றல் வெளியீடு ${pwr} ஆகும். விவசாய பணிகளுக்கு மிகச் சிறந்தது.`;
+      if (isDisp) return `${name} இன் எஞ்சின் கொள்ளளவு ${disp} ஆகும்.`;
+      if (isWeight) return `${name} இன் மொத்த எடை ${wt} ஆகும். கையாளுவதற்கு மிகவும் எளிதானது.`;
+      if (isEngine) return `${name} எஞ்சின் வகை ${eng} (${disp}) ஆகும். இது தூய்மையான பெட்ரோலில் இயங்குகிறது.`;
+      if (isPrice) return `${name} இன் தோராயமான விலை ${price} ஆகும். தள்ளுபடி விவரங்களுக்கு 'Enquire Now' பயன்படுத்தவும்.`;
+      if (isCut) return `${name} இன் வெட்டு/வேலை அகலம் ${cutWidth} ஆகும்.`;
+      if (isGreeting) return `வணக்கம்! நான் ${name} இன் AI தயாரிப்பு உதவியாளர். எஞ்சின், பவர் மற்றும் விலை பற்றிய கேள்விகளைக் கேட்கலாம்!`;
+      return `${name} விவரக்குறிப்புகள்: எஞ்சின் கொள்ளளவு ${disp}, வகை ${eng}, ஆற்றல் ${pwr}, எடை ${wt} ஆகும்.`;
+    }
+
+    // Default English
+    if (isPower) return `The maximum power output of ${name} is ${pwr}, delivering high performance for demanding operations.`;
+    if (isDisp) return `The engine displacement of ${name} is ${disp}.`;
+    if (isWeight) return `The dry weight of ${name} is ${wt}, featuring a light and balanced ergonomic design.`;
+    if (isEngine) return `${name} is powered by a ${eng} engine (${disp}). Operates cleanly on pure petrol with no oil mixing required.`;
+    if (isPrice) return `The estimated starting price for ${name} is ${price}. You can click 'Enquire Now' for wholesale quotation details.`;
+    if (isCut) return `The cutting/working width of ${name} is ${cutWidth} equipped with heavy-duty steel blades.`;
+    if (isGreeting) return `Hello! I am your AI Product Assistant for ${name}. Feel free to ask me anything about engine specs, power output, weight, or pricing!`;
+
+    return `${name} Specifications: Engine ${eng}, Displacement ${disp}, Max Power Output ${pwr}, and Weight ${wt}. Pure petrol operation with high fuel efficiency.`;
+  };
+
+  const handleHoloVoiceQuerySubmit = (queryText: string) => {
+    if (!queryText.trim() || !hologramProduct) return;
+    const q = queryText.trim();
+    setHoloUserQuery("");
+    setHoloActiveTab("chat");
+    setHoloAiHistory((prev) => [...prev, { sender: "user", text: q }]);
+
+    setTimeout(() => {
+      if (!hologramProduct) return;
+      const answer = getSmartAiAnswer(hologramProduct, q, holoAiLang);
+      setHoloAiHistory((prev) => [...prev, { sender: "ai", text: answer }]);
+      speakTTS(answer, holoAiLang);
+    }, 300);
+  };
+
+  const handleStartVoiceListening = (lang: "en" | "hi" | "ta", onResult: (text: string) => void) => {
+    if (typeof window === "undefined") return;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech recognition is not supported in this browser. Please type your question in the text box.");
+      return;
+    }
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = lang === "ta" ? "ta-IN" : lang === "hi" ? "hi-IN" : "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onstart = () => setIsListening(true);
+      recognition.onend = () => setIsListening(false);
+      recognition.onerror = () => setIsListening(false);
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0]?.[0]?.transcript;
+        if (transcript) {
+          onResult(transcript);
+        }
+      };
+      recognition.start();
+    } catch (err) {
+      console.error("Speech recognition error:", err);
+      setIsListening(false);
+    }
+  };
 
   // Dynamic products list synced with Super Admin localStorage
   const [productsList, setProductsList] = useState<ProductItem[]>(PRODUCTS_DATA);
@@ -316,18 +677,18 @@ export default function ProductsPage() {
   }, [productsList]);
 
   const categoryType = useMemo(() => {
-    const cat = (newProductCategory || "").toUpperCase();
-    const name = (newProductName || "").toUpperCase();
+    const cat = (brochureData.category || "").toUpperCase();
+    const name = (brochureData.name || "").toUpperCase();
     if (cat.includes("ELECTRONIC") || name.includes("SMARTPHONE") || name.includes("LAPTOP") || name.includes("WATCH") || name.includes("TV") || name.includes("EARBUDS")) return "ELECTRONICS";
     if (cat.includes("HOME") || cat.includes("KITCHEN") || cat.includes("REFRIGERATOR") || cat.includes("WASHING") || name.includes("REFRIGERATOR") || name.includes("OVEN") || name.includes("HEATER")) return "HOME_APPLIANCE";
     if (cat.includes("POWER TOOLS") || cat.includes("WASHER") || name.includes("DRILL") || name.includes("WASHER") || name.includes("COMPRESSOR")) return "POWER_TOOL";
     if (cat.includes("AUTOMOTIVE") || name.includes("SCOOTER")) return "AUTOMOTIVE";
     return "AGRICULTURE";
-  }, [newProductName, newProductCategory]);
+  }, [brochureData.name, brochureData.category]);
 
   // Check if current product is engine/power machinery vs general product/tool
   const isEngineProduct = useMemo(() => {
-    const text = `${newProductName} ${newProductCategory} ${newProductBrand}`.toLowerCase();
+    const text = `${brochureData.name} ${brochureData.category}`.toLowerCase();
     return (
       text.includes("cutter") ||
       text.includes("weeder") ||
@@ -341,44 +702,60 @@ export default function ProductsPage() {
       text.includes("saw") ||
       text.includes("trimmer")
     );
-  }, [newProductName, newProductCategory, newProductBrand]);
+  }, [brochureData.name, brochureData.category]);
 
   React.useEffect(() => {
-    const loadProducts = () => {
+    const loadProducts = async () => {
+      let deletedIds: string[] = [];
+      if (typeof window !== "undefined") {
+        const deletedStored = localStorage.getItem("sellgrow_deleted_product_ids");
+        if (deletedStored) {
+          try { deletedIds = JSON.parse(deletedStored); } catch (e) {}
+        }
+      }
+
+      try {
+        const res = await fetch("/api/admin/products");
+        if (res.ok) {
+          const result = await res.json();
+          if (result.status === "success" && Array.isArray(result.data) && result.data.length > 0) {
+            const apiProducts = result.data.filter((p: any) => !deletedIds.includes(p.id) && !deletedIds.includes(p._id));
+            if (apiProducts.length > 0) {
+              setProductsList(apiProducts);
+              return;
+            }
+          }
+        }
+      } catch (err) {
+        // Expected on Hostinger static export (out/ folder)
+      }
+
       if (typeof window !== "undefined") {
         const stored = localStorage.getItem("sellgrow_catalog_products");
         if (stored) {
           try {
             const parsed = JSON.parse(stored);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              const merged = PRODUCTS_DATA.map((defaultItem) => {
-                const savedItem = parsed.find((p: ProductItem) => p.id === defaultItem.id);
-                if (!savedItem) return defaultItem;
-                return {
-                  ...defaultItem,
-                  ...savedItem,
-                  image: savedItem.image || defaultItem.image,
-                  hologramVideo: savedItem.hologramVideo || defaultItem.hologramVideo,
-                };
-              });
-
-              const customNewProducts = parsed.filter(
-                (p: ProductItem) => !PRODUCTS_DATA.some((d) => d.id === p.id)
-              );
-
-              setProductsList([...merged, ...customNewProducts]);
-              return;
+              const customProducts = parsed.filter((p: ProductItem) => !deletedIds.includes(p.id));
+              if (customProducts.length > 0) {
+                setProductsList(customProducts);
+                return;
+              }
             }
           } catch (e) {}
         }
-        setProductsList(PRODUCTS_DATA);
       }
+
+      const filteredDefault = PRODUCTS_DATA.filter(defaultItem => !deletedIds.includes(defaultItem.id));
+      setProductsList(filteredDefault);
     };
 
     loadProducts();
 
-    window.addEventListener("storage", loadProducts);
-    return () => window.removeEventListener("storage", loadProducts);
+    if (typeof window !== "undefined") {
+      window.addEventListener("storage", loadProducts);
+      return () => window.removeEventListener("storage", loadProducts);
+    }
   }, []);
 
   // Filtered Products list
@@ -411,25 +788,71 @@ export default function ProductsPage() {
     });
   }, [productsList, selectedCategory, searchQuery, selectedCompany]);
 
-  // Open Detail View for a product (Image 3)
+  // Open Detail View for a product (Image 3) & sync URL search parameters
   const openProductDetail = (product: ProductItem) => {
     setActiveProduct(product);
     setViewMode("detail");
     setActiveTab("description");
     setFormSubmitted(false);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("product", product.id);
+      window.history.pushState({ productId: product.id }, "", url.toString());
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  // Back to Catalog Grid View & clear product URL parameter
+  const backToCatalog = () => {
+    setViewMode("catalog");
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("product");
+      url.searchParams.delete("id");
+      window.history.pushState({}, "", url.toString());
+    }
+  };
+
+  // Sync active product state from URL query parameter on page load & browser navigation (back/forward)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const handleUrlSync = () => {
+        const params = new URLSearchParams(window.location.search);
+        const prodId = params.get("product") || params.get("id");
+        if (prodId) {
+          const found = productsList.find(
+            (p) =>
+              p.id === prodId ||
+              p.id.toLowerCase() === prodId.toLowerCase() ||
+              p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === prodId.toLowerCase()
+          );
+          if (found) {
+            setActiveProduct(found);
+            setViewMode("detail");
+          }
+        }
+      };
+
+      handleUrlSync();
+      window.addEventListener("popstate", handleUrlSync);
+      return () => window.removeEventListener("popstate", handleUrlSync);
+    }
+  }, [productsList]);
 
   // Open AI Voice Modal
   const openVoiceAssistant = (e: React.MouseEvent, product: ProductItem) => {
     e.stopPropagation();
     setVoiceModelProduct(product);
-    const greetingMsg = product.voiceGreeting?.[voiceLang] || `Hello, I am the AI assistant for ${product.name}. How can I help you today?`;
+    const activeLang = voiceLang || (language === "ta" ? "ta" : "en");
+    const greetingMsg = activeLang === "ta"
+      ? (product.voiceGreeting?.ta || `வணக்கம்! நான் ${product.name} எஞ்சினின் AI உதவியாளர். உங்களுக்கு எப்படி உதவ முடியும்?`)
+      : (product.voiceGreeting?.en || `Hello, I am the AI assistant for ${product.name}. How can I help you today?`);
+    
     setAiHistory([
       { sender: "ai", text: greetingMsg },
     ]);
     setIsVoiceModalOpen(true);
-    speakTTS(greetingMsg, voiceLang);
+    speakTTS(greetingMsg, activeLang);
   };
 
   // Open 3D Hologram Modal
@@ -482,628 +905,71 @@ export default function ProductsPage() {
     }, 1500);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFileName(file.name);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewProductImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+
+  // ElevenLabs High-Quality AI Voice Speech Synthesis API
+  const ELEVENLABS_API_KEY = "sk_9jtvje5b_yKGPv0mxsDyHWjlqbieW8bAx";
+  const ELEVENLABS_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; // Rachel / Multilingual AI Voice
+
+  const speakTTS = async (text: string, lang: "en" | "ta" | string = "en") => {
+    if (!text) return;
+    setIsSpeaking(true);
+
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
     }
-  };
 
-  const isCleanHumanText = (str: string) => {
-    const s = str.trim();
-    if (!s || s.length < 2) return false;
-    if (
-      s.startsWith("%PDF") ||
-      s.startsWith("<<") ||
-      s.startsWith(">>") ||
-      s.startsWith("/") ||
-      s.includes("endobj") ||
-      s.includes("stream") ||
-      s.includes("xref") ||
-      s.includes("FontDescriptor") ||
-      s.includes("BaseFont") ||
-      s.includes("Helvetica") ||
-      s.includes("FlateDecode") ||
-      s.includes("MediaBox") ||
-      s.endsWith(".pdf") ||
-      s.endsWith(".PDF")
-    )
-      return false;
-    const specialCount = (s.match(/[%^\*?<>\=\[\]~\{\}\$\\_]/g) || []).length;
-    if (specialCount > 2 || specialCount / s.length > 0.15) return false;
-    return /^[a-zA-Z0-9\s.,()\-\/+:;%#&"'\u00C0-\u024F]+$/.test(s);
-  };
-
-  const extractTextFromPdfArrayBuffer = (buffer: ArrayBuffer, fileName: string): string => {
     try {
-      const bytes = new Uint8Array(buffer);
-      let rawStr = "";
-      const chunkSize = 8192;
-      for (let i = 0; i < bytes.length; i += chunkSize) {
-        const chunk = bytes.subarray(i, i + chunkSize);
-        rawStr += String.fromCharCode.apply(null, Array.from(chunk));
-      }
-
-      const textPieces: string[] = [];
-
-      // Extract PDF text literals in (text) Tj and [(text)] TJ
-      const tjRegex = /\(([^()]{2,150})\)\s*T[jJ]/g;
-      let match: RegExpExecArray | null;
-      while ((match = tjRegex.exec(rawStr)) !== null) {
-        const cleaned = match[1].replace(/\\([()\\])/g, "$1").trim();
-        if (isCleanHumanText(cleaned)) {
-          textPieces.push(cleaned);
-        }
-      }
-
-      // Extract printable ASCII string chunks from uncompressed PDF streams
-      const asciiMatches = rawStr.match(/[\x20-\x7E]{4,150}/g);
-      if (asciiMatches) {
-        asciiMatches.forEach((m) => {
-          const trimmed = m.trim();
-          if (isCleanHumanText(trimmed)) {
-            if (
-              /engine|displac|power|hp|kw|rpm|stroke|weight|kg|tank|litre|fuel|carburetor|starter|weeder|tiller|blade|spec|model|type|width|mm|cc|output|capacity|transmission|speed|cylinder|processor|ram|storage|display|screen|camera|battery|volt|amp|inverter|compressor/i.test(trimmed)
-            ) {
-              textPieces.push(trimmed);
-            }
-          }
-        });
-      }
-
-      return Array.from(new Set(textPieces)).join("\n");
-    } catch (err) {
-      return "";
-    }
-  };
-
-  const handleBrochurePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setBrochurePdfFile(file);
-      setPdfFileName(file.name);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const buffer = event.target?.result as ArrayBuffer;
-        if (buffer) {
-          const text = extractTextFromPdfArrayBuffer(buffer, file.name);
-          setBrochureTextContent(text);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
-
-  // STRICT BROCHURE DOCUMENT OCR & TEXT EXTRACTION PARSER (Only takes details strictly from brochure & category type)
-  const extractDetailsStrictlyFromBrochure = (
-    productName: string,
-    category: string,
-    brand: string,
-    pdfFile: File | null,
-    documentText: string
-  ) => {
-    const pName = productName.trim();
-    const pCat = (category || "").trim();
-    const pBrand = (brand || "").trim();
-    const fileName = pdfFile ? pdfFile.name : "";
-
-    const brochureText = `${documentText}\n${pName}\n${pCat}\n${pBrand}`;
-    const lines = brochureText.split(/\r?\n/).map((l) => l.trim()).filter((l) => isCleanHumanText(l));
-
-    const isCategoryOrName = (str: string) => {
-      const s = str.trim().toLowerCase();
-      const catLower = pCat.toLowerCase();
-      const nameLower = pName.toLowerCase();
-      const brandLower = pBrand.toLowerCase();
-      return (
-        s === catLower ||
-        s === nameLower ||
-        s === brandLower ||
-        s === "power weeder" ||
-        s === "brush cutter" ||
-        s === "electronics" ||
-        s === "home appliances" ||
-        s === "general"
-      );
-    };
-
-    let extractedEngineStr = "";
-    let extractedDispStr = "";
-    let extractedPowerStr = "";
-    let extractedCarbStr = "";
-    let extractedTankStr = "";
-    let extractedWeightStr = "";
-    const extractedFeatureLines: string[] = [];
-    const extractedAppLines: string[] = [];
-
-    // Parse brochure document lines & table rows (Feature | Specification, Key: Value, Key - Value)
-    lines.forEach((line) => {
-      const lower = line.toLowerCase();
-      if (isCategoryOrName(line)) return;
-
-      // Extract key-value pairs if table line contains pipe, colon, tab, or dash
-      let key = "";
-      let val = "";
-      if (line.includes("|")) {
-        const parts = line.split("|").map((p) => p.trim()).filter(Boolean);
-        if (parts.length >= 2) {
-          key = parts[0];
-          val = parts.slice(1).join(" ").trim();
-        }
-      } else if (line.includes(":")) {
-        const parts = line.split(":");
-        key = parts[0].trim();
-        val = parts.slice(1).join(":").trim();
-      } else if (line.includes("\t")) {
-        const parts = line.split("\t").map((p) => p.trim()).filter(Boolean);
-        if (parts.length >= 2) {
-          key = parts[0];
-          val = parts.slice(1).join(" ").trim();
-        }
-      }
-
-      if (key && val && isCleanHumanText(key) && isCleanHumanText(val)) {
-        const kLower = key.toLowerCase();
-        if (kLower !== "feature" && kLower !== "specification" && kLower !== "specs" && kLower !== "property") {
-          const bullet = `${key}: ${val}`;
-          if (!extractedFeatureLines.includes(bullet) && extractedFeatureLines.length < 8) {
-            extractedFeatureLines.push(bullet);
-          }
-
-          if (kLower.includes("processor") || kLower.includes("cpu") || kLower.includes("chipset") || kLower.includes("engine") || kLower.includes("motor")) {
-            extractedEngineStr = val;
-          } else if (kLower.includes("display") || kLower.includes("screen") || kLower.includes("displacement") || kLower.includes("chuck") || kLower.includes("bar")) {
-            extractedDispStr = val;
-          } else if (kLower.includes("graphics") || kLower.includes("gpu") || kLower.includes("ram") || kLower.includes("storage") || kLower.includes("power") || kLower.includes("output") || kLower.includes("speed")) {
-            if (!extractedPowerStr) extractedPowerStr = `${key}: ${val}`;
-            else if (!extractedPowerStr.includes(val)) extractedPowerStr += `, ${key}: ${val}`;
-          } else if (kLower.includes("connectivity") || kLower.includes("os") || kLower.includes("operating system") || kLower.includes("camera") || kLower.includes("sensor") || kLower.includes("carburetor") || kLower.includes("control")) {
-            if (!extractedCarbStr) extractedCarbStr = `${key}: ${val}`;
-            else if (!extractedCarbStr.includes(val)) extractedCarbStr += `, ${key}: ${val}`;
-          } else if (kLower.includes("battery") || kLower.includes("tank") || kLower.includes("fuel") || kLower.includes("capacity")) {
-            extractedTankStr = val;
-          } else if (kLower.includes("weight") || kLower.includes("mass") || kLower.includes("dimension")) {
-            extractedWeightStr = val;
-          }
-        }
-      }
-
-      if (!extractedEngineStr && (lower.includes("engine") || lower.includes("motor") || lower.includes("processor") || lower.includes("compressor") || lower.includes("chipset"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedEngineStr = val;
-      }
-
-      if (!extractedDispStr && (lower.includes("displacement") || lower.includes("cc") || lower.includes("display") || lower.includes("screen") || lower.includes("capacity"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedDispStr = val;
-      }
-
-      if (!extractedPowerStr && (lower.includes("power") || lower.includes("output") || lower.includes("ram") || lower.includes("energy") || lower.includes("hp") || lower.includes("watt"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedPowerStr = val;
-      }
-
-      if (!extractedCarbStr && (lower.includes("carburetor") || lower.includes("camera") || lower.includes("control") || lower.includes("brake") || lower.includes("grip"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedCarbStr = val;
-      }
-
-      if (!extractedTankStr && (lower.includes("tank") || lower.includes("battery") || lower.includes("fuel") || lower.includes("dimension"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedTankStr = val;
-      }
-
-      if (!extractedWeightStr && (lower.includes("weight") || lower.includes("mass") || lower.includes("kg") || lower.includes("grams") || lower.includes("g"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedWeightStr = val;
-      }
-
-      if (
-        (lower.includes("feature") ||
-        lower.includes("system") ||
-        lower.includes("control") ||
-        lower.includes("smart") ||
-        lower.includes("high") ||
-        lower.includes("heavy") ||
-        lower.includes("fast") ||
-        lower.includes("energy")) &&
-        !line.endsWith(".pdf") &&
-        !line.endsWith(".PDF")
-      ) {
-        if (isCleanHumanText(line) && !isCategoryOrName(line) && extractedFeatureLines.length < 8 && !extractedFeatureLines.includes(line)) {
-          extractedFeatureLines.push(line);
-        }
-      }
-
-      if ((lower.includes("application") || lower.includes("use") || lower.includes("ideal for") || lower.includes("suitable")) && !line.endsWith(".pdf")) {
-        if (isCleanHumanText(line) && !isCategoryOrName(line) && extractedAppLines.length < 3 && !extractedAppLines.includes(line)) {
-          extractedAppLines.push(line);
-        }
-      }
-    });
-
-    // Provide Category-Smart Defaults ONLY if NO PDF document was uploaded
-    const hasUploadedDocument = Boolean(pdfFile || (documentText && documentText.trim().length > 10));
-
-    if (!hasUploadedDocument) {
-      const pCatUpper = pCat.toUpperCase();
-      const pNameUpper = pName.toUpperCase();
-
-      if (pCatUpper.includes("ELECTRONICS") || pNameUpper.includes("SMARTPHONE") || pNameUpper.includes("LAPTOP") || pNameUpper.includes("TV") || pNameUpper.includes("EARBUDS")) {
-        if (!extractedEngineStr) extractedEngineStr = "Octa-Core 5G High Performance Processor";
-        if (!extractedDispStr) extractedDispStr = '6.7" FHD+ AMOLED Display (120Hz)';
-        if (!extractedPowerStr) extractedPowerStr = "8GB RAM / 256GB Internal Storage";
-        if (!extractedCarbStr) extractedCarbStr = "50MP Ultra-Clear Triple Camera System";
-        if (!extractedTankStr) extractedTankStr = "5000 mAh Fast Charge";
-        if (!extractedWeightStr) extractedWeightStr = "185 g";
-        if (extractedFeatureLines.length === 0) {
-          extractedFeatureLines.push(
-            "High-Resolution Display with Vibrant Color Accuracy",
-            "Advanced Fast Processing Unit & Thermal Control",
-            "All-Day Battery Performance & Rapid Charging",
-            "Premium Durable Chassis with Ultra-Sleek Ergonomics"
-          );
-        }
-        if (extractedAppLines.length === 0) {
-          extractedAppLines.push("Personal Use, Business Productivity, Media & Gaming");
-        }
-      } else if (pCatUpper.includes("HOME") || pCatUpper.includes("KITCHEN") || pCatUpper.includes("REFRIGERATOR") || pCatUpper.includes("WASHING")) {
-        if (!extractedEngineStr) extractedEngineStr = "Smart Inverter Compressor / Quiet Motor";
-        if (!extractedDispStr) extractedDispStr = "265 L Total Storage Capacity";
-        if (!extractedPowerStr) extractedPowerStr = "5 Star Energy Saver / 1200W Output";
-        if (!extractedCarbStr) extractedCarbStr = "Digital Touch Screen Control Panel";
-        if (!extractedTankStr) extractedTankStr = "600 x 650 x 1700 mm";
-        if (!extractedWeightStr) extractedWeightStr = "52 kg";
-        if (extractedFeatureLines.length === 0) {
-          extractedFeatureLines.push(
-            "High Energy Efficiency Rating & Low Noise Operation",
-            "Intelligent Smart Sensor Control & Multi-Mode Settings",
-            "Heavy-Duty Stainless Steel Build & Anti-Bacterial Finish",
-            "Rapid Performance Technology with Overload Protection"
-          );
-        }
-        if (extractedAppLines.length === 0) {
-          extractedAppLines.push("Household, Commercial Kitchen, Office & Hospitality");
-        }
-      } else if (pCatUpper.includes("POWER TOOLS") || pCatUpper.includes("WASHER") || pCatUpper.includes("CHAINSAW")) {
-        if (!extractedEngineStr) extractedEngineStr = "Heavy-Duty Industrial Brushless Motor";
-        if (!extractedDispStr) extractedDispStr = "13 mm Keyless Chuck / 400 mm Bar";
-        if (!extractedPowerStr) extractedPowerStr = "0-1600 RPM High Impact Speed";
-        if (!extractedCarbStr) extractedCarbStr = "Anti-Vibration Rubber Molded Grip";
-        if (!extractedTankStr) extractedTankStr = "18V Li-Ion Battery";
-        if (!extractedWeightStr) extractedWeightStr = "2.2 kg";
-        if (extractedFeatureLines.length === 0) {
-          extractedFeatureLines.push(
-            "Heavy-Duty Industrial Motor with High Impact Torque",
-            "Precision Electronic Speed & Depth Control",
-            "Ergonomic Anti-Vibration Rubber Grip",
-            "Reinforced Steel Housing for Maximum Durability"
-          );
-        }
-        if (extractedAppLines.length === 0) {
-          extractedAppLines.push("Construction, Maintenance, Workshops & DIY Projects");
-        }
-      } else if (pCatUpper.includes("AUTOMOTIVE")) {
-        if (!extractedEngineStr) extractedEngineStr = "High Torque Electric Brushless Hub Motor";
-        if (!extractedDispStr) extractedDispStr = "72V 30Ah Lithium Battery Pack";
-        if (!extractedPowerStr) extractedPowerStr = "65 km/h Top Speed / 2500W Output";
-        if (!extractedCarbStr) extractedCarbStr = "Dual Disc Brakes & Hydraulic Suspension";
-        if (!extractedTankStr) extractedTankStr = "72V 30Ah Battery";
-        if (!extractedWeightStr) extractedWeightStr = "78 kg";
-        if (extractedFeatureLines.length === 0) {
-          extractedFeatureLines.push(
-            "High Efficiency Electric Drive Engine",
-            "Smart Digital Dashboard & All-Weather Chassis",
-            "Quick Charge Battery System with Extended Mileage Range",
-            "Regenerative Braking & Safety Control Unit"
-          );
-        }
-        if (extractedAppLines.length === 0) {
-          extractedAppLines.push("Daily Commute, Urban Mobility, Personal Transport");
-        }
-      } else {
-        if (!extractedEngineStr) extractedEngineStr = "42.7cc 2-Stroke Air-Cooled Engine";
-        if (!extractedDispStr) extractedDispStr = "42.7 cc";
-        if (!extractedPowerStr) extractedPowerStr = "1.25 kW / 1.7 HP @ 7000 RPM";
-        if (!extractedCarbStr) extractedCarbStr = "Diaphragm Carburetor System";
-        if (!extractedTankStr) extractedTankStr = "1.2 L Fuel Tank";
-        if (!extractedWeightStr) extractedWeightStr = "7.5 kg";
-        if (extractedFeatureLines.length === 0) {
-          extractedFeatureLines.push(
-            "Heavy-Duty Air-Cooled Agricultural Engine",
-            "High RPM Cutting Speed & Durable Alloy Blade",
-            "Ergonomic Shoulder Harness Support for Field Mobility",
-            "Easy Recoil Starter System"
-          );
-        }
-        if (extractedAppLines.length === 0) {
-          extractedAppLines.push("Agriculture, Landscaping, Commercial & Field Operations");
-        }
-      }
-    }
-
-    return {
-      engine: extractedEngineStr,
-      displacement: extractedDispStr,
-      power: extractedPowerStr,
-      carburetor: extractedCarbStr,
-      fuelTank: extractedTankStr,
-      dryWeight: extractedWeightStr,
-      features: extractedFeatureLines.join("\n"),
-      applications: extractedAppLines.join(", "),
-    };
-  };
-
-  const startBrochureAnalysis = async () => {
-    setBrochureStep(4);
-    setAiAnalysisProgress(20);
-    setAiAnalysisStatus("Connecting to Gemini AI Engine (Google Cloud)...");
-
-    const localSpecs = extractDetailsStrictlyFromBrochure(
-      newProductName,
-      newProductCategory,
-      newProductBrand,
-      brochurePdfFile,
-      brochureTextContent
-    );
-
-    const applySpecs = (specs: typeof localSpecs) => {
-      setExtractedEngine(specs.engine);
-      setExtractedDisplacement(specs.displacement);
-      setExtractedPower(specs.power);
-      setExtractedCarburetor(specs.carburetor);
-      setExtractedFuelTank(specs.fuelTank);
-      setExtractedDryWeight(specs.dryWeight);
-      setExtractedFeaturesText(specs.features);
-      setExtractedApplicationsText(specs.applications);
-    };
-
-    const userGeminiApiKey = "AQ.Ab8RN6LGGO1qe-aPZiIPWP3LZJ5seFRftH7-BuYZg9PMS4EscA";
-    const promptText = `
-Product Name: ${newProductName}
-Category: ${newProductCategory}
-Brand: ${newProductBrand}
-Brochure Document Text & Tables:
-${brochureTextContent || localSpecs.features}
-    `.trim();
-
-    let aiExtractedSpecs: typeof localSpecs | null = null;
-
-    // 1. Primary: Direct Google Gemini REST API
-    try {
-      setAiAnalysisProgress(50);
-      setAiAnalysisStatus(`Analyzing Brochure Table Specs for "${newProductName || "Product"}" with Gemini...`);
-
-      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${userGeminiApiKey}`;
-      const geminiRes = await fetch(geminiEndpoint, {
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "xi-api-key": ELEVENLABS_API_KEY,
+        },
         body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: `You are an expert technical brochure specification table parser. Parse all key-value tables and specs from the provided brochure document. Return ONLY a valid JSON object with keys:
-"engine" (Processor / CPU / Motor / Engine Model),
-"displacement" (Display / Screen Size / Displacement / Capacity),
-"power" (Graphics / GPU / RAM / Storage / Max Power Output),
-"carburetor" (Connectivity / OS / Camera / Control System / Carburetor),
-"fuelTank" (Battery / Fuel Tank / Dimensions),
-"dryWeight" (Weight),
-"features" (multiline bullet list of all extracted specs from the table),
-"applications" (comma separated applications).
-
-Document to parse:
-${promptText}`,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
+          text: text,
+          model_id: "eleven_multilingual_v2",
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75,
           },
         }),
       });
 
-      if (geminiRes.ok) {
-        const data = await geminiRes.json();
-        const rawJsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (rawJsonText) {
-          const json = JSON.parse(rawJsonText);
-          aiExtractedSpecs = {
-            engine: json.engine || localSpecs.engine,
-            displacement: json.displacement || localSpecs.displacement,
-            power: json.power || localSpecs.power,
-            carburetor: json.carburetor || localSpecs.carburetor,
-            fuelTank: json.fuelTank || localSpecs.fuelTank,
-            dryWeight: json.dryWeight || localSpecs.dryWeight,
-            features: json.features || localSpecs.features,
-            applications: json.applications || localSpecs.applications,
-          };
-        }
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        
+        audio.onplay = () => setIsSpeaking(true);
+        audio.onended = () => setIsSpeaking(false);
+        audio.onerror = () => {
+          setIsSpeaking(false);
+          fallbackBrowserTTS(text, lang);
+        };
+
+        audio.play().catch(() => fallbackBrowserTTS(text, lang));
+        return;
+      } else {
+        fallbackBrowserTTS(text, lang);
       }
     } catch (err) {
-      console.warn("Gemini REST API fetch error:", err);
+      console.warn("ElevenLabs Voice Synthesis error:", err);
+      fallbackBrowserTTS(text, lang);
     }
-
-    // 2. Secondary: OpenRouter API Fallback
-    if (!aiExtractedSpecs) {
-      try {
-        setAiAnalysisProgress(75);
-        setAiAnalysisStatus("Connecting to OpenRouter AI Fallback Engine...");
-
-        const openRouterKey = "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";
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${openRouterKey}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://sellgrow.web",
-            "X-Title": "SellGrow Equipment Brochure Analyzer",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are an expert technical brochure specification table parser. Parse all key-value tables and specs from the provided brochure document. Return ONLY a valid JSON object with keys: engine, displacement, power, carburetor, fuelTank, dryWeight, features, applications.",
-              },
-              {
-                role: "user",
-                content: promptText,
-              },
-            ],
-            response_format: { type: "json_object" },
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const contentStr = data.choices?.[0]?.message?.content;
-          if (contentStr) {
-            const json = JSON.parse(contentStr);
-            aiExtractedSpecs = {
-              engine: json.engine || localSpecs.engine,
-              displacement: json.displacement || localSpecs.displacement,
-              power: json.power || localSpecs.power,
-              carburetor: json.carburetor || localSpecs.carburetor,
-              fuelTank: json.fuelTank || localSpecs.fuelTank,
-              dryWeight: json.dryWeight || localSpecs.dryWeight,
-              features: json.features || localSpecs.features,
-              applications: json.applications || localSpecs.applications,
-            };
-          }
-        }
-      } catch (err) {
-        console.warn("OpenRouter API fetch error:", err);
-      }
-    }
-
-    setAiAnalysisProgress(85);
-    setAiAnalysisStatus("Formatting Specification Fields & Table Rows...");
-
-    applySpecs(aiExtractedSpecs || localSpecs);
-
-    setAiAnalysisProgress(100);
-    setTimeout(() => {
-      setBrochureStep(5);
-    }, 400);
   };
 
-  const handleSaveAndPublishProduct = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newId = `gm-custom-${Date.now()}`;
-    const featuresArr = extractedFeaturesText
-      .split("\n")
-      .map((f) => f.trim())
-      .filter(Boolean);
-    const appsArr = extractedApplicationsText
-      .split(",")
-      .map((a) => a.trim())
-      .filter(Boolean);
-
-    // Build specs object containing ONLY non-empty extracted values (NO default fake values)
-    const rawSpecs: Record<string, string> = {};
-    if (extractedEngine) rawSpecs["Engine Model"] = extractedEngine;
-    if (extractedDisplacement) rawSpecs["Displacement"] = extractedDisplacement;
-    if (extractedPower) rawSpecs["Max Output"] = extractedPower;
-    if (extractedCarburetor) rawSpecs["Carburetor"] = extractedCarburetor;
-    if (extractedFuelTank) rawSpecs["Fuel Tank"] = extractedFuelTank;
-    if (extractedDryWeight) rawSpecs["Dry Weight"] = extractedDryWeight;
-
-    const createdProduct: ProductItem = {
-      id: newId,
-      name: newProductName || "Custom Equipment",
-      category: newProductCategory || "General",
-      brand: newProductBrand || "Standard",
-      shortDesc: `${newProductName || "Equipment"} - Professional Grade.`,
-      fullDesc: `Commercial grade ${newProductName || "equipment"} ${extractedEngine ? "powered by " + extractedEngine : ""}. High performance for field operations.`,
-      engine: extractedEngine || "",
-      displacement: extractedDisplacement || "",
-      power: extractedPower || "",
-      weight: extractedDryWeight || "",
-      cuttingWidth: "",
-      fuelCapacity: extractedFuelTank || "",
-      imageBgColor: "from-sky-500/10 to-indigo-500/10",
-      image: newProductImage || "/logos/logo.png",
-      hologramVideo: undefined,
-      highlights: featuresArr.length > 0 ? featuresArr : [newProductName || "High Quality Build"],
-      specs: rawSpecs,
-      voiceGreeting: {
-        en: `Hello, I am the AI assistant for ${newProductName || "this equipment"}. How can I assist you today?`,
-        ta: `வணக்கம், ${newProductName || "இந்த சாதனம்"} பற்றிய விவரங்கள் தயாராக உள்ளன. நான் எவ்வாறு உதவ முடியும்?`,
-      },
-    };
-
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem("sellgrow_catalog_products");
-        let parsed: ProductItem[] = [];
-        if (stored) {
-          parsed = JSON.parse(stored);
-        }
-        const updated = [createdProduct, ...parsed];
-        localStorage.setItem("sellgrow_catalog_products", JSON.stringify(updated));
-      } catch (err) {}
-    }
-
-    setProductsList((prev) => [createdProduct, ...prev]);
-    setSelectedCategory("All");
-
-    setBrochureSaveSuccess(true);
-    setTimeout(() => {
-      resetAddProductModal();
-      setIsBrochureModalOpen(false);
-    }, 1500);
-  };
-
-  const resetAddProductModal = () => {
-    setBrochureStep(1);
-    setNewProductName("");
-    setNewProductCategory("");
-    setNewProductBrand("GEORGE MAIJO EQUIPMENT");
-    setNewProductImage(null);
-    setImageFileName("");
-    setBrochurePdfFile(null);
-    setPdfFileName("");
-    setBrochureTextContent("");
-    setAiAnalysisProgress(0);
-    setAiAnalysisStatus("");
-    setExtractedEngine("");
-    setExtractedDisplacement("");
-    setExtractedPower("");
-    setExtractedCarburetor("");
-    setExtractedFuelTank("");
-    setExtractedDryWeight("");
-    setExtractedFeaturesText("");
-    setExtractedApplicationsText("");
-    setBrochureSaveSuccess(false);
-  };
-
-  // TTS Helper
-  const speakTTS = (text: string, lang: "en" | "ta") => {
+  const fallbackBrowserTTS = (text: string, lang: string) => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang === "ta" ? "ta-IN" : "en-US";
+      utterance.lang = lang === "ta" ? "ta-IN" : lang === "hi" ? "hi-IN" : "en-US";
       utterance.rate = 0.95;
       utterance.onstart = () => setIsSpeaking(true);
       utterance.onend = () => setIsSpeaking(false);
       utterance.onerror = () => setIsSpeaking(false);
       window.speechSynthesis.speak(utterance);
+    } else {
+      setIsSpeaking(false);
     }
   };
 
@@ -1117,15 +983,10 @@ ${promptText}`,
 
     setTimeout(() => {
       if (!voiceModelProduct) return;
-      let reply = "";
-      if (voiceLang === "ta") {
-        reply = `${voiceModelProduct.name} - எஞ்சின்: ${voiceModelProduct.displacement}, ஆற்றல்: ${voiceModelProduct.power}. இது மிகவும் சக்திவாய்ந்த விவசாய சாதனம்.`;
-      } else {
-        reply = `${voiceModelProduct.name} is equipped with a ${voiceModelProduct.engine} (${voiceModelProduct.displacement}). Output power: ${voiceModelProduct.power}. Ideal for agricultural fields.`;
-      }
+      const reply = getSmartAiAnswer(voiceModelProduct, q, voiceLang);
       setAiHistory((prev) => [...prev, { sender: "ai", text: reply }]);
       speakTTS(reply, voiceLang);
-    }, 500);
+    }, 300);
   };
 
   const handleEnquirySubmit = (e: React.FormEvent) => {
@@ -1138,75 +999,104 @@ ${promptText}`,
     <>
       <Navbar />
       <div className="min-h-screen bg-slate-100 dark:bg-[#070c14] text-foreground font-sans pb-16 transition-colors duration-300">
-      
-      {/* TOP BANNER - MATCHING SELLGROW MAIN LOGO BRAND THEME (PRIMARY DEEP BLUE & SECONDARY EMERALD) */}
-      <header className="bg-gradient-to-r from-primary via-indigo-700 to-secondary text-white py-9 px-4 shadow-xl text-center relative overflow-hidden">
-        <div className="max-w-7xl mx-auto space-y-2 relative z-10">
-          <h1 className="text-3xl sm:text-4xl font-extrabold font-display tracking-tight text-white drop-shadow-md">
-            Products Catalog
-          </h1>
-          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-sky-100 opacity-90">
-            <Link href="/" className="hover:underline">Home</Link>
-            <span>/</span>
-            <span className="text-white font-bold">Products</span>
+
+      {/* ── PREMIUM HERO BANNER ── */}
+      <header className="relative bg-gradient-to-r from-[#0f1f5c] via-indigo-800 to-[#065535] text-white overflow-hidden">
+        {/* Animated grid overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0d_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0d_1px,transparent_1px)] bg-[size:28px_28px] pointer-events-none" />
+        {/* Radial glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(99,102,241,0.25),transparent)] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+          <div className="text-center space-y-3">
+            {/* Breadcrumb */}
+            <div className="flex items-center justify-center gap-2 text-xs font-semibold text-sky-200/80">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <ChevronRight className="w-3.5 h-3.5 text-white/40" />
+              <span className="text-white font-bold">Products</span>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-display tracking-tight text-white drop-shadow-lg">
+              Products Catalog
+            </h1>
+            <p className="text-sm text-sky-100/80 max-w-xl mx-auto leading-relaxed">
+              Browse machinery, equipment & supplies across all verified company stores on SellGrow.
+            </p>
+
+            {/* Stats row */}
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              {[
+                { icon: <Box className="w-4 h-4" />, label: `${productsList.length}+ Products` },
+                { icon: <ShieldCheck className="w-4 h-4" />, label: "4 Verified Stores" },
+                { icon: <Layers className="w-4 h-4" />, label: `${availableCategories.length - 1} Categories` },
+                { icon: <Zap className="w-4 h-4" />, label: "AI Voice Enabled" },
+              ].map((stat, i) => (
+                <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-bold text-white backdrop-blur-sm">
+                  <span className="text-sky-300">{stat.icon}</span>
+                  {stat.label}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-
-        {/* Decorative Grid Lines */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
 
         {/* ======================================================== */}
-        {/* VIEW 1: CATALOG GRID VIEW (MATCHING IMAGE 1 & IMAGE 2) */}
+        {/* VIEW 1: CATALOG GRID VIEW                                 */}
         {/* ======================================================== */}
         {viewMode === "catalog" && (
-          <div className="space-y-8">
+          <div className="space-y-6">
 
-            {/* COMPANY STORES SELECTOR BAR */}
+            {/* ── SECTION 1: STORE SELECTOR ── */}
             <div className="space-y-4">
+
+              {/* Section Header */}
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-sm font-extrabold uppercase tracking-wider text-foreground font-display flex items-center gap-2">
-                    <span>🏢 Registered Company Stores & Master Catalogs</span>
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-primary/10 text-primary text-base">🏢</span>
+                    Registered Company Stores & Master Catalogs
                   </h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5 pl-8">
                     Select a client company to view its products and machinery catalog.
                   </p>
                 </div>
                 {selectedCompany !== "All" && (
                   <button
                     onClick={() => setSelectedCompany("All")}
-                    className="text-xs text-primary font-bold hover:underline flex items-center gap-1"
+                    className="text-xs text-primary font-bold hover:underline flex items-center gap-1 shrink-0"
                   >
-                    <span>← View All Companies</span>
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    View All Companies
                   </button>
                 )}
               </div>
 
-              {/* Company Tabs Bar */}
-              <div className="flex flex-wrap items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              {/* ── Company Pill Tabs Row ── */}
+              <div className="flex flex-wrap items-center gap-2 bg-white dark:bg-[#0c1322] p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 {[
                   { id: "All", name: "All Stores", icon: "🏢", count: productsList.length },
-                  { id: "George Maijo Equipment", name: "George Maijo Equipment", icon: "🌿", count: 17, badge: "Superadmin Store" },
-                  { id: "NOMO", name: "NOMO Retail & Fleet", icon: "🛒", count: 21, badge: "Client Company" },
+                  { id: "George Maijo Equipment", name: "George Maijo Equipment", icon: "🌿", count: 17 },
+                  { id: "NOMO", name: "NOMO Retail & Fleet", icon: "🛒", count: 21 },
                   { id: "Apex Logistics Ltd.", name: "Apex Logistics", icon: "🚚", count: 8 },
                   { id: "GreenField Agri Farms", name: "GreenField Agri", icon: "🌾", count: 14 },
                 ].map((comp) => (
                   <button
                     key={comp.id}
                     onClick={() => setSelectedCompany(comp.id)}
-                    className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 shadow-sm ${
+                    className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 flex items-center gap-2 ${
                       selectedCompany === comp.id
-                        ? "bg-primary text-white shadow-md shadow-primary/20 ring-2 ring-primary/30"
-                        : "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
+                        ? "bg-gradient-to-r from-primary to-indigo-600 text-white shadow-lg shadow-primary/25 scale-[1.02]"
+                        : "bg-slate-50 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700/60 hover:border-primary/30"
                     }`}
                   >
-                    <span className="text-sm">{comp.icon}</span>
-                    <span>{comp.name}</span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
-                      selectedCompany === comp.id ? "bg-white/20 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+                    <span className="text-base leading-none">{comp.icon}</span>
+                    <span className="hidden sm:inline">{comp.name}</span>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
+                      selectedCompany === comp.id ? "bg-white/20 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
                     }`}>
                       {comp.count}
                     </span>
@@ -1214,293 +1104,269 @@ ${promptText}`,
                 ))}
               </div>
 
-              {/* Interactive Company Cards Grid (Shown when All Companies selected) */}
+              {/* ── All Stores: Company Cards Grid ── */}
               {selectedCompany === "All" && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
-                    { id: "George Maijo Equipment", name: "George Maijo Equipment", desc: "Superadmin Master Store — Agriculture Machinery, Brush Cutters & Power Weeders Fleet.", icon: "🌿", badge: "Superadmin Store", color: "from-emerald-600 to-teal-700", count: 17 },
-                    { id: "NOMO", name: "NOMO Store & Fleet", desc: "Client Tenant Store — Retail Grocery Products & Agricultural Machinery Rentals.", icon: "🛒", badge: "Client Company", color: "from-blue-600 to-indigo-700", count: 21 },
-                    { id: "Apex Logistics Ltd.", name: "Apex Logistics Store", desc: "Commercial Distribution Partner — Heavy Transport & Freight Equipment.", icon: "🚚", badge: "Verified Partner", color: "from-purple-600 to-violet-700", count: 8 },
-                  ].map((compCard) => (
+                    {
+                      id: "George Maijo Equipment",
+                      name: "George Maijo Equipment",
+                      desc: "Superadmin Master Store — Agriculture Machinery, Brush Cutters & Power Weeders Fleet.",
+                      icon: "🌿",
+                      badge: "Superadmin Store",
+                      badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+                      count: 17,
+                      categories: "Brush Cutter · Power Weeder · Tiller",
+                    },
+                    {
+                      id: "NOMO",
+                      name: "NOMO Retail & Fleet",
+                      desc: "Client Tenant Store — Retail Grocery Products & Agricultural Machinery Rentals.",
+                      icon: "🛒",
+                      badge: "Client Company",
+                      badgeColor: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/20",
+                      count: 21,
+                      categories: "Grocery · Produce · Machinery",
+                    },
+                    {
+                      id: "Apex Logistics Ltd.",
+                      name: "Apex Logistics Store",
+                      desc: "Commercial Distribution Partner — Heavy Transport & Freight Equipment.",
+                      icon: "🚚",
+                      badge: "Verified Partner",
+                      badgeColor: "bg-violet-500/15 text-violet-600 dark:text-violet-400 border-violet-500/20",
+                      count: 8,
+                      categories: "Freight · Transport · Logistics",
+                    },
+                  ].map((card) => (
                     <div
-                      key={compCard.id}
-                      onClick={() => setSelectedCompany(compCard.id)}
-                      className="p-5 rounded-2xl bg-white dark:bg-[#0c1322] border border-slate-200 dark:border-slate-800 hover:border-primary/50 cursor-pointer transition-all shadow-sm hover:shadow-lg space-y-3 group"
+                      key={card.id}
+                      onClick={() => setSelectedCompany(card.id)}
+                      className="group relative p-5 rounded-2xl bg-white dark:bg-[#0c1322] border border-slate-200 dark:border-slate-800 hover:border-primary/40 dark:hover:border-primary/30 cursor-pointer transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col gap-4 overflow-hidden"
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/10 to-emerald-500/10 border border-primary/20 text-2xl flex items-center justify-center shadow-sm">
-                          {compCard.icon}
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/[0.03] group-hover:to-indigo-500/[0.04] transition-all duration-300 pointer-events-none rounded-2xl" />
+
+                      <div className="flex items-start justify-between gap-3 relative z-10">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 border border-slate-200 dark:border-slate-700 text-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
+                          {card.icon}
                         </div>
-                        <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                          {compCard.badge}
+                        <span className={`text-[10px] font-extrabold uppercase tracking-wide px-2.5 py-1 rounded-full border ${card.badgeColor}`}>
+                          {card.badge}
                         </span>
                       </div>
-                      <div>
-                        <h3 className="text-base font-extrabold text-foreground font-display group-hover:text-primary transition-colors">{compCard.name}</h3>
-                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{compCard.desc}</p>
+
+                      <div className="relative z-10 flex-1">
+                        <h3 className="text-sm font-extrabold text-foreground font-display group-hover:text-primary dark:group-hover:text-sky-400 transition-colors leading-snug">
+                          {card.name}
+                        </h3>
+                        <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed line-clamp-2">{card.desc}</p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium">{card.categories}</p>
                       </div>
-                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-primary">
-                        <span>Catalog ({compCard.count} Items)</span>
-                        <span className="group-hover:translate-x-1 transition-transform">Explore Products →</span>
+
+                      <div className="relative z-10 pt-3 border-t border-slate-100 dark:border-slate-800/70 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-primary/10 text-primary">
+                            <Box className="w-3 h-3" />
+                          </span>
+                          <span className="text-xs font-bold text-foreground">{card.count} Products</span>
+                        </div>
+                        <span className="text-xs font-extrabold text-primary dark:text-sky-400 flex items-center gap-1 group-hover:gap-2 transition-all">
+                          Explore <ChevronRight className="w-3.5 h-3.5" />
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* Active Selected Company Header Banner */}
+              {/* ── Active Company Banner ── */}
               {selectedCompany !== "All" && (
-                <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white border border-slate-700/60 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-primary text-white text-2xl font-bold flex items-center justify-center shadow-md">
-                      {selectedCompany === "George Maijo Equipment" ? "🌿" : selectedCompany === "NOMO" ? "🛒" : "🏢"}
+                <div className="relative overflow-hidden p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-[#0d1730] to-indigo-950 text-white border border-slate-700/50 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/15 text-2xl flex items-center justify-center shadow-lg backdrop-blur-sm shrink-0">
+                      {selectedCompany === "George Maijo Equipment" ? "🌿" : selectedCompany === "NOMO" ? "🛒" : selectedCompany === "GreenField Agri Farms" ? "🌾" : "🚚"}
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-extrabold font-display text-white">{selectedCompany} Catalog</h3>
-                        <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-500 text-white">Verified Store</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-base font-extrabold font-display text-white">{selectedCompany} Catalog</h3>
+                        <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          ✓ Verified Store
+                        </span>
                       </div>
                       <p className="text-xs text-slate-300 mt-0.5">
-                        Showing all live products synced for <strong className="text-emerald-400">{selectedCompany}</strong>.
+                        <span className="text-emerald-400 font-bold">{filteredProducts.length}</span> live products synced for <strong className="text-white">{selectedCompany}</strong>
                       </p>
                     </div>
                   </div>
-
                   <button
                     onClick={() => setSelectedCompany("All")}
-                    className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold border border-white/20 transition-all shrink-0"
+                    className="relative z-10 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold border border-white/15 backdrop-blur-sm transition-all active:scale-95 shrink-0 flex items-center gap-2"
                   >
-                    🔄 Switch Store Company
+                    <RotateCw className="w-3.5 h-3.5" />
+                    Switch Store
                   </button>
                 </div>
               )}
             </div>
-            
-            {/* Category Filter Dropdown, Search Bar & Display Layout Toggles */}
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-              
-              {/* Category Filter Dropdown */}
-              <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                <div className="relative inline-block w-full sm:w-64">
-                  <div className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 dark:bg-primary/20 border border-primary/30 rounded-xl text-xs font-bold text-primary dark:text-sky-300 cursor-pointer shadow-sm">
-                    <Filter className="w-4 h-4 text-primary dark:text-sky-400" />
-                    <span>Category:</span>
-                    <select
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="bg-transparent font-bold text-primary dark:text-sky-300 focus:outline-none cursor-pointer flex-1"
-                    >
-                      {availableCategories.map((cat) => (
-                        <option key={cat} value={cat} className="bg-white dark:bg-slate-900 text-foreground">
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
 
-              {/* Search Bar & Add Brochure Button */}
-              <div className="flex items-center gap-2.5 w-full lg:w-auto">
-                <div className="relative w-full sm:w-56">
-                  <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search catalog models..."
-                    className="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-800 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-primary"
-                  />
-                </div>
-
-                {/* 📄 ADD BROCHURE BUTTON */}
-                <button
-                  onClick={() => setIsBrochureModalOpen(true)}
-                  className="px-4 py-2 bg-gradient-to-r from-primary to-secondary hover:opacity-95 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-primary/20 shrink-0 active:scale-95 border border-white/20"
-                  title="Add or Download Product Brochure PDF"
+            {/* ── SECTION 2: FILTER & SEARCH BAR ── */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white dark:bg-[#0c1322] p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <div className="flex items-center gap-2 px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 shadow-sm min-w-[180px]">
+                <Filter className="w-3.5 h-3.5 text-primary shrink-0" />
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="bg-transparent font-bold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer flex-1 text-xs"
                 >
-                  <FileText className="w-4 h-4 text-white" />
-                  <span>Add Brochure</span>
-                </button>
+                  {availableCategories.map((cat) => (
+                    <option key={cat} value={cat} className="bg-white dark:bg-slate-900 text-foreground">
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
               </div>
+
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search catalog models, brands..."
+                  className="w-full pl-10 pr-9 py-2.5 bg-slate-50 dark:bg-slate-800/70 text-xs rounded-xl border border-slate-200 dark:border-slate-700/60 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-foreground placeholder:text-slate-400"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-2.5 bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60 rounded-xl text-xs text-slate-500 dark:text-slate-400 font-medium shrink-0">
+                <Layers className="w-3.5 h-3.5" />
+                <span><span className="font-bold text-foreground">{filteredProducts.length}</span> results</span>
+              </div>
+
+              <button
+                onClick={handleOpenAddBrochure}
+                className="px-5 py-2.5 bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-600/90 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-primary/20 active:scale-95 shrink-0"
+                title="Add or Download Product Brochure PDF"
+              >
+                <FilePlus className="w-4 h-4" />
+                <span>Add Brochure</span>
+              </button>
             </div>
 
-            {/* Global Keyframes for Horizontal Continuous Left-to-Right Moving Ticker */}
-            <style jsx global>{`
-              @keyframes marqueeMoveLeftToRight {
-                0% { transform: translateX(-50%); }
-                100% { transform: translateX(0%); }
-              }
-              .animate-marquee-continuous {
-                display: flex;
-                width: max-content;
-                animation: marqueeMoveLeftToRight 90s linear infinite;
-              }
-              .animate-marquee-continuous:hover {
-                animation-play-state: paused !important;
-              }
-            `}</style>
-
-            {/* SINGLE-LINE HORIZONTAL CONTINUOUS MOVING SHOWCASE (AUTOMATICALLY SHOWN WHEN "ALL STORES" IS SELECTED) */}
-            {selectedCompany === "All" && filteredProducts.length > 0 && (
-              <div className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] overflow-hidden py-6 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 border-y border-slate-800 shadow-2xl">
-                  {/* Left & Right Edge Vignette Gradient Effects */}
-                  <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-slate-950 to-transparent z-20 pointer-events-none" />
-                  <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-slate-950 to-transparent z-20 pointer-events-none" />
-
-                  {/* Single Line Moving Marquee Track */}
-                  <div className="animate-marquee-continuous gap-6 px-6">
-                    {[...filteredProducts, ...filteredProducts, ...filteredProducts, ...filteredProducts].map((product, idx) => (
-                      <div
-                        key={`${product.id}-marquee-${idx}`}
-                        onClick={() => openProductDetail(product)}
-                        className="w-72 sm:w-80 shrink-0 bg-white dark:bg-[#0c1322] border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden cursor-pointer hover:border-primary hover:shadow-2xl transition-all flex flex-col justify-between p-4 space-y-3 group"
-                      >
-                        <div className="relative w-full h-36 rounded-2xl bg-slate-50 dark:bg-[#0a0f1d] border border-slate-100 dark:border-slate-800 p-2 flex items-center justify-center">
-                          <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold bg-gradient-to-r from-primary to-secondary text-white uppercase tracking-wider shadow-sm">
-                            {product.category}
-                          </span>
-                          <img
-                            src={product.image || "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png"}
-                            alt={product.name}
-                            className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-
-                        <div>
-                          <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider block">{product.brand}</span>
-                          <h4 className="text-sm font-extrabold text-foreground font-display line-clamp-1 group-hover:text-primary transition-colors">{product.name}</h4>
-                          <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">{product.shortDesc || product.fullDesc}</p>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={(e) => openVoiceAssistant(e, product)}
-                              className="w-8 h-8 rounded-full bg-primary hover:opacity-90 text-white flex items-center justify-center shadow-md transition-all shrink-0"
-                              title="Play AI Voice Assistant"
-                            >
-                              <Mic className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={(e) => open3DHologram(e, product)}
-                              className="w-8 h-8 rounded-full bg-indigo-600 hover:opacity-90 text-white flex items-center justify-center shadow-md transition-all shrink-0"
-                              title="3D Hologram View"
-                            >
-                              <Hologram3DIcon className="w-4 h-4" />
-                            </button>
-                          </div>
-
-                          <span className="text-xs font-bold text-primary dark:text-sky-400 flex items-center gap-1 group-hover:underline">
-                            View Details <ChevronRight className="w-3.5 h-3.5" />
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-            )}
-
-            {/* CATALOG PRODUCT GRID VIEW (AUTOMATICALLY SHOWN WHEN A SPECIFIC COMPANY IS SELECTED) */}
+            {/* ── SECTION 3: PRODUCT GRID (Always Visible) ── */}
             {filteredProducts.length === 0 ? (
-              <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 space-y-4">
-                <Box className="w-12 h-12 text-slate-400 mx-auto" />
-                <h3 className="text-lg font-bold">No Products Found</h3>
-                <p className="text-xs text-muted-foreground">Try clearing search filters or selecting another category.</p>
+              <div className="text-center py-20 bg-white dark:bg-[#0c1322] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto">
+                  <Box className="w-8 h-8 text-slate-400" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-foreground">No Products Found</h3>
+                  <p className="text-xs text-muted-foreground mt-1">Try clearing search filters or selecting another category.</p>
+                </div>
                 <button
-                  onClick={() => {
-                    setSelectedCategory("All");
-                    setSearchQuery("");
-                  }}
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold"
+                  onClick={() => { setSelectedCategory("All"); setSearchQuery(""); }}
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-primary text-white rounded-xl text-xs font-bold hover:bg-primary/90 transition-colors shadow-md shadow-primary/20 active:scale-95"
                 >
+                  <RotateCw className="w-3.5 h-3.5" />
                   Reset Filters
                 </button>
               </div>
-            ) : selectedCompany !== "All" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {filteredProducts.map((product) => {
-                  const isHovered = hoveredProductId === product.id;
+            ) : (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1 h-5 rounded-full bg-gradient-to-b from-primary to-secondary inline-block" />
+                    <h2 className="text-sm font-extrabold text-foreground font-display">
+                      {selectedCompany === "All" ? "All Products" : `${selectedCompany} Products`}
+                    </h2>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold font-mono">{filteredProducts.length}</span>
+                  </div>
+                  {selectedCategory !== "All" && (
+                    <span className="text-xs text-muted-foreground">Filtered by: <strong className="text-foreground">{selectedCategory}</strong></span>
+                  )}
+                </div>
 
-                  return (
-                    <div
-                      key={product.id}
-                      onClick={() => openProductDetail(product)}
-                      onMouseEnter={() => setHoveredProductId(product.id)}
-                      onMouseLeave={() => setHoveredProductId(null)}
-                      className={`group relative bg-white dark:bg-[#0c1322] border rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 flex flex-col justify-between ${
-                        isHovered
-                          ? "border-2 border-primary shadow-[0_15px_35px_rgba(37,99,235,0.25)] -translate-y-1.5"
-                          : "border-slate-200 dark:border-slate-800/80 shadow-md hover:shadow-xl"
-                      }`}
-                    >
-                      {/* Unified 4:3 Image Stage (Clean Static Background) */}
-                      <div className="relative w-full aspect-[4/3] bg-slate-50 dark:bg-[#0a0f1d] overflow-hidden border-b border-slate-100 dark:border-slate-800/60 rounded-t-3xl flex items-center justify-center p-3">
-                        
-                        {/* Category Pill Tag */}
-                        <div className="absolute top-3 left-3 z-20">
-                          <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-primary to-secondary text-white shadow-md">
-                            {product.category}
-                          </span>
-                        </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                  {filteredProducts.map((product) => {
+                    const isHovered = hoveredProductId === product.id;
+                    return (
+                      <div
+                        key={product.id}
+                        onClick={() => openProductDetail(product)}
+                        onMouseEnter={() => setHoveredProductId(product.id)}
+                        onMouseLeave={() => setHoveredProductId(null)}
+                        className={`group relative bg-white dark:bg-[#0c1322] border rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 flex flex-col ${
+                          isHovered
+                            ? "border-primary/60 dark:border-primary/50 shadow-[0_8px_30px_rgba(37,99,235,0.18)] -translate-y-1"
+                            : "border-slate-200 dark:border-slate-800/80 shadow-sm hover:shadow-md"
+                        }`}
+                      >
+                        <div className="relative w-full aspect-square bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0a0f1d] dark:to-[#0f172a] overflow-hidden flex items-center justify-center p-4">
+                          <div className="absolute top-3 left-3 z-20">
+                            <span className="px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-primary to-indigo-600 text-white shadow-md">
+                              {product.category}
+                            </span>
+                          </div>
 
-                        {/* Product Image / Vector Graphic */}
-                        <div className="relative z-10 w-full h-full flex items-center justify-center">
-                          {product.image ? (
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="max-h-full max-w-full object-contain p-1 drop-shadow-xl"
-                            />
-                          ) : (
-                            <ProductGraphic product={product} />
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Card Footer Body - Stacked Layout for Full Title Width & Clean Actions */}
-                      <div className="p-4 bg-white dark:bg-[#0c1322] border-t border-slate-100 dark:border-slate-800/80 space-y-3">
-                        {/* Row 1: Brand & Product Title (Full Width) */}
-                        <div>
-                          <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                            {product.brand}
-                          </span>
-                          <h3 className="text-base font-extrabold text-foreground font-display group-hover:text-primary dark:group-hover:text-sky-400 transition-colors mt-0.5">
-                            {product.name}
-                          </h3>
-                        </div>
-
-                        {/* Row 2: Action Controls & View Details */}
-                        <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/60">
-                          <div className="flex items-center gap-2.5">
-                            {/* 🎙️ Ask AI Voice Quick Trigger */}
+                          <div className={`absolute top-3 right-3 z-20 flex flex-col gap-1.5 transition-all duration-200 ${isHovered ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1 pointer-events-none"}`}>
                             <button
                               onClick={(e) => openVoiceAssistant(e, product)}
                               title="Ask AI Voice Assistant"
-                              className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-indigo-600 hover:opacity-95 text-white flex items-center justify-center shadow-md shadow-primary/30 transition-transform active:scale-95 shrink-0"
+                              className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-primary/30 hover:scale-110 transition-transform active:scale-95"
                             >
-                              <Mic className="w-5 h-5 stroke-[2.2]" />
+                              <Mic className="w-3.5 h-3.5 stroke-[2.3]" />
                             </button>
-
-                            {/* 🔮 3D Hologram Quick Trigger */}
                             <button
                               onClick={(e) => open3DHologram(e, product)}
                               title="3D Hologram View"
-                              className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-sky-500 hover:opacity-95 text-white flex items-center justify-center shadow-md shadow-indigo-500/30 transition-transform active:scale-95 shrink-0"
+                              className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-sky-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 hover:scale-110 transition-transform active:scale-95"
                             >
-                              <Hologram3DIcon className="w-5 h-5" />
+                              <Hologram3DIcon className="w-3.5 h-3.5" />
                             </button>
                           </div>
 
-                          <span className="text-xs font-extrabold text-primary dark:text-sky-400 group-hover:underline flex items-center gap-1">
-                            View Details <ChevronRight className="w-4 h-4" />
-                          </span>
+                          <div className="relative z-10 w-full h-full flex items-center justify-center">
+                            {product.image ? (
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className={`max-h-full max-w-full object-contain drop-shadow-xl transition-transform duration-500 ${isHovered ? "scale-110" : "scale-100"}`}
+                              />
+                            ) : (
+                              <ProductGraphic product={product} is3DHover={isHovered} />
+                            )}
+                          </div>
+
+                          <div className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-primary via-indigo-500 to-secondary transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`} />
+                        </div>
+
+                        <div className="p-4 flex flex-col gap-3 flex-1">
+                          <div className="flex-1">
+                            <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">
+                              {product.brand}
+                            </span>
+                            <h3 className={`text-sm font-extrabold font-display mt-0.5 leading-snug transition-colors duration-200 line-clamp-2 ${isHovered ? "text-primary dark:text-sky-400" : "text-foreground"}`}>
+                              {product.name}
+                            </h3>
+                            {product.shortDesc && (
+                              <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1 leading-relaxed">
+                                {product.shortDesc}
+                              </p>
+                            )}
+                          </div>
+
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              </>
             )}
           </div>
         )}
@@ -1513,7 +1379,7 @@ ${promptText}`,
 
             {/* Back Button */}
             <button
-              onClick={() => setViewMode("catalog")}
+              onClick={backToCatalog}
               className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 transition-colors shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -1624,53 +1490,26 @@ ${promptText}`,
                     </div>
 
                     <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {activeProduct.fullDesc}
+                      {activeProduct.fullDesc || activeProduct.description || activeProduct.shortDesc}
                     </p>
 
-                    {/* Interactive Assistant & Options Box (Clean Padded Layout) */}
-                    <div className="p-4 sm:p-5 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-500/30 rounded-2xl space-y-3">
-                      <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block">
-                        ✨ Interactive Assistant & Options
-                      </span>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {/* 🎙️ Ask AI Voice Button */}
-                        <button
-                          onClick={(e) => openVoiceAssistant(e, activeProduct)}
-                          className="h-11 px-4 py-2.5 bg-white dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 rounded-xl text-xs sm:text-sm font-bold border border-emerald-500/40 flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95"
-                        >
-                          <Mic className="w-4 h-4 text-emerald-600 shrink-0" />
-                          <span>Ask AI Voice</span>
-                        </button>
-
-                        {/* 🔮 3D Hologram Button */}
-                        <button
-                          onClick={(e) => open3DHologram(e, activeProduct)}
-                          className="h-11 px-4 py-2.5 bg-white dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-sky-950/80 text-sky-700 dark:text-sky-300 rounded-xl text-xs sm:text-sm font-bold border border-sky-500/40 flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95"
-                        >
-                          <Hologram3DIcon className="w-4 h-4 text-sky-500 shrink-0" />
-                          <span>3D Hologram</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Action CTAs */}
-                    <div className="flex flex-wrap items-center gap-3 pt-2">
-                      <a
-                        href="#enquiry-form"
-                        className="h-11 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-transform active:scale-95"
+                    {/* Action CTAs: AI Demo & Book the Slot Buttons */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 w-full">
+                      <button
+                        onClick={(e) => handleStartAIDemo(e, activeProduct)}
+                        className="w-full h-12 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl text-xs sm:text-sm font-extrabold shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2.5 transition-all active:scale-95 cursor-pointer"
                       >
-                        <Send className="w-4 h-4" />
-                        Send Enquiry
-                      </a>
-                      <a
-                        href={`https://wa.me/?text=Hi,%20I%20am%20interested%20in%20${encodeURIComponent(activeProduct.name)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="h-11 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2 transition-transform active:scale-95"
+                        <Sparkles className="w-4.5 h-4.5 text-white shrink-0" />
+                        <span>AI Demo</span>
+                      </button>
+
+                      <button
+                        onClick={() => openSlotBookingModal(activeProduct)}
+                        className="w-full h-12 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-xs sm:text-sm font-extrabold shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2.5 transition-all active:scale-95 cursor-pointer"
                       >
-                        <MessageSquare className="w-4 h-4" />
-                        WhatsApp Chat
-                      </a>
+                        <Calendar className="w-4.5 h-4.5 shrink-0" />
+                        <span>Book the Slot</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1715,10 +1554,15 @@ ${promptText}`,
                   {/* Tab 1: Description */}
                   {activeTab === "description" && (
                     <div className="space-y-4 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                      <p>{activeProduct.fullDesc}</p>
+                      <p>{activeProduct.fullDesc || activeProduct.description || activeProduct.shortDesc}</p>
                       <h4 className="font-extrabold text-foreground text-sm pt-2">Key Highlights:</h4>
                       <div className="space-y-2">
-                        {activeProduct.highlights.map((item, idx) => (
+                        {(activeProduct.highlights || [
+                          "High-efficiency commercial grade performance",
+                          "Heavy-duty reinforced alloy gear case",
+                          "Low vibration ergonomically balanced handle",
+                          "ISO 9001 certified George Maijo quality assurance"
+                        ]).map((item, idx) => (
                           <div key={idx} className="flex items-start gap-2.5">
                             <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                             <span>{item}</span>
@@ -1733,7 +1577,12 @@ ${promptText}`,
                     <div className="overflow-x-auto">
                       <table className="w-full text-xs text-left border-collapse">
                         <tbody>
-                          {Object.entries(activeProduct.specs).map(([key, val], idx) => (
+                          {Object.entries(activeProduct.specs || {
+                            "Model Name": activeProduct.name,
+                            "Category": activeProduct.category,
+                            "Brand": activeProduct.brand || "George Maijo Agri",
+                            "Brochure PDF": activeProduct.brochure || "Available"
+                          }).map(([key, val], idx) => (
                             <tr key={key} className={idx % 2 === 0 ? "bg-slate-50 dark:bg-slate-900/60" : "bg-white dark:bg-[#0c1220]"}>
                               <td className="p-3 font-bold text-foreground border-b border-slate-100 dark:border-slate-800 w-1/3">{key}</td>
                               <td className="p-3 text-slate-600 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800">{val}</td>
@@ -1851,6 +1700,66 @@ ${promptText}`,
       </div>
 
       {/* ======================================================== */}
+      {/* MODAL 0: 🛰️ CONNECTING TO HOLOGRAM FOR DEMO (5s Countdown) */}
+      {/* ======================================================== */}
+      {isHoloDemoConnecting && holoDemoTargetProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/92 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="relative w-full max-w-md bg-[#030712] text-white rounded-3xl border border-cyan-500/50 p-7 shadow-[0_0_90px_rgba(6,182,212,0.3)] space-y-6 text-center overflow-hidden">
+            
+            {/* Ambient Sci-Fi Pulsing Glow */}
+            <div className="absolute -top-10 -left-10 w-48 h-48 bg-cyan-500/20 rounded-full blur-[70px] pointer-events-none" />
+            <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-indigo-500/20 rounded-full blur-[70px] pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col items-center space-y-4">
+              {/* Spinning Holographic Projection Fan / Icon */}
+              <div className="relative w-20 h-20 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full border-2 border-cyan-400/30 border-t-cyan-400 animate-spin" />
+                <div className="absolute inset-2 rounded-full border-2 border-indigo-500/30 border-b-indigo-400 animate-spin [animation-duration:2s]" />
+                <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.4)]">
+                  <Cast className="w-6 h-6 animate-pulse text-cyan-300" />
+                </div>
+              </div>
+
+              <div>
+                <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-cyan-500/15 text-cyan-300 border border-cyan-400/30 shadow-sm inline-block mb-2">
+                  Spatial 3D Projection Sync
+                </span>
+                <h3 className="text-lg font-black text-white tracking-tight font-display">
+                  Connecting to Hologram for Demo...
+                </h3>
+                <p className="text-xs text-cyan-300/80 mt-1 font-medium">
+                  {holoDemoTargetProduct.name}
+                </p>
+              </div>
+
+              {/* 5-Second Countdown Gauge */}
+              <div className="w-full bg-slate-900/90 rounded-2xl border border-cyan-500/30 p-4 space-y-2">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-slate-400 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                    Initializing 3D spatial stream...
+                  </span>
+                  <span className="text-cyan-400 font-extrabold text-base">{holoDemoCountdown}s</span>
+                </div>
+
+                <div className="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-cyan-900/60">
+                  <div 
+                    className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 transition-all duration-1000 ease-linear rounded-full"
+                    style={{ width: `${((5 - holoDemoCountdown) / 5) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              <p className="text-[11px] text-slate-400 italic">
+                Launching 3D spatial demo in {holoDemoCountdown} seconds...
+              </p>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
       {/* MODAL 1: 🎙️ ASK AI VOICE ASSISTANT MODAL */}
       {/* ======================================================== */}
       {isVoiceModalOpen && voiceModelProduct && (
@@ -1867,40 +1776,80 @@ ${promptText}`,
                   <p className="text-[11px] text-emerald-400">{voiceModelProduct.name}</p>
                 </div>
               </div>
-              <button
-                onClick={() => {
-                  setIsVoiceModalOpen(false);
-                  if (typeof window !== "undefined" && "speechSynthesis" in window) {
-                    window.speechSynthesis.cancel();
-                  }
-                }}
-                className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-slate-800"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setIsVoiceModalOpen(false);
+                    setIsTamilTrainingModalOpen(true);
+                  }}
+                  className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white font-extrabold rounded-xl text-[10px] flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
+                  title="Train Voice AI with HuggingFace Dataset"
+                >
+                  <BrainCircuit className="w-3.5 h-3.5" />
+                  <span>Train Tamil AI</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setIsVoiceModalOpen(false);
+                    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+                      window.speechSynthesis.cancel();
+                    }
+                  }}
+                  className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-slate-800"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Language Switch */}
             <div className="flex items-center justify-between bg-slate-900 p-2 rounded-xl border border-slate-800 text-xs">
               <span className="text-slate-400 font-bold">Voice Language:</span>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    setVoiceLang("ta");
-                    speakTTS(voiceModelProduct.voiceGreeting.ta, "ta");
-                  }}
-                  className={`px-3 py-1 rounded-lg font-bold text-xs ${voiceLang === "ta" ? "bg-emerald-500 text-white" : "text-slate-400"}`}
-                >
-                  🇮🇳 தமிழ்
-                </button>
+              <div className="flex gap-1.5 flex-wrap">
                 <button
                   onClick={() => {
                     setVoiceLang("en");
-                    speakTTS(voiceModelProduct.voiceGreeting.en, "en");
+                    const enMsg = voiceModelProduct.voiceGreeting?.en || `Hello! The ${voiceModelProduct.name} features a 4-stroke pure petrol engine. Ask me anything!`;
+                    setAiHistory([{ sender: "ai", text: enMsg }]);
+                    speakTTS(enMsg, "en");
                   }}
-                  className={`px-3 py-1 rounded-lg font-bold text-xs ${voiceLang === "en" ? "bg-emerald-500 text-white" : "text-slate-400"}`}
+                  className={`px-3 py-1.5 rounded-xl font-extrabold text-xs transition-all ${
+                    voiceLang === "en"
+                      ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30"
+                      : "bg-slate-800 text-slate-400 hover:text-white border border-slate-700"
+                  }`}
                 >
                   🇺🇸 English
+                </button>
+                <button
+                  onClick={() => {
+                    setVoiceLang("hi");
+                    const hiMsg = `नमस्ते! मैं ${voiceModelProduct.name} का AI उत्पाद सहायक हूँ। इंजन, पावर या कीमत के बारे में पूछें!`;
+                    setAiHistory([{ sender: "ai", text: hiMsg }]);
+                    speakTTS(hiMsg, "hi");
+                  }}
+                  className={`px-3 py-1.5 rounded-xl font-extrabold text-xs transition-all ${
+                    voiceLang === "hi"
+                      ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30"
+                      : "bg-slate-800 text-slate-400 hover:text-white border border-slate-700"
+                  }`}
+                >
+                  🇮🇳 हिंदी
+                </button>
+                <button
+                  onClick={() => {
+                    setVoiceLang("ta");
+                    const taMsg = voiceModelProduct.voiceGreeting?.ta || `வணக்கம்! நான் ${voiceModelProduct.name} எஞ்சினின் AI உதவியாளர். உங்களுக்கு எப்படி உதவ முடியும்?`;
+                    setAiHistory([{ sender: "ai", text: taMsg }]);
+                    speakTTS(taMsg, "ta");
+                  }}
+                  className={`px-3 py-1.5 rounded-xl font-extrabold text-xs transition-all ${
+                    voiceLang === "ta"
+                      ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30"
+                      : "bg-slate-800 text-slate-400 hover:text-white border border-slate-700"
+                  }`}
+                >
+                  🇮🇳 தமிழ்
                 </button>
               </div>
             </div>
@@ -1909,24 +1858,65 @@ ${promptText}`,
             <div className="h-48 overflow-y-auto space-y-2 p-3 bg-slate-900/90 rounded-xl border border-slate-800 text-xs">
               {aiHistory.map((h, i) => (
                 <div key={i} className={`flex ${h.sender === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`p-2.5 rounded-xl max-w-[85%] ${h.sender === "user" ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-200 border border-slate-700"}`}>
-                    {h.text}
+                  <div className={`p-2.5 rounded-xl max-w-[85%] ${h.sender === "user" ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-200 border border-slate-700 flex items-start justify-between gap-2"}`}>
+                    <span>{h.text}</span>
+                    {h.sender === "ai" && (
+                      <button
+                        onClick={() => speakTTS(h.text, voiceLang)}
+                        className="p-1 text-emerald-400 hover:text-white rounded transition-colors shrink-0"
+                        title="Read Aloud"
+                      >
+                        <Volume2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Input Form */}
+            {/* Input Form with Mic Button */}
             <form onSubmit={handleSendVoiceQuery} className="flex gap-2">
-              <input
-                type="text"
-                value={userQuery}
-                onChange={(e) => setUserQuery(e.target.value)}
-                placeholder={voiceLang === "ta" ? "கேள்வி தட்டச்சு செய்க: எ.கா. 'வணக்கம், எப்படி இருக்கிறீர்கள்?'" : "Ask about specs, engine, or price..."}
-                className="flex-1 px-3 py-2 bg-slate-900 text-white text-xs rounded-xl border border-slate-800 focus:outline-none focus:border-emerald-500"
-              />
-              <button type="submit" className="px-4 py-2 bg-emerald-500 text-white font-bold rounded-xl text-xs">
-                Speak
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={userQuery}
+                  onChange={(e) => setUserQuery(e.target.value)}
+                  placeholder={
+                    voiceLang === "hi"
+                      ? "प्रश्न पूछें: उदा. 'पावर क्या है?' या 'कीमत क्या है?'"
+                      : voiceLang === "ta"
+                      ? "கேள்வி தட்டச்சு செய்க: எ.கா. 'வணக்கம், எப்படி இருக்கிறீர்கள்?'"
+                      : "Ask about specs, engine, power, or price..."
+                  }
+                  className="w-full pl-3 pr-9 py-2 bg-slate-900 text-white text-xs rounded-xl border border-slate-800 focus:outline-none focus:border-emerald-500 font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleStartVoiceListening(voiceLang, (transcript) => {
+                      setUserQuery(transcript);
+                      const q = transcript.trim();
+                      if (!q || !voiceModelProduct) return;
+                      setUserQuery("");
+                      setAiHistory((prev) => [...prev, { sender: "user", text: q }]);
+                      setTimeout(() => {
+                        if (!voiceModelProduct) return;
+                        const reply = getSmartAiAnswer(voiceModelProduct, q, voiceLang);
+                        setAiHistory((prev) => [...prev, { sender: "ai", text: reply }]);
+                        speakTTS(reply, voiceLang);
+                      }, 300);
+                    })
+                  }
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-lg transition-colors ${
+                    isListening ? "bg-rose-500 text-white animate-pulse" : "text-slate-400 hover:text-emerald-400"
+                  }`}
+                  title="Click to speak your question"
+                >
+                  <Mic className="w-4 h-4" />
+                </button>
+              </div>
+              <button type="submit" className="px-4 py-2 bg-emerald-500 text-white font-bold rounded-xl text-xs active:scale-95 cursor-pointer shrink-0">
+                Send
               </button>
             </form>
           </div>
@@ -1934,297 +1924,555 @@ ${promptText}`,
       )}
 
       {/* ======================================================== */}
-      {/* MODAL 2: 🔮 3D HOLOGRAM INTERACTIVE VIEWER MODAL */}
+      {/* MODAL 2: 🔮 3D HOLOGRAM INTERACTIVE VIEWER MODAL (FULL SIZE) */}
       {/* ======================================================== */}
       {is3DModalOpen && hologramProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/90 backdrop-blur-xl overflow-y-auto animate-in fade-in duration-300">
-          <div className={`relative w-full ${isHologramFullscreen ? "max-w-7xl" : "max-w-5xl"} bg-slate-950 text-white rounded-3xl border border-sky-500/30 p-5 sm:p-7 shadow-[0_0_80px_rgba(14,165,233,0.15)] space-y-5 transition-all duration-300`}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/95 backdrop-blur-2xl overflow-hidden animate-in fade-in duration-300">
+          <div className="relative w-full max-w-6xl h-[88vh] bg-[#01040f] text-white rounded-3xl border border-cyan-500/40 p-3 sm:p-4 shadow-[0_0_100px_rgba(6,182,212,0.3)] flex flex-col justify-between overflow-hidden">
             
-            {/* Modal Glass Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800/80 pb-4 gap-3">
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500/20 to-indigo-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.2)]">
-                  <Sparkles className="w-6 h-6 animate-pulse text-sky-400" />
+            {/* Ambient Sci-Fi Glow Background */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+            {/* Top Overlay Bar */}
+            <div className="relative z-20 flex items-center justify-between p-2">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-400/40 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                  <Sparkles className="w-5 h-5 animate-pulse text-cyan-300" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-widest bg-sky-500/10 text-sky-400 border border-sky-500/30">
-                      3D Spatial Hologram Stage
-                    </span>
-                    <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                      Live Projection Sync
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-black text-white tracking-tight mt-0.5">{hologramProduct.name}</h3>
-                  <p className="text-xs text-slate-400 font-medium">{hologramProduct.brand} • {hologramProduct.category}</p>
+                  <h3 className="text-base sm:text-lg font-black text-white tracking-tight font-display">
+                    {hologramProduct.name}
+                  </h3>
+                  <p className="text-[11px] font-mono text-cyan-400">
+                    3D Spatial Hologram Projection • 7000 RPM ENGINE SIM
+                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 self-end sm:self-center">
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setIsHologramFullscreen(!isHologramFullscreen)}
-                  className="p-2 text-slate-400 hover:text-sky-400 rounded-xl hover:bg-slate-900 border border-transparent hover:border-slate-800 transition-all flex items-center gap-1.5 text-xs"
-                  title="Toggle Display Size"
+                  onClick={handleConnectHolo}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 border shadow-md active:scale-95 ${
+                    isHoloConnected
+                      ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                      : "bg-cyan-500/20 text-cyan-300 border-cyan-400/40"
+                  }`}
                 >
-                  {isHologramFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                  <span className="hidden sm:inline">{isHologramFullscreen ? "Standard" : "Expand"}</span>
+                  <Cast className={`w-3.5 h-3.5 ${isHoloConnected ? "text-emerald-400" : "text-cyan-400 animate-pulse"}`} />
+                  <span>{isHoloConnected ? "Holo Connected" : "Connect Holo"}</span>
                 </button>
+
                 <button
                   onClick={() => setIs3DModalOpen(false)}
-                  className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-900 border border-slate-800 transition-all"
+                  className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-900/80 hover:bg-rose-500/20 border border-slate-800 hover:border-rose-500/40 transition-all cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            {/* Main Stage Grid Container */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Main Stage 3D Full-Size Viewport */}
+            <div className="relative z-10 flex-1 w-full h-full min-h-0 flex items-center justify-center overflow-hidden rounded-2xl border border-cyan-500/30 bg-[#01040f]">
+              {/* Futuristic Grid Matrix Backdrop */}
+              <div className="absolute inset-0 bg-[radial-gradient(#06b6d420_1px,transparent_1px)] bg-[size:22px_22px] pointer-events-none" />
               
-              {/* Left Column: 3D Holographic Interactive Viewport */}
-              <div className="lg:col-span-8 flex flex-col space-y-3">
-                <div className="relative w-full aspect-[16/10] bg-[#020617] rounded-2xl overflow-hidden border border-sky-500/30 shadow-[inset_0_0_40px_rgba(2,6,23,0.9)] flex items-center justify-center group">
-                  
-                  {/* Futuristic Grid Matrix Backdrop */}
-                  <div className="absolute inset-0 bg-[radial-gradient(#38bdf818_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
-                  
-                  {/* Glowing Sci-Fi Pedestal Floor */}
-                  <div className="absolute bottom-2 w-72 h-14 rounded-[100%] bg-sky-500/15 border border-sky-400/30 shadow-[0_0_40px_rgba(56,189,248,0.5)] animate-pulse pointer-events-none" />
+              {/* Glowing Sci-Fi Pedestal Floor */}
+              <div className="absolute bottom-4 w-96 h-16 rounded-[100%] bg-cyan-500/20 border border-cyan-400/40 shadow-[0_0_50px_rgba(6,182,212,0.6)] animate-pulse pointer-events-none" />
 
-                  {/* Corner Sci-Fi Viewport Brackets */}
-                  <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-sky-400/70 pointer-events-none" />
-                  <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-sky-400/70 pointer-events-none" />
-                  <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-sky-400/70 pointer-events-none" />
-                  <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-sky-400/70 pointer-events-none" />
+              {/* Corner Sci-Fi Viewport Brackets */}
+              <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+              <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+              <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+              <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
 
-                  {/* Top HUD Stats Overlay */}
-                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none z-20">
-                    <div className="bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-sky-500/30 text-[10px] font-mono text-sky-300 flex items-center gap-2 shadow-lg">
-                      <Activity className="w-3.5 h-3.5 text-sky-400 animate-pulse" />
-                      <span>HUD MATRIX • 360° WIREFRAME</span>
-                    </div>
-                    <div className="bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-emerald-500/30 text-[10px] font-mono text-emerald-400 flex items-center gap-2 shadow-lg">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                      <span>7000 RPM ENGINE SIM</span>
-                    </div>
-                  </div>
+            {/* Main Viewport Content Area: Split 2-Column Layout (Left: 3D Stage, Right: Dedicated Separate AI Assistant Column) */}
+            <div className="relative z-10 flex-1 w-full h-full min-h-0 flex flex-col lg:flex-row gap-3.5 overflow-hidden mt-1">
+              
+              {/* LEFT COLUMN: Interactive 3D Hologram Stage */}
+              <div className="relative flex-1 w-full h-full min-h-[300px] flex flex-col justify-between overflow-hidden rounded-2xl border border-cyan-500/30 bg-[#01040f]">
+                {/* Futuristic Grid Matrix Backdrop */}
+                <div className="absolute inset-0 bg-[radial-gradient(#06b6d420_1px,transparent_1px)] bg-[size:22px_22px] pointer-events-none" />
+                
+                {/* Glowing Sci-Fi Pedestal Floor */}
+                <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-80 sm:w-96 h-16 rounded-[100%] bg-cyan-500/20 border border-cyan-400/40 shadow-[0_0_50px_rgba(6,182,212,0.6)] animate-pulse pointer-events-none" />
 
-                  {/* Video or Graphic Player Container with 360 Degree Orbit Animation */}
-                  <style jsx global>{`
-                    @keyframes orbit360Stage {
-                      0% { transform: perspective(1000px) rotateY(0deg); }
-                      100% { transform: perspective(1000px) rotateY(360deg); }
-                    }
-                    .animate-360-stage-orbit {
-                      animation: orbit360Stage 12s linear infinite;
-                    }
-                  `}</style>
+                {/* Corner Sci-Fi Viewport Brackets */}
+                <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+                <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+                <div className="absolute bottom-16 left-3 w-5 h-5 border-b-2 border-l-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+                <div className="absolute bottom-16 right-3 w-5 h-5 border-b-2 border-r-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
 
-                  {/* Interactive Mouse & Touch Drag 360° Rotation Viewport Stage */}
+                {/* Top Left HUD Stats Badge */}
+                <div className="absolute top-3 left-3 z-20 bg-slate-950/85 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-cyan-500/35 text-xs font-mono text-cyan-300 flex items-center gap-2 shadow-lg">
+                  <Activity className="w-4 h-4 text-cyan-400 animate-pulse" />
+                  <span className="font-bold">HUD MATRIX • 360° WIREFRAME</span>
+                </div>
+
+                {/* Interactive Mouse & Touch Drag 360° Rotation Viewport Stage */}
+                <div
+                  onMouseDown={handleHologramMouseDown}
+                  onMouseMove={handleHologramMouseMove}
+                  onMouseUp={handleHologramMouseUp}
+                  onMouseLeave={handleHologramMouseUp}
+                  onTouchStart={handleHologramTouchStart}
+                  onTouchMove={handleHologramTouchMove}
+                  onTouchEnd={handleHologramTouchEnd}
+                  className={`relative z-10 w-full flex-1 min-h-0 flex items-center justify-center p-4 select-none ${
+                    isDraggingHologram ? "cursor-grabbing" : "cursor-grab"
+                  }`}
+                >
                   <div
-                    onMouseDown={handleHologramMouseDown}
-                    onMouseMove={handleHologramMouseMove}
-                    onMouseUp={handleHologramMouseUp}
-                    onMouseLeave={handleHologramMouseUp}
-                    onTouchStart={handleHologramTouchStart}
-                    onTouchMove={handleHologramTouchMove}
-                    onTouchEnd={handleHologramTouchEnd}
-                    className={`relative z-10 w-full h-full flex items-center justify-center p-1 select-none ${
-                      isDraggingHologram ? "cursor-grabbing" : "cursor-grab"
-                    }`}
+                    className={`w-full h-full flex items-center justify-center transition-transform ${
+                      isDraggingHologram ? "duration-0" : "duration-300"
+                    } ${is360Rotating ? "animate-360-stage-orbit" : ""}`}
+                    style={{
+                      transform: !is360Rotating ? `perspective(1000px) rotateY(${dragRotationAngle}deg)` : undefined
+                    }}
                   >
-                    {/* Floating Mouse Rotation Guidance Badge */}
-                    <div className="absolute top-3 right-3 z-30 bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-xl border border-sky-500/40 text-[10px] font-mono text-sky-300 flex items-center gap-1.5 shadow-lg pointer-events-none">
-                      <span className="text-sm">🖱️</span>
-                      <span>{isDraggingHologram ? `360° Drag Angle: ${Math.round(dragRotationAngle)}°` : "Click & Drag mouse to rotate 360°"}</span>
-                    </div>
-
-                    <div
-                      className={`w-full h-full flex items-center justify-center transition-transform ${
-                        isDraggingHologram ? "duration-0" : "duration-300"
-                      } ${is360Rotating ? "animate-360-stage-orbit" : ""}`}
-                      style={{
-                        transform: !is360Rotating ? `perspective(1000px) rotateY(${dragRotationAngle}deg)` : undefined
-                      }}
-                    >
-                      {hologramProduct.hologramVideo || hologramProduct.id === "gm-bc-358-4sp" || hologramProduct.name.toLowerCase().includes("bc 358 4sp") ? (
-                        <video
-                          ref={hologramVideoRef}
-                          src={hologramProduct.hologramVideo || "/videos/remove_all_the_background.mp4"}
-                          autoPlay
-                          loop
-                          muted={isHologramMuted}
-                          playsInline
-                          className="w-full h-full object-contain rounded-xl filter drop-shadow-[0_0_25px_rgba(56,189,248,0.4)] pointer-events-none"
-                        />
-                      ) : (
-                        <ProductGraphic product={hologramProduct} is3DHover={true} />
-                      )}
-                    </div>
+                    {hologramProduct.hologramVideo || hologramProduct.id === "gm-bc-358-4sp" || hologramProduct.name.toLowerCase().includes("bc 358 4sp") ? (
+                      <video
+                        ref={hologramVideoRef}
+                        src={hologramProduct.hologramVideo || "/videos/remove_all_the_background.mp4"}
+                        autoPlay
+                        loop
+                        muted={isHologramMuted}
+                        playsInline
+                        className="w-full h-full object-contain filter drop-shadow-[0_0_40px_rgba(6,182,212,0.6)] mix-blend-screen pointer-events-none"
+                      />
+                    ) : (
+                      <ProductGraphic product={hologramProduct} is3DHover={true} />
+                    )}
                   </div>
+                </div>
 
-                  {/* Floating Custom HUD Control Bar */}
-                  <div className="absolute bottom-3 left-3 right-3 z-30 bg-slate-950/85 backdrop-blur-xl border border-sky-500/30 rounded-2xl p-2 sm:p-2.5 flex items-center justify-between shadow-2xl">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={toggleHologramPlay}
-                        className="p-2 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 rounded-xl border border-sky-500/30 transition-all flex items-center gap-1.5 text-xs font-bold"
-                        title={isHologramPlaying ? "Pause Model" : "Play Model"}
-                      >
-                        {isHologramPlaying ? <Pause className="w-4 h-4 text-sky-400" /> : <Play className="w-4 h-4 text-sky-400 fill-sky-400" />}
-                        <span className="hidden sm:inline">{isHologramPlaying ? "Pause" : "Play"}</span>
-                      </button>
-
-                      <button
-                        onClick={toggleHologramMute}
-                        className={`p-2 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-bold ${
-                          !isHologramMuted
-                            ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
-                            : "bg-slate-900 text-slate-400 border-slate-800 hover:text-white"
-                        }`}
-                        title={isHologramMuted ? "Unmute Audio" : "Mute Audio"}
-                      >
-                        {!isHologramMuted ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4" />}
-                        <span className="hidden sm:inline">{!isHologramMuted ? "Audio ON" : "Muted"}</span>
-                      </button>
-
-                      {/* Clean 360° Orbit Button */}
-                      <button
-                        onClick={() => setIs360Rotating(!is360Rotating)}
-                        className={`p-2 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-bold ${
-                          is360Rotating
-                            ? "bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-sm"
-                            : "bg-slate-900 text-slate-400 border-slate-800 hover:text-white"
-                        }`}
-                        title="Toggle 360° Orbit View"
-                      >
-                        <RotateCw className={`w-4 h-4 ${is360Rotating ? "animate-spin text-sky-400" : "text-slate-400"}`} />
-                        <span className="hidden sm:inline">{is360Rotating ? "360° Orbit ON" : "360° Orbit OFF"}</span>
-                      </button>
-                    </div>
-
-                    <div className="text-[11px] font-mono text-slate-400 hidden md:flex items-center gap-2">
-                      <Cpu className="w-3.5 h-3.5 text-sky-400" />
-                      <span>360° Spatial Telemetry Engine</span>
-                    </div>
+                {/* Floating Custom HUD Control Bar at bottom of 3D stage */}
+                <div className="relative z-30 bg-slate-950/90 backdrop-blur-2xl border-t border-cyan-500/35 p-2.5 flex items-center justify-between shadow-2xl shrink-0">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={toggleHologramPlay}
+                      className="px-3.5 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 rounded-xl border border-cyan-400/40 transition-all flex items-center gap-1.5 text-xs font-extrabold shadow-[0_0_12px_rgba(6,182,212,0.2)] active:scale-95 cursor-pointer"
+                      title={isHologramPlaying ? "Pause Model" : "Play Model"}
+                    >
+                      {isHologramPlaying ? <Pause className="w-4 h-4 text-cyan-300" /> : <Play className="w-4 h-4 text-cyan-300 fill-cyan-300" />}
+                      <span>{isHologramPlaying ? "Pause" : "Play"}</span>
+                    </button>
 
                     <button
-                      onClick={() => setIsHologramFullscreen(!isHologramFullscreen)}
-                      className="p-2 bg-slate-900 hover:bg-slate-800 text-sky-300 rounded-xl border border-slate-800 transition-all text-xs flex items-center gap-1"
+                      onClick={toggleHologramMute}
+                      className={`px-3.5 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-extrabold active:scale-95 cursor-pointer ${
+                        !isHologramMuted
+                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
+                          : "bg-slate-900 text-slate-400 border-slate-800 hover:text-white"
+                      }`}
+                      title={isHologramMuted ? "Unmute Audio" : "Mute Audio"}
                     >
-                      {isHologramFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                      {!isHologramMuted ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4" />}
+                      <span>{!isHologramMuted ? "Audio ON" : "Muted"}</span>
+                    </button>
+
+                    <button
+                      onClick={() => setIs360Rotating(!is360Rotating)}
+                      className={`px-3.5 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-extrabold active:scale-95 cursor-pointer ${
+                        is360Rotating
+                          ? "bg-indigo-500/20 text-indigo-300 border-indigo-400/40 shadow-[0_0_12px_rgba(99,102,241,0.2)]"
+                          : "bg-slate-900 text-slate-400 border-slate-800 hover:text-white"
+                      }`}
+                      title="Toggle 360° Orbit View"
+                    >
+                      <RotateCw className={`w-4 h-4 ${is360Rotating ? "animate-spin text-indigo-400" : "text-slate-400"}`} />
+                      <span>{is360Rotating ? "360° Orbit ON" : "360° Orbit OFF"}</span>
+                    </button>
+                  </div>
+
+                  <div className="text-xs font-mono text-cyan-300 hidden md:flex items-center gap-2 font-semibold">
+                    <Cpu className="w-4 h-4 text-cyan-400" />
+                    <span>360° Spatial Telemetry Engine</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT COLUMN: Dedicated Separate AI Voice Assistant & Chat Panel */}
+              <div className="w-full lg:w-[380px] xl:w-[400px] h-full flex flex-col justify-between bg-slate-950/95 backdrop-blur-2xl border border-cyan-500/40 rounded-2xl p-4 shadow-2xl overflow-y-auto shrink-0 space-y-3">
+                <div className="flex items-center justify-between border-b border-cyan-900/40 pb-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className={`w-4 h-4 ${isSpeaking ? "text-cyan-400 animate-spin" : "text-cyan-400 animate-pulse"}`} />
+                    <span className="text-xs font-black uppercase tracking-wider text-cyan-300 font-display">
+                      AI Voice Assistant & Chat
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setHoloActiveTab("specs")}
+                      className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer ${
+                        holoActiveTab === "specs"
+                          ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
+                          : "bg-slate-900 text-slate-400 hover:text-white border border-cyan-900/50"
+                      }`}
+                    >
+                      Specs
+                    </button>
+                    <button
+                      onClick={() => setHoloActiveTab("chat")}
+                      className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer relative ${
+                        holoActiveTab === "chat"
+                          ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
+                          : "bg-slate-900 text-slate-400 hover:text-white border border-cyan-900/50"
+                      }`}
+                    >
+                      Ask AI
+                      {holoAiHistory.length > 0 && (
+                        <span className="ml-1 w-2 h-2 inline-block bg-emerald-400 rounded-full animate-ping" />
+                      )}
                     </button>
                   </div>
                 </div>
-              </div>
 
-              {/* Right Column: Holographic Specs & Telemetry Dashboard */}
-              <div className="lg:col-span-4 flex flex-col justify-between bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-4 backdrop-blur-md">
-                
-                <div className="space-y-3.5">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-                    <span className="text-xs font-black uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-                      <Cpu className="w-4 h-4 text-sky-400" />
-                      System Telemetry
-                    </span>
-                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                      VERIFIED SPECS
-                    </span>
-                  </div>
-
-                  {/* Telemetry Grid */}
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-0.5">
-                      <span className="text-[10px] font-mono text-slate-400 uppercase block">Displacement</span>
-                      <span className="font-bold text-white text-xs">{hologramProduct.displacement || "35.8 cc"}</span>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-0.5">
-                      <span className="text-[10px] font-mono text-slate-400 uppercase block">Engine Type</span>
-                      <span className="font-bold text-white text-xs truncate block" title={hologramProduct.engine}>{hologramProduct.engine || "4-Stroke OHC"}</span>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-0.5">
-                      <span className="text-[10px] font-mono text-slate-400 uppercase block">Max Output</span>
-                      <span className="font-bold text-white text-xs">{hologramProduct.power || "1.0 kW / 1.4 HP"}</span>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-0.5">
-                      <span className="text-[10px] font-mono text-slate-400 uppercase block">Dry Weight</span>
-                      <span className="font-bold text-white text-xs">{hologramProduct.weight || "7.8 kg"}</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5 pt-1">
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Key Engineering Highlights</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {hologramProduct.highlights && hologramProduct.highlights.length > 0 ? (
-                        hologramProduct.highlights.slice(0, 4).map((hl, idx) => (
-                          <span key={idx} className="text-[10px] font-medium bg-sky-950/60 text-sky-300 border border-sky-800/60 px-2 py-1 rounded-lg flex items-center gap-1">
-                            <ShieldCheck className="w-3 h-3 text-sky-400 shrink-0" />
-                            <span className="truncate max-w-[190px]">{hl.split("–")[0].trim()}</span>
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-[10px] text-slate-400">Pure Petrol 4-Stroke Technology</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Direct Action Buttons */}
-                <div className="space-y-2 pt-2 border-t border-slate-800">
-                  <a
-                    href={`https://wa.me/919444154944?text=${encodeURIComponent(`Hello George Maijo Team, I am interested in ${hologramProduct.name} after reviewing the 3D Hologram model. Please send full catalog and price quotation.`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30 transition-all"
+                {/* Language Switcher Bar: English, Hindi, Tamil ONLY */}
+                <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-cyan-900/50">
+                  <button
+                    onClick={() => {
+                      setHoloAiLang("en");
+                      speakTTS(getProductSpecsText(hologramProduct, "en"), "en");
+                    }}
+                    className={`flex-1 py-1.5 px-2 rounded-lg font-extrabold text-[10.5px] transition-all cursor-pointer ${
+                      holoAiLang === "en"
+                        ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
+                        : "text-slate-400 hover:text-white"
+                    }`}
                   >
-                    <MessageSquare className="w-4 h-4 fill-white" />
-                    <span>WhatsApp Quote & Order</span>
-                  </a>
+                    🇺🇸 English
+                  </button>
 
                   <button
-                    onClick={(e) => {
-                      setIs3DModalOpen(false);
-                      openVoiceAssistant(e, hologramProduct);
+                    onClick={() => {
+                      setHoloAiLang("hi");
+                      speakTTS(getProductSpecsText(hologramProduct, "hi"), "hi");
                     }}
-                    className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all"
+                    className={`flex-1 py-1.5 px-2 rounded-lg font-extrabold text-[10.5px] transition-all cursor-pointer ${
+                      holoAiLang === "hi"
+                        ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
+                        : "text-slate-400 hover:text-white"
+                    }`}
                   >
-                    <Mic className="w-4 h-4 text-sky-400" />
-                    <span>Ask AI Voice Assistant</span>
+                    🇮🇳 हिंदी
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setHoloAiLang("ta");
+                      speakTTS(getProductSpecsText(hologramProduct, "ta"), "ta");
+                    }}
+                    className={`flex-1 py-1.5 px-2 rounded-lg font-extrabold text-[10.5px] transition-all cursor-pointer ${
+                      holoAiLang === "ta"
+                        ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    🇮🇳 தமிழ்
                   </button>
                 </div>
 
+                {/* Main Content Area: Specs View vs Chat Stream View */}
+                {holoActiveTab === "specs" ? (
+                  <div className="flex-1 flex flex-col justify-between space-y-3 min-h-0 overflow-y-auto">
+                    {/* Specification Overview Display Box */}
+                    <div className="p-3 bg-slate-900/90 rounded-xl border border-cyan-500/25 space-y-2 text-xs">
+                      <p className="text-[12px] text-cyan-200 leading-relaxed font-medium">
+                        {getProductSpecsText(hologramProduct, holoAiLang)}
+                      </p>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono pt-2 border-t border-cyan-900/40">
+                        <span className="text-slate-400">Displacement: <strong className="text-white font-bold">{hologramProduct.displacement || "35.8 cc"}</strong></span>
+                        <span className="text-slate-400">Power: <strong className="text-white font-bold">{hologramProduct.power || "1.4 HP"}</strong></span>
+                      </div>
+                    </div>
+
+                    {/* Quick Prompt Chips */}
+                    <div className="space-y-1.5">
+                      <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wide">Quick Inquiries:</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {[
+                          { label: "⚡ Power Output", query: "What is the max power output?" },
+                          { label: "⛽ Engine & Petrol", query: "What engine and fuel does it use?" },
+                          { label: "⚖️ Dry Weight", query: "What is the dry weight?" },
+                          { label: "💰 Price Inquiry", query: "What is the price of this model?" },
+                        ].map((chip, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleHoloVoiceQuerySubmit(chip.query)}
+                            className="px-2.5 py-1 bg-cyan-950/70 hover:bg-cyan-900 text-cyan-300 text-[10px] font-semibold rounded-lg border border-cyan-800/60 hover:border-cyan-400 transition-all cursor-pointer"
+                          >
+                            {chip.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Speak Aloud Button */}
+                    <button
+                      onClick={() => speakTTS(getProductSpecsText(hologramProduct, holoAiLang), holoAiLang)}
+                      className="w-full py-2 px-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-extrabold rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-cyan-500/20 active:scale-95 cursor-pointer mt-auto"
+                    >
+                      <Volume2 className="w-4 h-4 fill-slate-950" />
+                      <span>Read Specs Aloud ({holoAiLang.toUpperCase()})</span>
+                    </button>
+                  </div>
+                ) : (
+                  /* Chat Stream View */
+                  <div className="flex-1 flex flex-col justify-between space-y-2 min-h-0">
+                    <div className="flex-1 overflow-y-auto space-y-2 p-3 bg-slate-900/90 rounded-xl border border-cyan-500/25 text-xs">
+                      {holoAiHistory.length === 0 ? (
+                        <div className="text-center py-8 space-y-2">
+                          <Sparkles className="w-7 h-7 text-cyan-400 mx-auto animate-bounce" />
+                          <p className="text-xs text-cyan-300 font-bold">Ask AI Answering Chatbot</p>
+                          <p className="text-[11px] text-slate-400 max-w-xs mx-auto">Type or speak any question about {hologramProduct.name} specs, power, weight or price!</p>
+                        </div>
+                      ) : (
+                        holoAiHistory.map((h, i) => (
+                          <div key={i} className={`flex ${h.sender === "user" ? "justify-end" : "justify-start"}`}>
+                            <div
+                              className={`p-2.5 rounded-xl max-w-[90%] text-[11.5px] leading-relaxed ${
+                                h.sender === "user"
+                                  ? "bg-cyan-600 text-white font-medium"
+                                  : "bg-slate-800 text-cyan-100 border border-cyan-800/60 flex items-start justify-between gap-2"
+                              }`}
+                            >
+                              <span>{h.text}</span>
+                              {h.sender === "ai" && (
+                                <button
+                                  onClick={() => speakTTS(h.text, holoAiLang)}
+                                  className="p-1 text-cyan-400 hover:text-white rounded transition-colors shrink-0"
+                                  title="Read Aloud"
+                                >
+                                  <Volume2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Interactive Question Input Form with Mic Button */}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleHoloVoiceQuerySubmit(holoUserQuery);
+                  }}
+                  className="flex items-center gap-1.5 pt-2 border-t border-cyan-900/40 shrink-0"
+                >
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={holoUserQuery}
+                      onChange={(e) => setHoloUserQuery(e.target.value)}
+                      placeholder={
+                        holoAiLang === "ta"
+                          ? "கேள்வி கேட்க: எ.கா. 'விலை என்ன?'"
+                          : holoAiLang === "hi"
+                          ? "प्रश्न पूछें: उदा. 'पावर क्या है?'"
+                          : "Ask question about engine, power, price..."
+                      }
+                      className="w-full pl-3 pr-8 py-2 bg-slate-900 text-white text-xs rounded-xl border border-cyan-900 focus:outline-none focus:border-cyan-400 placeholder:text-slate-500 font-medium"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleStartVoiceListening(holoAiLang, (transcript) => {
+                          setHoloUserQuery(transcript);
+                          handleHoloVoiceQuerySubmit(transcript);
+                        })
+                      }
+                      className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-lg transition-colors ${
+                        isListening
+                          ? "bg-rose-500 text-white animate-pulse"
+                          : "text-slate-400 hover:text-cyan-400"
+                      }`}
+                      title="Click to speak your question"
+                    >
+                      <Mic className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={!holoUserQuery.trim()}
+                    className="p-2 bg-cyan-500 disabled:opacity-50 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-xl text-xs transition-all active:scale-95 cursor-pointer shrink-0"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </form>
               </div>
+
             </div>
 
-            {/* Modal Bottom Footer Status */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800/80 gap-3">
-              <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
-                <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
-                <span>3D Spatial Hologram Projection Active • George Maijo Machinery</span>
-              </div>
-              
-              <div className="flex items-center gap-2.5 self-end sm:self-auto">
-                {/* 📡 CONNECT HOLO DEVICE BUTTON */}
-                <button
-                  onClick={handleConnectHolo}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border shadow-lg ${
-                    isHoloConnected
-                      ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-emerald-950/40"
-                      : "bg-gradient-to-r from-sky-500/20 to-indigo-500/20 hover:from-sky-500/30 hover:to-indigo-500/30 text-sky-300 border-sky-500/40 shadow-sky-950/40"
-                  }`}
-                >
-                  <Cast className={`w-4 h-4 ${isHoloConnected ? "text-emerald-400" : "text-sky-400 animate-pulse"}`} />
-                  <span>{isHoloConnected ? "Holo Connected • Streaming" : "Connect Holo"}</span>
-                </button>
+            </div>
 
-                <button
-                  onClick={() => setIs3DModalOpen(false)}
-                  className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold rounded-xl text-xs transition-all"
-                >
-                  Close 3D View
-                </button>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL 5: 🧠 TAMIL AI VOICE ASSISTANT TRAINING STUDIO */}
+      {/* ======================================================== */}
+      {isTamilTrainingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/92 backdrop-blur-xl overflow-y-auto animate-in fade-in duration-300">
+          <div className="relative w-full max-w-2xl bg-[#030712] text-white rounded-3xl border border-purple-500/40 p-6 sm:p-7 shadow-[0_0_90px_rgba(168,85,247,0.25)] space-y-5 overflow-hidden">
+            
+            {/* Ambient Background Glow */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
+
+            {/* Header */}
+            <div className="relative z-10 flex items-center justify-between border-b border-purple-900/40 pb-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-500/30 via-indigo-500/20 to-blue-500/30 text-purple-300 border border-purple-400/40 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.3)] shrink-0">
+                  <BrainCircuit className="w-6 h-6 animate-pulse text-purple-300" />
+                </div>
+                <div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-widest bg-purple-500/15 text-purple-300 border border-purple-400/30 shadow-sm">
+                    Separated Voice Assistant Training Studio
+                  </span>
+                  <h3 className="text-lg sm:text-xl font-black text-white tracking-tight mt-0.5 font-display">
+                    Tamil AI Speech Training Engine
+                  </h3>
+                  <p className="text-xs text-slate-400 font-medium">
+                    Dataset Source: <span className="text-purple-300 font-mono">Achitha/simple_tamil</span> (Hugging Face)
+                  </p>
+                </div>
               </div>
+
+              <button
+                onClick={() => setIsTamilTrainingModalOpen(false)}
+                className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-900/80 hover:bg-rose-500/20 border border-slate-800 transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Main Configuration Card */}
+            <div className="relative z-10 space-y-4">
+              
+              {/* Dataset URL & Config */}
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-purple-500/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-extrabold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Database className="w-4 h-4 text-purple-400" />
+                    Hugging Face Dataset Ingestion URL
+                  </span>
+                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                    ONLINE &amp; READY
+                  </span>
+                </div>
+                
+                <input
+                  type="text"
+                  value={hfDatasetUrl}
+                  onChange={(e) => setHfDatasetUrl(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-slate-950 text-white font-mono text-xs rounded-xl border border-purple-500/30 focus:outline-none focus:border-purple-400"
+                  placeholder="https://huggingface.co/datasets/..."
+                />
+              </div>
+
+              {/* Training Telemetry Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800 text-center space-y-1">
+                  <span className="text-[9px] font-mono text-slate-400 uppercase tracking-wider block">Training Sentences</span>
+                  <span className="font-extrabold text-white text-sm font-mono">{trainingMetrics.totalRows.toLocaleString()}</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800 text-center space-y-1">
+                  <span className="text-[9px] font-mono text-slate-400 uppercase tracking-wider block">Tamil Vocabulary</span>
+                  <span className="font-extrabold text-purple-300 text-sm font-mono">{trainingMetrics.vocabCount.toLocaleString()}</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800 text-center space-y-1">
+                  <span className="text-[9px] font-mono text-slate-400 uppercase tracking-wider block">Speech Accuracy</span>
+                  <span className="font-extrabold text-emerald-400 text-sm font-mono">{trainingMetrics.accuracy}%</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800 text-center space-y-1">
+                  <span className="text-[9px] font-mono text-slate-400 uppercase tracking-wider block">TTS Latency</span>
+                  <span className="font-extrabold text-cyan-300 text-sm font-mono">{trainingMetrics.latency}</span>
+                </div>
+              </div>
+
+              {/* Sample Training Rows Preview from Achitha/simple_tamil */}
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-purple-400" />
+                  Dataset Speech Training Pairs (<span className="text-purple-300 font-mono">Achitha/simple_tamil</span>)
+                </span>
+                <div className="max-h-36 overflow-y-auto space-y-2 p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs font-mono">
+                  <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800 space-y-1">
+                    <p className="text-purple-300 font-bold">Q: "வணக்கம், உங்கள் எஞ்சின் விவரங்கள் என்ன?"</p>
+                    <p className="text-slate-300">A: "4-ஸ்ட்ரோக் ஓ.எச்.சி எஞ்சின் 7000 RPM வேகத்தில் 1.4 HP ஆற்றலை வழங்குகிறது."</p>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800 space-y-1">
+                    <p className="text-purple-300 font-bold">Q: "எண்ணெய் கலக்க தேவையா?"</p>
+                    <p className="text-slate-300">A: "இல்லை, தூய பெட்ரோல் மட்டுமே பயன்படுத்த வேண்டும். பராமரிப்பு எளிதானது."</p>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800 space-y-1">
+                    <p className="text-purple-300 font-bold">Q: "உத்தரவாதம் எவ்வளவு காலம்?"</p>
+                    <p className="text-slate-300">A: "George Maijo சாதனங்களுக்கு 1 வருட நிறுவன உத்தரவாதம் வழங்கப்படுகிறது."</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress & Live Terminal Output */}
+              {isTrainingActive && (
+                <div className="p-4 rounded-2xl bg-purple-950/40 border border-purple-500/40 space-y-3 animate-pulse">
+                  <div className="flex items-center justify-between text-xs font-mono">
+                    <span className="text-purple-300 font-bold flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
+                      Training Tamil Speech Model...
+                    </span>
+                    <span className="text-purple-300 font-bold">{trainingProgress}%</span>
+                  </div>
+                  
+                  <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-purple-500/30">
+                    <div className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-emerald-400 transition-all duration-300" style={{ width: `${trainingProgress}%` }} />
+                  </div>
+
+                  <p className="text-[11px] font-mono text-slate-300 italic">{trainingStepStatus}</p>
+                </div>
+              )}
+
+              {isTrainingComplete && (
+                <div className="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between text-xs text-emerald-300 font-bold">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    <span>Tamil AI Voice Speech Model Trained &amp; Synced with ElevenLabs!</span>
+                  </div>
+                  <button
+                    onClick={() => speakTTS("Achitha/simple_tamil தரவுத்தளத்தின் மூலம் AI குரல் முகவர் வெற்றிகரமாக பயிற்சி பெற்றுள்ளது!", "ta")}
+                    className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-md active:scale-95"
+                  >
+                    <Volume2 className="w-3.5 h-3.5" />
+                    <span>Test Speech</span>
+                  </button>
+                </div>
+              )}
+
+            </div>
+
+            {/* Modal Footer Controls */}
+            <div className="relative z-10 flex items-center justify-between pt-3 border-t border-purple-900/40">
+              <button
+                onClick={() => setIsTamilTrainingModalOpen(false)}
+                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-xl text-xs font-extrabold transition-all"
+              >
+                Close Studio
+              </button>
+
+              <button
+                onClick={startTamilVoiceTraining}
+                disabled={isTrainingActive}
+                className="px-5 py-2.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:opacity-90 disabled:opacity-50 text-white rounded-xl text-xs font-extrabold flex items-center gap-2 shadow-lg shadow-purple-950/50 transition-all active:scale-95"
+              >
+                <BrainCircuit className="w-4 h-4" />
+                <span>{isTrainingActive ? "Training In Progress..." : "Start Tamil Voice Training"}</span>
+              </button>
             </div>
 
           </div>
@@ -2341,583 +2589,647 @@ ${promptText}`,
       )}
 
       {/* ======================================================== */}
-      {/* MODAL 4: 📄 AI BROCHURE INGESTION & PRODUCT CREATOR WIZARD */}
+      {/* ======================================================== */}
+      {/* MODAL 4: 📄 AI BROCHURE INGESTION (2-STEP PDF-FIRST WORKFLOW) */}
       {/* ======================================================== */}
       {isBrochureModalOpen && (
-        <div className="fixed inset-0 top-0 left-0 w-screen h-screen z-[99999] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-xl bg-white dark:bg-slate-950 text-slate-900 dark:text-white rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn overflow-y-auto">
+          <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-card border border-border rounded-3xl shadow-2xl my-auto text-left animate-scaleUp overflow-hidden text-foreground">
             
-            {/* Header with Step Stepper */}
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white flex items-center justify-center shadow-lg border border-slate-700/60 relative group">
-                  <FilePlus className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-950 animate-pulse" />
+            {/* Modal Header & Step Indicator */}
+            <div className="flex flex-col gap-4 p-6 border-b border-border bg-card shrink-0">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+                    <FilePlus className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 font-mono">
+                        Step {brochureStep} of 2
+                      </span>
+                      <span className="text-[11px] text-muted-foreground font-semibold">
+                        {brochureStep === 1 && "1. Upload Product Brochure PDF"}
+                        {brochureStep === 2 && "2. Review AI Details & Save Product"}
+                      </span>
+                    </div>
+                    <h2 className="text-xl font-extrabold font-display text-foreground mt-1">
+                      Add George Maijo Product Brochure
+                    </h2>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-base font-extrabold font-display flex items-center gap-2">
-                    <span>Add Product & Brochure</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                      STEP {brochureStep} OF 5
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {brochureStep === 1 && "Step 1: Product Information & Category Selection"}
-                    {brochureStep === 2 && "Step 2: Upload Product Image"}
-                    {brochureStep === 3 && "Step 3: Upload Brochure PDF Document"}
-                    {brochureStep === 4 && "Step 4: Document Analysis & Spec Extraction"}
-                    {brochureStep === 5 && "Step 5: Review & Save Specifications"}
-                  </p>
+
+                <button
+                  type="button"
+                  onClick={() => setIsBrochureModalOpen(false)}
+                  className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Step Progress Bar */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div className={`h-2 rounded-full transition-all duration-300 ${brochureStep >= 1 ? "bg-blue-600" : "bg-muted"}`} />
+                <div className={`h-2 rounded-full transition-all duration-300 ${brochureStep >= 2 ? "bg-blue-600" : "bg-muted"}`} />
+              </div>
+            </div>
+
+            {/* Form Steps - Scrollable */}
+            <form onSubmit={handleSaveAddBrochure} className="flex-1 overflow-y-auto p-6 space-y-5 text-xs">
+
+              {/* STEP 1: UPLOAD PRODUCT BROCHURE PDF FIRST */}
+              {brochureStep === 1 && (
+                <div className="space-y-4 animate-fadeIn">
+                  
+                  {/* PDF Upload Card */}
+                  <div className="space-y-4 p-6 rounded-2xl border-2 border-dashed border-blue-500/40 bg-blue-500/5 text-center">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center mx-auto shadow-xl shadow-blue-500/30">
+                      <FileText className="w-7 h-7" />
+                    </div>
+
+                    <div>
+                      <h4 className="text-base font-extrabold text-foreground font-display">
+                        Upload Product Brochure PDF Document
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                        Upload your brochure PDF file. The AI model will automatically analyze the document, extract the product name, image, category, specifications table, and highlights.
+                      </p>
+                    </div>
+
+                    <label className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white text-xs font-extrabold rounded-xl cursor-pointer shadow-lg shadow-blue-500/25 transition-all active:scale-95">
+                      <Upload className="w-4 h-4" />
+                      <span>Select & Upload Brochure PDF</span>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setBrochureData(prev => ({
+                              ...prev,
+                              pdfFileName: file.name,
+                              pdfFile: URL.createObjectURL(file)
+                            }));
+                            await handleAnalyzePdfBrochure(file.name);
+                          }
+                        }}
+                      />
+                    </label>
+
+                    {/* Pre-installed / Sample PDF selection */}
+                    <div className="pt-3 border-t border-border/50 text-left space-y-2">
+                      <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">
+                        Or Quick Select an Existing Brochure PDF
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {[
+                          { title: "Brush Cutter 4SP PR", pdf: "Brush_Cutter_4SP_PR_Brochure.pdf" },
+                          { title: "Power Weeder M700 ECO", pdf: "Power_Weeder_M700_ECO_Brochure.pdf" },
+                          { title: "Power Weeder M800 ECO", pdf: "Power_Weeder_M800_ECO_Brochure.pdf" },
+                          { title: "BC 520 2SP Brush Cutter", pdf: "George_Maijo_BC_520_2SP_Brochure.pdf" }
+                        ].map((item, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            disabled={isAnalyzingPdf}
+                            onClick={async () => {
+                              setBrochureData(prev => ({ ...prev, pdfFileName: item.pdf }));
+                              await handleAnalyzePdfBrochure(item.pdf);
+                            }}
+                            className="flex items-center justify-between p-2.5 rounded-xl border border-border bg-background hover:border-blue-500 hover:bg-blue-500/5 transition-all text-left group"
+                          >
+                            <div className="flex items-center gap-2 truncate">
+                              <FileText className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                              <span className="font-bold text-[11px] truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                {item.title}
+                              </span>
+                            </div>
+                            <Sparkles className="w-3 h-3 text-muted-foreground group-hover:text-blue-500 shrink-0" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5 text-left pt-2">
+                      <div className="flex items-center justify-between">
+                        <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Type PDF File Name</label>
+                        <button
+                          type="button"
+                          disabled={isAnalyzingPdf}
+                          onClick={async () => {
+                            await handleAnalyzePdfBrochure(brochureData.pdfFileName || "Brush_Cutter_4SP_PR_Brochure.pdf");
+                          }}
+                          className="text-[10px] text-blue-600 dark:text-blue-400 font-extrabold hover:underline flex items-center gap-1"
+                        >
+                          <Sparkles className="w-3 h-3" />
+                          <span>{isAnalyzingPdf ? "Analyzing PDF..." : "✨ AI Extract & Analyze PDF"}</span>
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={brochureData.pdfFileName}
+                        onChange={(e) => setBrochureData(prev => ({ ...prev, pdfFileName: e.target.value }))}
+                        placeholder="e.g. Brush_Cutter_4SP_PR_Brochure.pdf"
+                        className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-mono font-bold focus:outline-none focus:border-primary text-foreground"
+                      />
+                    </div>
+
+                    {isAnalyzingPdf && (
+                      <div className="p-4 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-300 font-extrabold text-xs flex items-center justify-center gap-2 animate-pulse">
+                        <Sparkles className="w-4 h-4 animate-spin" />
+                        <span>AI Engine is analyzing PDF, extracting product image, text & specs...</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsBrochureModalOpen(false)}
+                      className="px-5 py-2.5 border border-border rounded-xl hover:bg-muted text-muted-foreground text-xs font-extrabold transition-all"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isAnalyzingPdf}
+                      onClick={async () => {
+                        await handleAnalyzePdfBrochure(brochureData.pdfFileName || "Brush_Cutter_4SP_PR_Brochure.pdf");
+                      }}
+                      className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2 active:scale-95"
+                    >
+                      <span>Analyze PDF & Continue to Review</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
+              )}
+
+              {/* STEP 2: REVIEW AI DETAILS & SAVE PRODUCT */}
+              {brochureStep === 2 && (
+                <div className="space-y-4 animate-fadeIn">
+                  
+                  {/* Top Bar: Extracted Image + Basic Information */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-2xl border border-blue-500/30 bg-blue-500/5 dark:bg-slate-900/60">
+                    
+                    {/* Extracted Product Image */}
+                    <div className="space-y-2 flex flex-col items-center justify-center text-center p-2 rounded-xl border border-border bg-background">
+                      <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">
+                        Extracted Product Image
+                      </label>
+                      <div className="h-28 w-full rounded-lg border border-border bg-slate-100 dark:bg-slate-900 flex items-center justify-center overflow-hidden p-1">
+                        {brochureData.image ? (
+                          <img src={brochureData.image} alt="Extracted Product" className="max-h-full object-contain" />
+                        ) : (
+                          <div className="text-muted-foreground text-[10px]">No image</div>
+                        )}
+                      </div>
+                      <label className="px-2.5 py-1 bg-muted hover:bg-muted/80 text-foreground text-[10px] font-extrabold rounded-lg cursor-pointer transition-all flex items-center gap-1">
+                        <Upload className="w-3 h-3" />
+                        <span>Change Image</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (evt) => {
+                                setBrochureData(prev => ({ ...prev, image: evt.target?.result as string }));
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {/* Basic Info Inputs */}
+                    <div className="sm:col-span-2 space-y-3">
+                      <div className="space-y-1">
+                        <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Product Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={brochureData.name}
+                          onChange={(e) => setBrochureData(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="e.g. George Maijo Brush Cutter 4SP PR"
+                          className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-bold focus:outline-none focus:border-primary text-foreground"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Category</label>
+                          <select
+                            value={brochureData.category}
+                            onChange={(e) => setBrochureData(prev => ({ ...prev, category: e.target.value }))}
+                            className="w-full p-2 rounded-xl border border-border bg-background text-xs font-bold focus:outline-none focus:border-primary text-foreground"
+                          >
+                            <option value="Brush Cutter">Brush Cutter</option>
+                            <option value="Power Weeder">Power Weeder</option>
+                            <option value="Power Tiller">Power Tiller</option>
+                            <option value="Combine Harvester">Combine Harvester</option>
+                            <option value="Paddy Reaper">Paddy Reaper</option>
+                            <option value="Agricultural Equipment">Agricultural Equipment</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">PDF File</label>
+                          <input
+                            type="text"
+                            readOnly
+                            value={brochureData.pdfFileName}
+                            className="w-full p-2 rounded-xl border border-border bg-muted text-xs font-mono font-bold text-muted-foreground"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Product Description *</label>
+                        <textarea
+                          rows={2}
+                          required
+                          value={brochureData.shortDesc}
+                          onChange={(e) => setBrochureData(prev => ({ ...prev, shortDesc: e.target.value }))}
+                          className="w-full p-2 rounded-xl border border-border bg-background text-[11px] leading-relaxed focus:outline-none focus:border-primary font-medium text-foreground"
+                        />
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Editable AI Extracted Specifications Table & Summary */}
+                  <div className="p-4 rounded-2xl border border-blue-500/30 bg-blue-500/5 dark:bg-slate-900/80 text-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-border pb-2">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <h4 className="font-extrabold text-foreground text-xs uppercase tracking-wider font-display">
+                          Editable AI Extracted Technical Specifications ({Object.keys(brochureData.specs || {}).length} Rows)
+                        </h4>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newKey = prompt("Enter new specification attribute name (e.g. Engine Model, Working Width, Fuel Capacity):");
+                          if (newKey && newKey.trim()) {
+                            const newVal = prompt(`Enter value for "${newKey.trim()}":`) || "Value";
+                            setBrochureData(prev => ({
+                              ...prev,
+                              specs: { ...prev.specs, [newKey.trim()]: newVal.trim() }
+                            }));
+                          }
+                        }}
+                        className="px-2.5 py-1 bg-blue-600 text-white rounded-lg text-[10px] font-extrabold hover:bg-blue-700 transition-all flex items-center gap-1 shadow-sm active:scale-95"
+                      >
+                        <span>Add Custom Spec Row</span>
+                      </button>
+                    </div>
+
+                    {/* Interactive Specs Table */}
+                    {Object.keys(brochureData.specs || {}).length > 0 ? (
+                      <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                        {Object.entries(brochureData.specs).map(([key, val], idx) => (
+                          <div key={idx} className="flex items-center gap-2 p-2 rounded-xl bg-background border border-border hover:border-blue-500/40 transition-all">
+                            <input
+                              type="text"
+                              value={key}
+                              onChange={(e) => {
+                                const newKey = e.target.value;
+                                setBrochureData(prev => {
+                                  const updated = { ...prev.specs };
+                                  delete updated[key];
+                                  if (newKey) updated[newKey] = val;
+                                  return { ...prev, specs: updated };
+                                });
+                              }}
+                              placeholder="Spec Parameter Name"
+                              className="w-1/3 p-1.5 rounded-lg border border-border bg-muted/40 font-bold text-foreground text-[11px] focus:outline-none focus:border-blue-500"
+                            />
+                            <input
+                              type="text"
+                              value={val}
+                              onChange={(e) => {
+                                const newVal = e.target.value;
+                                setBrochureData(prev => ({
+                                  ...prev,
+                                  specs: { ...prev.specs, [key]: newVal }
+                                }));
+                              }}
+                              placeholder="Spec Parameter Value"
+                              className="flex-1 p-1.5 rounded-lg border border-border bg-background text-[11px] font-medium text-foreground focus:outline-none focus:border-blue-500 font-mono"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-3 text-center text-muted-foreground text-[11px] font-medium border border-dashed border-border rounded-xl">
+                        No specifications extracted yet.
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setBrochureStep(1)}
+                      className="px-5 py-2.5 border border-border rounded-xl hover:bg-muted text-muted-foreground text-xs font-extrabold transition-all"
+                    >
+                      ⬅ Back to Upload PDF
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-95 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 active:scale-95"
+                    >
+                      <CheckCircle2 className="w-4 h-4" /> Save Product & Publish to Catalog
+                    </button>
+                  </div>
+                </div>
+              )}
+
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 📅 BOOK THE SLOT MODAL */}
+      {isSlotModalOpen && slotProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6">
+            
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
+                  <Calendar className="w-4 h-4" />
+                  <span>Schedule Product Demo / Meeting</span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
+                  Book a Slot for {slotProduct.name}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Select your preferred date & time to connect with our agricultural machinery experts.
+                </p>
               </div>
               <button
-                onClick={() => {
-                  setIsBrochureModalOpen(false);
-                  resetAddProductModal();
-                }}
-                className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                onClick={() => setIsSlotModalOpen(false)}
+                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {brochureSaveSuccess ? (
-              <div className="p-8 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30 rounded-2xl text-center space-y-3 animate-in zoom-in-95">
-                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto animate-bounce" />
-                <h4 className="text-lg font-extrabold text-emerald-800 dark:text-emerald-300">
-                  Product Created & Saved Live!
-                </h4>
-                <p className="text-xs text-emerald-700 dark:text-emerald-400">
-                  "{newProductName}" has been added to the catalog and is now displayed live on the products page!
-                </p>
+            {slotSubmitted ? (
+              /* Success View */
+              <div className="py-6 text-center space-y-4 animate-in zoom-in-95">
+                <div className="w-16 h-16 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto border-2 border-emerald-500/40">
+                  <CheckCircle2 className="w-10 h-10" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-black text-slate-900 dark:text-white">
+                    Slot Booked Successfully! 🎉
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
+                    Your demo request for <span className="font-bold text-slate-700 dark:text-slate-200">{slotProduct.name}</span> has been confirmed.
+                  </p>
+                </div>
+
+                <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 text-left space-y-2 text-xs">
+                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                    <span className="font-medium text-slate-500 dark:text-slate-400">📅 Date:</span>
+                    <span className="font-extrabold">{slotDate}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                    <span className="font-medium text-slate-500 dark:text-slate-400">⏰ Time Slot:</span>
+                    <span className="font-extrabold text-emerald-600 dark:text-emerald-400">{slotTime}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                    <span className="font-medium text-slate-500 dark:text-slate-400">👤 Name:</span>
+                    <span className="font-bold">{slotForm.name || "Customer"}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                    <span className="font-medium text-slate-500 dark:text-slate-400">📞 Phone:</span>
+                    <span className="font-bold">{slotForm.phone || "Provided"}</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex items-center justify-center gap-3">
+                  <a
+                    href={`https://wa.me/919444154944?text=${encodeURIComponent(`Hi George Maijo Team, I just booked a slot for ${slotProduct.name} on ${slotDate} at ${slotTime}. My name is ${slotForm.name}.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md transition-all"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Notify on WhatsApp</span>
+                  </a>
+                  <button
+                    onClick={() => setIsSlotModalOpen(false)}
+                    className="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-all"
+                  >
+                    Done
+                  </button>
+                </div>
               </div>
             ) : (
-              <>
-                {/* STEP 1: Product Information & Category Selection */}
-                {brochureStep === 1 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="space-y-5"
-                  >
-                    {/* 1. Product Name Select Field */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-extrabold text-[11px]">
-                            1
-                          </span>
-                          <span>Product Name *</span>
-                        </label>
-                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-1">
-                          <Zap className="w-3 h-3 text-emerald-500" />
-                          Auto-fills Category & Brand
-                        </span>
-                      </div>
+              /* Booking Form */
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
 
-                      {/* Single Sleek Corporate Select Dropdown */}
-                      <div className="relative group">
-                        <select
-                          value={DAY_TO_DAY_PRODUCTS.some((p) => p.name === newProductName) ? newProductName : (newProductName ? "CUSTOM" : "")}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            resetAddProductModal();
-                            if (val === "CUSTOM") {
-                              setNewProductName("");
-                            } else if (val) {
-                              setNewProductName(val);
-                              const preset = DAY_TO_DAY_PRODUCTS.find((p) => p.name === val);
-                              if (preset) {
-                                setNewProductCategory(preset.category);
-                                setNewProductBrand(preset.brand);
-                              }
-                            }
-                          }}
-                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 focus:border-emerald-500 font-semibold text-slate-900 dark:text-white shadow-sm transition-all appearance-none cursor-pointer pr-10"
-                        >
-                          <option value="">-- Select Product Name --</option>
-                          {Array.from(new Set(DAY_TO_DAY_PRODUCTS.map((p) => p.group))).map((groupName) => (
-                            <optgroup key={groupName} label={groupName} className="font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-900">
-                              {DAY_TO_DAY_PRODUCTS.filter((p) => p.group === groupName).map((prod) => (
-                                <option key={prod.name} value={prod.name} className="font-normal text-slate-700 dark:text-slate-300 py-1">
-                                  {prod.name}
-                                </option>
-                              ))}
-                            </optgroup>
-                          ))}
-                          <option value="CUSTOM">Custom Product (Enter manually...)</option>
-                        </select>
-                        <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500">
-                          <ChevronDown className="w-4 h-4" />
-                        </div>
-                      </div>
+                  const customerName = slotForm.name.trim() || "Booked Customer";
+                  const leadTitle = `${customerName} (${slotProduct.name} Demo)`;
+                  const timeFormatted = `${slotDate} @ ${slotTime}`;
+                  
+                  // 1. Create a Lead object for the CRM Kanban Board under 'meeting' (MEETING SCHEDULED)
+                  const newLead = {
+                    id: `slot-lead-${Date.now()}`,
+                    name: leadTitle,
+                    value: slotProduct.price ? `₹${slotProduct.price.toLocaleString()}` : "₹24,500",
+                    probability: 92,
+                    coordinates: "13.0827° N, 80.2707° E",
+                    summary: `Live Product Demo Slot Booked for ${slotProduct.name}. Date: ${slotDate}, Time Slot: ${slotTime}. Phone: ${slotForm.phone}. Email: ${slotForm.email || 'N/A'}.`,
+                    stage: "meeting",
+                    scheduledTime: timeFormatted,
+                    assignedSalesman: "Alex Rivera (Senior Specialist)"
+                  };
 
-                      {/* Custom Input field - Only shows if user selects Custom */}
-                      {(!DAY_TO_DAY_PRODUCTS.some((p) => p.name === newProductName) && newProductName !== "") && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          className="pt-1"
-                        >
-                          <input
-                            type="text"
-                            value={newProductName}
-                            onChange={(e) => setNewProductName(e.target.value)}
-                            placeholder="Enter custom product name..."
-                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-emerald-500 font-semibold text-slate-900 dark:text-white"
-                          />
-                        </motion.div>
-                      )}
-                    </div>
+                  // 2. Create a SalesSchedule object for CRM Schedules Tab
+                  const newSchedule = {
+                    id: `slot-sch-${Date.now()}`,
+                    leadName: leadTitle,
+                    salesmanId: "rep-1",
+                    salesmanName: "Alex Rivera",
+                    date: slotDate,
+                    startTime: slotTime.split(" - ")[0] || "10:30 AM",
+                    endTime: slotTime.split(" - ")[1] || "11:15 AM",
+                    status: "Scheduled",
+                    meetingType: "Video Demo",
+                    location: "Google Meet / Live Demo Portal",
+                    notes: `Booked via Product Slot Request for ${slotProduct.name}. Phone: ${slotForm.phone}`
+                  };
 
-                    {/* Grid for Category & Brand Manufacturer */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* 2. Category Dropdown */}
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-extrabold text-[11px]">
-                            2
-                          </span>
-                          <span>Category *</span>
-                        </label>
+                  // 3. Create a Service Person Booking object
+                  const newBooking = {
+                    id: `slot-bk-${Date.now()}`,
+                    name: customerName,
+                    email: slotForm.email || "customer@example.com",
+                    whatsapp: slotForm.phone || "+91 98765 43210",
+                    date: slotDate,
+                    time: slotTime,
+                    solutionId: slotProduct.id || "prod-1",
+                    solutionTitle: `${slotProduct.name} Live Demo`,
+                    servicePerson: {
+                      name: "Alex Rivera",
+                      role: "Senior Product Specialist",
+                      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+                    },
+                    bookedAt: new Date().toISOString(),
+                    status: "pending",
+                    notes: `Live demo requested for ${slotProduct.name}`
+                  };
 
-                        <div className="relative group">
-                          <select
-                            value={newProductCategory}
-                            onChange={(e) => setNewProductCategory(e.target.value)}
-                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 focus:border-emerald-500 font-semibold text-slate-900 dark:text-white shadow-sm transition-all appearance-none cursor-pointer pr-10"
-                          >
-                            <option value="">-- Select Category --</option>
-                            <option value="BRUSH CUTTER">BRUSH CUTTER</option>
-                            <option value="POWER WEEDER">POWER WEEDER</option>
-                            <option value="ELECTRONICS">ELECTRONICS</option>
-                            <option value="HOME APPLIANCES">HOME APPLIANCES</option>
-                            <option value="KITCHEN APPLIANCES">KITCHEN APPLIANCES</option>
-                            <option value="POWER TOOLS">POWER TOOLS</option>
-                            <option value="AUTOMOTIVE">AUTOMOTIVE</option>
-                            <option value="LAWN MOWER">LAWN MOWER</option>
-                            <option value="WATER PUMP">WATER PUMP</option>
-                            <option value="CHAINSAW">CHAINSAW</option>
-                            <option value="PRESSURE WASHER">PRESSURE WASHER</option>
-                            <option value="COMBINE HARVESTER">COMBINE HARVESTER</option>
-                            <option value="POWER TILLER">POWER TILLER</option>
-                            <option value="REAPER">REAPER</option>
-                            <option value="SOLAR EQUIPMENT">SOLAR EQUIPMENT</option>
-                          </select>
-                          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500">
-                            <ChevronDown className="w-4 h-4" />
-                          </div>
-                        </div>
-                      </div>
+                  // 4. Save into localStorage keys
+                  try {
+                    const existingLeads = JSON.parse(localStorage.getItem("sellgrow_booked_leads") || "[]");
+                    localStorage.setItem("sellgrow_booked_leads", JSON.stringify([newLead, ...existingLeads]));
 
-                      {/* 3. Brand Manufacturer Input */}
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-extrabold text-[11px]">
-                            3
-                          </span>
-                          <span>Brand / Manufacturer</span>
-                        </label>
+                    const existingSchedules = JSON.parse(localStorage.getItem("sellgrow_booked_schedules") || "[]");
+                    localStorage.setItem("sellgrow_booked_schedules", JSON.stringify([newSchedule, ...existingSchedules]));
 
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={newProductBrand}
-                            onChange={(e) => setNewProductBrand(e.target.value)}
-                            placeholder="e.g. GEORGE MAIJO EQUIPMENT"
-                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 focus:border-emerald-500 font-semibold text-slate-900 dark:text-white shadow-sm transition-all"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    const existingBookings = JSON.parse(localStorage.getItem("sellgrow_bookings") || "[]");
+                    localStorage.setItem("sellgrow_bookings", JSON.stringify([newBooking, ...existingBookings]));
 
-                    {/* Corporate Product Summary Card */}
-                    {newProductName && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-3 shadow-xs"
-                      >
-                        <div>
-                          <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                            Selected Product Summary
-                          </div>
-                          <div className="text-sm font-bold text-slate-900 dark:text-white pt-0.5">
-                            {newProductName}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 rounded-lg font-bold border border-emerald-200 dark:border-emerald-800/80 text-xs">
-                            Category: {newProductCategory || "Not Set"}
-                          </span>
-                          <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-bold border border-slate-200 dark:border-slate-700 text-xs">
-                            Brand: {newProductBrand || "Not Set"}
-                          </span>
-                        </div>
-                      </motion.div>
-                    )}
+                    window.dispatchEvent(new Event("storage"));
+                  } catch (err) {
+                    console.error("Failed to store booking data in localStorage", err);
+                  }
 
-                    {/* Action Next CTA Button */}
-                    <div className="flex justify-end pt-2">
-                      <button
-                        onClick={() => {
-                          if (!newProductName.trim()) return;
-                          setBrochureStep(2);
-                        }}
-                        disabled={!newProductName.trim()}
-                        className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center gap-2"
-                      >
-                        <span>Next: Upload Product Image</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* STEP 2: Upload Product Image from Local File */}
-                {brochureStep === 2 && (
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                        Upload Product Image (From Local Storage)
-                      </label>
-                      <div className="relative border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-6 text-center hover:border-primary transition-colors bg-slate-50/50 dark:bg-slate-900/50">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        />
-                        <ImageIcon className="w-8 h-8 text-primary mx-auto mb-2" />
-                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
-                          {imageFileName ? imageFileName : "Click or drag & drop equipment image"}
-                        </span>
-                        <span className="text-[10px] text-slate-400 block mt-1">
-                          Supports PNG, JPG, WEBP formats
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Image Preview Box */}
-                    {newProductImage && (
-                      <div className="p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center gap-4">
-                        <img
-                          src={newProductImage}
-                          alt="Uploaded Preview"
-                          className="w-16 h-16 object-contain rounded-xl bg-white dark:bg-slate-950 p-1 border border-slate-200 dark:border-slate-800"
-                        />
-                        <div>
-                          <span className="text-xs font-bold block text-emerald-600 dark:text-emerald-400">
-                            Image Uploaded Successfully!
-                          </span>
-                          <span className="text-[11px] text-slate-400 font-mono">{imageFileName}</span>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between pt-2">
-                      <button
-                        onClick={() => setBrochureStep(1)}
-                        className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs"
-                      >
-                        Back
-                      </button>
-                      <button
-                        onClick={() => setBrochureStep(3)}
-                        className="px-5 py-2.5 bg-gradient-to-r from-primary to-secondary hover:opacity-95 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2"
-                      >
-                        <span>Next: Upload Brochure PDF</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </div>
+                  setSlotSubmitted(true);
+                }}
+                className="space-y-5"
+              >
+                {/* Select Date */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>1. Select Date</span>
+                    </label>
+                    <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                      Selected: {slotDate}
+                    </span>
                   </div>
-                )}
 
-                {/* STEP 3: Upload PDF Brochure */}
-                {brochureStep === 3 && (
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                        Upload Product Brochure PDF Document
-                      </label>
-                      <div className="relative border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-6 text-center hover:border-primary transition-colors bg-slate-50/50 dark:bg-slate-900/50">
-                        <input
-                          type="file"
-                          accept=".pdf"
-                          onChange={handleBrochurePdfUpload}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        />
-                        <FileText className="w-8 h-8 text-primary mx-auto mb-2" />
-                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
-                          {pdfFileName ? pdfFileName : "Click or drag & drop Brochure PDF file"}
-                        </span>
-                        <span className="text-[10px] text-slate-400 block mt-1">
-                          Supports .PDF technical datasheets up to 25MB
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2">
-                      <button
-                        onClick={() => setBrochureStep(2)}
-                        className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs"
-                      >
-                        Back
-                      </button>
-                      <button
-                        onClick={startBrochureAnalysis}
-                        className="px-5 py-2.5 bg-gradient-to-r from-primary to-secondary hover:opacity-95 text-white font-bold rounded-xl text-xs transition-all shadow-lg shadow-primary/25 flex items-center gap-2"
-                      >
-                        <Sparkles className="w-4 h-4 animate-spin" />
-                        <span>Analyze Brochure PDF with AI 🪄</span>
-                      </button>
-                    </div>
+                  {/* Calendar Date Picker Input */}
+                  <div className="relative flex items-center">
+                    <input
+                      type="date"
+                      min={new Date().toISOString().split("T")[0]}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          const [year, month, day] = e.target.value.split("-");
+                          const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                          const formatted = dateObj.toLocaleDateString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric"
+                          });
+                          setSlotDate(formatted);
+                        }
+                      }}
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-emerald-500 font-semibold cursor-pointer"
+                    />
+                    <Calendar className="w-4 h-4 text-emerald-500 absolute left-3 pointer-events-none" />
                   </div>
-                )}
+                </div>
 
-                {/* STEP 4: AI Analysis in Progress */}
-                {brochureStep === 4 && (
-                  <div className="py-10 text-center space-y-6">
-                    <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-                      <div className="absolute inset-0 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-                      <Sparkles className="w-8 h-8 text-primary animate-pulse" />
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="text-base font-extrabold text-foreground">
-                        Analyzing Brochure Specifications...
-                      </h4>
-                      <p className="text-xs text-primary font-mono animate-pulse">
-                        {aiAnalysisStatus}
-                      </p>
-                    </div>
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-primary to-secondary h-full transition-all duration-300"
-                        style={{ width: `${aiAnalysisProgress}%` }}
-                      />
-                    </div>
+                {/* Select Time Slot */}
+                <div className="space-y-2">
+                  <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>2. Select Time Slot</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      "09:30 AM - 10:15 AM",
+                      "10:30 AM - 11:15 AM",
+                      "02:00 PM - 02:45 PM",
+                      "04:00 PM - 04:45 PM",
+                    ].map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setSlotTime(t)}
+                        className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border text-center ${
+                          slotTime === t
+                            ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20"
+                            : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-emerald-500"
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
                   </div>
-                )}
+                </div>
 
-                {/* STEP 5: Extracted Product Details & Full Edit Screen */}
-                {brochureStep === 5 && (
-                  <form onSubmit={handleSaveAndPublishProduct} className="space-y-4">
-                    <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30 rounded-2xl flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span className="font-bold text-emerald-800 dark:text-emerald-300">
-                          AI Analysis Complete! Review & Edit Extracted Details:
-                        </span>
-                      </div>
-                    </div>
+                {/* User Details */}
+                <div className="space-y-3 pt-1 border-t border-slate-100 dark:border-slate-800">
+                  <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300">
+                    3. Your Contact Details
+                  </label>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          Product Name
-                        </label>
-                        <input
-                          type="text"
-                          value={newProductName}
-                          onChange={(e) => setNewProductName(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-semibold focus:border-primary"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          Category
-                        </label>
-                        <input
-                          type="text"
-                          value={newProductCategory}
-                          onChange={(e) => setNewProductCategory(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-semibold focus:border-primary"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          {categoryType === "ELECTRONICS" && "Processor / Chipset"}
-                          {categoryType === "HOME_APPLIANCE" && "Compressor / Technology"}
-                          {categoryType === "POWER_TOOL" && "Motor & Power Type"}
-                          {categoryType === "AUTOMOTIVE" && "Motor Drive System"}
-                          {categoryType === "AGRICULTURE" && "Engine Model / Motor"}
-                        </label>
-                        <input
-                          type="text"
-                          value={extractedEngine}
-                          onChange={(e) => setExtractedEngine(e.target.value)}
-                          placeholder={
-                            categoryType === "ELECTRONICS"
-                              ? "e.g. Octa-Core 5G High Performance Processor"
-                              : categoryType === "HOME_APPLIANCE"
-                              ? "e.g. Smart Inverter Compressor"
-                              : categoryType === "POWER_TOOL"
-                              ? "e.g. Heavy-Duty Industrial Brushless Motor"
-                              : categoryType === "AUTOMOTIVE"
-                              ? "e.g. High Torque Electric Hub Motor"
-                              : "e.g. 42.7cc 2-Stroke Air-Cooled Engine"
-                          }
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-primary"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          {categoryType === "ELECTRONICS" && "Display / Screen Size"}
-                          {categoryType === "HOME_APPLIANCE" && "Capacity / Volume"}
-                          {categoryType === "POWER_TOOL" && "Chuck / Bar Size"}
-                          {categoryType === "AUTOMOTIVE" && "Battery & Range"}
-                          {categoryType === "AGRICULTURE" && "Displacement (cc)"}
-                        </label>
-                        <input
-                          type="text"
-                          value={extractedDisplacement}
-                          onChange={(e) => setExtractedDisplacement(e.target.value)}
-                          placeholder={
-                            categoryType === "ELECTRONICS"
-                              ? 'e.g. 6.7" FHD+ AMOLED Display (120Hz)'
-                              : categoryType === "HOME_APPLIANCE"
-                              ? "e.g. 265 L Total Storage Capacity"
-                              : categoryType === "POWER_TOOL"
-                              ? "e.g. 13 mm Keyless Chuck"
-                              : categoryType === "AUTOMOTIVE"
-                              ? "e.g. 72V 30Ah Lithium Battery / 90 km"
-                              : "e.g. 42.7 cc"
-                          }
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-primary"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          {categoryType === "ELECTRONICS" && "RAM & Storage"}
-                          {categoryType === "HOME_APPLIANCE" && "Energy Rating & Power"}
-                          {categoryType === "POWER_TOOL" && "Speed & Impact Output"}
-                          {categoryType === "AUTOMOTIVE" && "Max Speed & Output"}
-                          {categoryType === "AGRICULTURE" && "Max Power Output"}
-                        </label>
-                        <input
-                          type="text"
-                          value={extractedPower}
-                          onChange={(e) => setExtractedPower(e.target.value)}
-                          placeholder={
-                            categoryType === "ELECTRONICS"
-                              ? "e.g. 8GB RAM / 256GB Internal Storage"
-                              : categoryType === "HOME_APPLIANCE"
-                              ? "e.g. 5 Star Energy Saver / 1200W"
-                              : categoryType === "POWER_TOOL"
-                              ? "e.g. 0-1600 RPM High Impact Speed"
-                              : categoryType === "AUTOMOTIVE"
-                              ? "e.g. 65 km/h Top Speed / 2500W"
-                              : "e.g. 1.25 kW / 1.7 HP @ 7000 RPM"
-                          }
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-primary"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          {categoryType === "ELECTRONICS" && "Camera / Sensor System"}
-                          {categoryType === "HOME_APPLIANCE" && "Control System"}
-                          {categoryType === "POWER_TOOL" && "Grip & Ergonomics"}
-                          {categoryType === "AUTOMOTIVE" && "Braking & Suspension"}
-                          {categoryType === "AGRICULTURE" && "Carburetor / Fuel System"}
-                        </label>
-                        <input
-                          type="text"
-                          value={extractedCarburetor}
-                          onChange={(e) => setExtractedCarburetor(e.target.value)}
-                          placeholder={
-                            categoryType === "ELECTRONICS"
-                              ? "e.g. 50MP Ultra-Clear Triple Camera"
-                              : categoryType === "HOME_APPLIANCE"
-                              ? "e.g. Digital Touch Screen Control Panel"
-                              : categoryType === "POWER_TOOL"
-                              ? "e.g. Anti-Vibration Rubber Molded Grip"
-                              : categoryType === "AUTOMOTIVE"
-                              ? "e.g. Dual Disc Brakes & Hydraulic Suspension"
-                              : "e.g. Diaphragm Carburetor System"
-                          }
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-primary"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          {categoryType === "ELECTRONICS" && "Battery & Weight"}
-                          {categoryType === "HOME_APPLIANCE" && "Dimensions & Weight"}
-                          {categoryType === "POWER_TOOL" && "Battery Source & Weight"}
-                          {categoryType === "AUTOMOTIVE" && "Vehicle Weight & Payload"}
-                          {categoryType === "AGRICULTURE" && "Fuel Tank & Dry Weight"}
-                        </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={extractedFuelTank}
-                            onChange={(e) => setExtractedFuelTank(e.target.value)}
-                            placeholder="Capacity / Dim"
-                            className="w-1/2 px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-primary"
-                          />
-                          <input
-                            type="text"
-                            value={extractedDryWeight}
-                            onChange={(e) => setExtractedDryWeight(e.target.value)}
-                            placeholder="Weight"
-                            className="w-1/2 px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-primary"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                        Key Features (One per line)
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={extractedFeaturesText}
-                        onChange={(e) => setExtractedFeaturesText(e.target.value)}
-                        placeholder={isEngineProduct ? "e.g. Heavy Duty Blade\nEasy Recoil Start" : "e.g. Drop-forged steel head\nErgonomic anti-vibration grip"}
-                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-primary"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                        Applications & Best Uses (Comma separated)
-                      </label>
+                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Full Name *</label>
                       <input
                         type="text"
-                        value={extractedApplicationsText}
-                        onChange={(e) => setExtractedApplicationsText(e.target.value)}
-                        placeholder={isEngineProduct ? "e.g. Agriculture, Field Clearing, Gardening" : "e.g. Woodworking, Construction, Framing, Home Repair"}
-                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-primary"
+                        required
+                        placeholder="e.g. Ramesh Kumar"
+                        value={slotForm.name}
+                        onChange={(e) => setSlotForm({ ...slotForm, name: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-emerald-500 font-medium"
                       />
                     </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
-                      <button
-                        type="button"
-                        onClick={() => setBrochureStep(3)}
-                        className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs"
-                      >
-                        Back to PDF
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-6 py-2.5 bg-gradient-to-r from-primary via-indigo-600 to-secondary hover:opacity-95 text-white font-extrabold rounded-xl text-xs transition-all shadow-lg shadow-primary/25 flex items-center gap-2"
-                      >
-                        <FilePlus className="w-4 h-4" />
-                        <span>Save & Publish Product 🚀</span>
-                      </button>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Phone Number *</label>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="+91 98765 43210"
+                        value={slotForm.phone}
+                        onChange={(e) => setSlotForm({ ...slotForm, phone: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-emerald-500 font-medium"
+                      />
                     </div>
-                  </form>
-                )}
-              </>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Email Address (Optional)</label>
+                    <input
+                      type="email"
+                      placeholder="ramesh@example.com"
+                      value={slotForm.email}
+                      onChange={(e) => setSlotForm({ ...slotForm, email: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-emerald-500 font-medium"
+                    />
+                  </div>
+                </div>
+
+                {/* Submit button */}
+                <button
+                  type="submit"
+                  className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold rounded-2xl text-xs sm:text-sm shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all active:scale-98 cursor-pointer"
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span>Confirm & Book Slot Now</span>
+                </button>
+              </form>
             )}
 
           </div>

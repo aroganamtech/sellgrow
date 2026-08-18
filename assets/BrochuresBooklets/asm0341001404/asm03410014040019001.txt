@@ -1,0 +1,13 @@
+﻿2	Baggage : explain weight limits, how baggage will be handled. Supply tags and tell how to fill them in.
+3	Hotels : tell winners where they’ll be staying, with information on checking in and out procedures, meal service, electric current (if other than 60 cycle AC).
+4	Climate : what to expect.
+5	Clothing : formal, casual, sports attire necessary to be well-dressed at all activities planned.
+6	Local customs : information on gratuities, hotel facilities, other topics helpful in avoiding unnecessary embarrassment.
+7	Communications: how to get in touch with home, how home can get in touch with the traveler.
+8	Documents: what’s needed, what’s not. How to obtain necessary documents.
+9	Personal funds: explain which personal expenses are considered part of the prize, which are not. Facts on travelers’ checks, money-changing, rates of exchange.
+10	Shopping: destination bargains. Explain duties, customs, etc.
+11	Language: supply phrase books if needed. Although English is understood by practically all hotel people, taxi drivers, waiters, etc.
+12	Places of worship: denominations, locations, accessibility, times, etc.
+13	List of winners: names, home towns, hotel room numbers when practicable, etc. Names and titles of company officials making the trip. List helps winners get acquainted, makes a fine memento.
+14	Badges: aid recognition, promote friendliness, keep your group together and easily identified. Special badges for hosts and guides.

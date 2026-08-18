@@ -1,0 +1,60 @@
+﻿New York, NY
+Reservations: 973-4000
+Airports K-JFK Inti L - LaGuardia
+	Freq.	Leave Arrive	Flight No.	Stops or Connecting City Aircraftf Meals	
+To Abidjan*:^	Th	K 530p 1145a+1	184	Two-Stop	747 & DBS
+From Abidjan	Th	720p K 500a+1	191	Two-Stop	747 SSB
+Res. 442132					
+To Accra	Su	K110Op 535p +1	188	Two-Stop	747 S- DBS
+From Accra	Mo	750p K 530a +1	185	Two-Stop	747 SSB
+Res. 21151					
+To Auckland*:*	TuThSa K 400p 835a +2		811	Two-Stop	747 ^DSB
+		Above Flight Effective Mar. 6			
+	TuThSa K 400p 935a +2		811	Two-Stop	747 S-DSB
+		Above Flight Discontinued After Mar. 4			
+From Auckland	Consult your Travel Agent or Pan Am				
+Res. 34164					
+To Bahrain*:*	Mo	K 7 OOp 755p +1	2	Two-Stop	747 S- DSL
+From Bahrain	We	515a K 125p	1/67	Frankfurt	747 & BLS
+Res. 258-850	We	515a K 405p	1	Two-Stop	747 S-BSL
+To Bangkok*:*	TuWeFrSa K 1200n 1135p+1		801/1	Tokyo	sf S-LSD
+	WeFrSaSu K 700p 730a+2		2	Three-Stop	747 g-DSL
+	FrSa	K 950p 730a+2	66/2	Frankfurt	747 S- DSL
+From Bangkok	MoThFrSu	1235a K 125p	1/67	Frankfurt	747 S-SBL
+Res. 252-2121	MoThFrSu	1235a K 405p	1	Three-Stop	747 S-SBL
+	Fr	830a K 510p	2/16	Tokyo	sf 5-BLD
+	MoTuFrSu	830a K 540p	2/800	Tokyo	sp ^-BLD
+To Beijing	WeSa	Kl200n 1010p+1	801/15	Tokyo	sf g-LSD
+	Sa	K 1240p 1010P+1	15	One-Stop	sf S-LSD
+From Beijing	Fr	1035a K 510p	16	Two-Stop	sf 35-LDB
+Res. 52-1756	MoFr	1035a K 540p	16/800	Tokyo	sf t^LDB
+To Berlin*:*	Daily	K 615p 940a+1	72	One-Stop	747 5-DS
+	WeThFrSaK 720p 1210p+1		76	One-Stop	1011 S-DS
+	Daily	K 945p 225p+1	104	Two-Stop	747 ^DSS
+	FrSa	K 950p 10Op +1	66	One-Stop	1011 S-DS
+From Berlin	Daily	745a K 135p	101	Two-Stop	747 S-SLS
+Res. 88-10-11	Daily	815a K 125p	67	One-Stop	747 &LS
+	ThFrSaSi	i 905a K 150p	77	One-Stop	1011 5HS
+	SaSu	1125a K 345p	73	One-Stop	1011 S-LS
+To Bombayo	WeSu	K 7 OOp 105a +2	2	Two-Stop	747 S' DSL
+From Bombay	MoTh	445a K 125p	1/67	Frankfurt	747 ^-SBL
+Res. 244020	MoTh	445a K 405p	1	Two-Stop	747 5-SBL
+To Buenos Aires*)	ThSa	K 615p 920a +1	453	One-Stop	sf S-DDS
+(Ezeiza Airport)	Mo	KlOOOp 155p +1	201/441	Riode Janeiro	sf 5-DBL
+	TuWeFrSu K 1000p 155p+1		201	One-Stop	sf ^DBL
+From Buenos Aires	Tu	630p K 605a +1	440/202	Riode Janeiro	sf s-DDB
+Res. 45-0111	MoWeThS;	i 630p K 605a +1	202	One-Stop	sf g-DDB
+	FrSu	1150p K 1145a +1	454	One-Stop	sf ^DSB
+To Caracas*:*	Daily	K 900a 635p	403/445	Miami	747 S-BL
+	Daily	K 400p 935p	217	NON-STOP	DC10 £D
+	Daily	K 615p 405a +1	453/443	Miami	747 S-DS
+		Above Flight Discontinued After Jan. 17			
+	Th	K 7OOp 405a +1	255/443	Miami	747 5-DS
+		Above Flight Discontinued After Jan. 14			
+From Caracas	Daily	930a K 110p	218	NON-STOP	DC10 &L
+Res. 284-9911					
+A plus ( + ) or minus (-) sign after the arrival	MEAL CODES:
+time indicates arrival the day(s) following departure	S-Snack L-Lunch
+or the day previous to departure.	B-Breakfast D-Dinner
+Flight numbers in Bold are operated by Wide Cabin aircraft. All times shown are locally observed
+Standard or Daylight Saving Time.

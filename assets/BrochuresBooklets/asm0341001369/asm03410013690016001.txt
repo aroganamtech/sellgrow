@@ -1,0 +1,15 @@
+﻿English—Ingles	S^nish—Español	Phonetica! Pronunciation—Spanish	Pronunciación lone'tica—Ingle's
+Monday.	Lunes.	Loo'-nayss.	Men'-dei.
+Tuesday.	Martes.	Mahr'-tayss.	Tiús-dei.
+Wednesday.	Miércoles.	Mee-ayr'-koh-layss.	Uens'-dei.
+Thursday.	Jueves.	Hoo-ay'-vayss.	Ders'-dei.
+Friday.	Viernes.	Vee-ayr'-nayss.	Frai'-dei.
+Saturday.	Sábado.	Sah'-bah-doh.	Sat'-er-dei.
+Sunday.	Domingo.	Doh-meen'-goh.	Sun'-dei.
+Black.	Negro (mase.) Negra (fem.)	Nay'-groh. Nay'-grah.	Blac.
+Red.	Rojo (mase.) Roja (fem.)	Roh'-hoh. Roh'-hah.	Red.
+Blue.	Azul.	Ah-zool'.	Bliú.
+White.	Blanco (mase.) Blanca (fem.)	Blahn'-koh. Blahn'-kah.	Juait.
+Green.	Verde.	Vayr'-day.	Grin.
+Yellow.	Amarillo (mase.) Amarilla (fem.)	Ah-mah-ree'-yoh. Ah-mah-ree'-yah.	Yel'-o.
+14

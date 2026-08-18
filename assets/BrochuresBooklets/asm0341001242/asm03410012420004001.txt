@@ -1,0 +1,52 @@
+﻿New York, NY
+Reservations: 973-4000 Airports K- JFK Inti L-LaGuardia
+	Freq.	Leave Arrive	Flight No.	Stops or Connecting City	Aircraftf Meals	
+To Guatemala City	Daily	K 900a 320p	403	One-Stop	747	^•BL
+From Guatemala	Daily	745a K 426p	404	One-Stop	747	&BL
+City						
+Res. 22144						
+To Hamburg*	Daily	K 945p 110p+1	104	One-Stop	747	5-DSS
+From Hamburg	Daily	905a K 135p	101	One-Stop	747	gpSLS
+Res. 500-9281						
+To Hong Kongo	Daily	K 900a 825p +1	5	One-Stop	Sf*	S-LSB
+			Occasional Fuel Stop At Okinawa On Flight 5.			
+	Daily	K1200n 845p +1	801/1	Tokyo	st* S-LSD	
+From Hong Kong	Daily	1230p K 620p	6	One-Stop	sf> S-LSB	
+Res. 5-231111	Fr	120p K 510p	2/16	Tokyo	sf* ^LDB	
+To Honolulu, HI	Dally	K 400p 1227a +1	811	One-Stop	747	S-DD
+From Honolulu, HI	Consult your Travel Agent or Pan Am					
+Res. 955-9111						
+To Houston, TX	Daily	K 830a 1123a	25	NON-STOP	727	B
+(Intercontinental Airport)	Daily	K 545p 835p	51	NON-STOP	747	
+From Houston, TX	Daily	1245p K 458p	52	NON-STOP	747	SH
+Res. 447-0088	Daily	430p K 843p	24	NON-STOP	727	D
+To Jacksonville, FL	Consult your Travel Agent or Pan Am					
+From Jacksonville,	Daily	505p K 900p	794	One-Stop	727	D
+FL						
+Res. 356-4455						
+To Karachi*:*	TuTh	K 7 OOp 1145p +1	2	Two-Stop	747	S-DSL
+From Karachi	TuSa	510a K 125p	1/67	Frankfurt	747	S-BLS
+Res. 510121/24	TuSa	510a K 405p	1	Two-Stop	747	S'BSL
+To Lagos	Tu	K 530p 1135a+1	190	One-Stop	747	5DSB
+	Th	K 530p 325p +1	184	Three-Stop	747	S-DBS
+From Lagos	Th	535p K 500a +1	191	Three-Stop	747	SSB
+Res. 26191	Sa	1005p K 530a +1	189	One-Stop	747	SSB
+To Las Vegas, NV	Consult your Travel Agent or Pan Am					
+From Las Vegas,	Daily	800a K 843p	954/24	Houston	727	BD
+NV						
+Res. 800-421-2707						
+To London*}	Daily	K 700p H 640a+1	2	NON-STOP	747	5-DS
+Airports: H-Heathrow	Daily	K 945p H 925a+1	104	NON-STOP	747	S-DS
+G-Gatwlck						
+From London	Daily	H 1100a K 135p	101	NON-STOP	747	5-LS
+Res. 409-0688	Daily	H 130p K 405p	1	NON-STOP	747	£LS
+To Los Angeles, CA Daily		K 830a 136p	25	One-Stop	727	BL
+	Daily	K 4OOp 702p	811	NON-STOP	747	&D
+From Los Angeles,	Daily	900a K 517p	114	NON-STOP	747	S-L
+CA	Daily	1030a K 843p	24	One-Stop	727	LD
+Res. 670-7301						
+Aplus(+)orminus( — )sign afterthearrival	MEAL CODES:
+timeindicatesarrival theday(s)followingdeparture	S-Snack L-Lunch
+orthedayprevioustodeparture.	B-Breakfast 0-Dinner
+Flight numbers in Bold areoperated by Wide Cabin aircraft.	All times shown arelocally observed
+Standard or DayllghtSavingTIme.

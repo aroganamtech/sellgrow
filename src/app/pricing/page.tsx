@@ -171,7 +171,7 @@ const STATIC_FALLBACK_SERVICES = [
   { id: "sells-crm", name: "Sells CRM", description: "Sales pipeline tracking, lead conversion analytics, and CRM dashboard", status: "Active", priceMonthlyINR: 2499, priceMonthlyUSD: 35, priceYearlyINR: 24999, priceYearlyUSD: 349, features: ["Lead Conversion Pipeline", "Real-time Analytics Tracker"] },
   { id: "digital-marketing", name: "Digital Marketing", description: "SEO metrics tracking, ad campaign monitoring, and marketing suite", status: "Active", priceMonthlyINR: 1999, priceMonthlyUSD: 29, priceYearlyINR: 15999, priceYearlyUSD: 299, features: ["SEO Performance Metrics", "Multi-Channel Ad Monitoring"] },
   { id: "website-creation", name: "Website Creation", description: "Automated premium landing page generation and builder engine", status: "Active", priceMonthlyINR: 4999, priceMonthlyUSD: 69, priceYearlyINR: 49999, priceYearlyUSD: 699, features: ["Automated Premium Layouts", "High-Speed Page Builder"] },
-  { id: "borcher", name: "Borcher", description: "Brochure creator, brand material generation, and catalog PDF builder", status: "Active", priceMonthlyINR: 799, priceMonthlyUSD: 10, priceYearlyINR: 7999, priceYearlyUSD: 99, features: ["Dynamic Digital Brochures", "Exportable PDF Catalogs"] },
+  { id: "borcher", name: "Brochure", description: "Brochure creator, brand material generation, and catalog PDF builder", status: "Active", priceMonthlyINR: 799, priceMonthlyUSD: 10, priceYearlyINR: 7999, priceYearlyUSD: 99, features: ["Dynamic Digital Brochures", "Exportable PDF Catalogs"] },
   { id: "logo", name: "Logo", description: "Branding asset builder, vector logo designs generator, and asset hosting", status: "Active", priceMonthlyINR: 499, priceMonthlyUSD: 7, priceYearlyINR: 4999, priceYearlyUSD: 69, features: ["High-Res Vector Formats", "Smart Brand Identity Builder"] },
   { id: "social-media", name: "Social Media", description: "Social platforms auto-posting gateway and feed synchronization engine", status: "Active", priceMonthlyINR: 1199, priceMonthlyUSD: 16, priceYearlyINR: 11999, priceYearlyUSD: 159, features: ["Scheduled Auto-Posting Engine", "Cross-Platform Feed Sync"] }
 ];
@@ -191,11 +191,14 @@ export default function PricingPage() {
         return res.json();
       })
       .then((data) => {
-        if (data.status === "success" && data.data && data.data.length > 0) {
-          const activeOnly = data.data.filter((s: any) => s.status === "Active");
-          if (activeOnly.length > 0) {
-            setServicesList(activeOnly);
-          }
+        if (data.status === "success" && Array.isArray(data.data)) {
+          const sanitized = data.data.map((s: any) => {
+            if (s.name === "Borcher") s.name = "Brochure";
+            if (s.id === "borcher") s.id = "brochure";
+            return s;
+          });
+          const activeOnly = sanitized.filter((s: any) => s.status === "Active");
+          setServicesList(activeOnly);
         }
       })
       .catch(() => {
@@ -203,11 +206,17 @@ export default function PricingPage() {
         if (stored) {
           try {
             const parsed = JSON.parse(stored);
-            const activeOnly = parsed.filter((s: any) => s.status === "Active");
-            if (activeOnly.length > 0) {
-              setServicesList(activeOnly);
-              return;
+            const sanitized = parsed.map((s: any) => {
+              if (s.name === "Borcher") s.name = "Brochure";
+              if (s.id === "borcher") s.id = "brochure";
+              return s;
+            });
+            const activeOnly = sanitized.filter((s: any) => s.status === "Active");
+            setServicesList(activeOnly);
+            if (typeof window !== "undefined") {
+              localStorage.setItem("sg_services_db", JSON.stringify(sanitized));
             }
+            return;
           } catch (e) {}
         }
         setServicesList(STATIC_FALLBACK_SERVICES);

@@ -1,0 +1,11 @@
+﻿WEIGHT. Of course, the weight of the plane itself must be included in these calculations, so each plane is first weighed empty. That is, without fuel, oil, crew or revenue load.
+The resulting figure is known as the WEIGHT EMPTY EQUIPPED. Next, we subtract this WEIGHT EMPTY EQUIPPED from the GROSS TAKE-OFF WEIGHT, as previously established. The remaining figure is known as the ALLOWABLE USEFUL LOAD (AUL). In other words, the ALLOWABLE USEFUL LOAD is the actual weight which can safely be added to our empty plane.
+ALLOWABLE CABIN LOAD
+Naturally, the operation of the plane in flight calls for an ample load of fuel and oil. We will also need a crew to fly the plane, food for crew and passengers, and other miscellaneous supplies and equipment.
+This basic, essential weight—our “working weight”— is called the OPERATING LOAD. Now, if we take this OPERATING LOAD and subtract it from our
+. •
+x\* V'
+| \	^ nXW* "X.::
+A
+.sj#"	..
+24

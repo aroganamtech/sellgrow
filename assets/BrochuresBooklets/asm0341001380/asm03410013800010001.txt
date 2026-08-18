@@ -1,0 +1,11 @@
+﻿28. Do you hold an air travel credit card?
+Yes □ No □
+If “yes”, is it a red card limiting travel to North America [] or a green card permitting travel around the world Q.
+Have You Made Friends With Your Travel Agent?
+29. Have you ever made travel reservations through a travel agent?	Yes □ No □
+If “yes”, did you find his services helpful?
+Yes □ No □ Would you ask a travel agent’s aid again?
+Yes □ No □
+Did the agent influence your choice of carrier?
+Yes □ No □
+8

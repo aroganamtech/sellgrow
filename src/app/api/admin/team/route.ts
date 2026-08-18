@@ -16,11 +16,25 @@ export async function GET() {
   try {
     const db = await getDatabase();
     const collection = db.collection('superadmin/sub-admin');
+    const metaCollection = db.collection<any>('_meta');
     
+    const seedMeta = await metaCollection.findOne({ key: 'team_seeded' });
     let list = await collection.find().toArray();
-    if (list.length === 0) {
+    
+    if (list.length === 0 && !seedMeta) {
       await collection.insertMany(DEFAULT_TEAM);
+      await metaCollection.updateOne(
+        { key: 'team_seeded' },
+        { $set: { seeded: true, seededAt: new Date() } },
+        { upsert: true }
+      );
       list = await collection.find().toArray();
+    } else if (list.length > 0 && !seedMeta) {
+      await metaCollection.updateOne(
+        { key: 'team_seeded' },
+        { $set: { seeded: true, seededAt: new Date() } },
+        { upsert: true }
+      );
     }
     
     const formatted = list.map((item: any, idx: number) => ({

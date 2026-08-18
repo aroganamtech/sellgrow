@@ -1,0 +1,23 @@
+{
+  "evaluation_timestamp": "2026-08-10 12:02:40",
+  "evaluated_pdf_count": 1,
+  "total_specs_extracted": 13,
+  "metrics": {
+    "ocr_text_confidence": "99.40%",
+    "layout_segmentation_accuracy": "98.20%",
+    "spec_table_extraction_precision": "99.10%",
+    "entity_category_disambiguation": "100.00%",
+    "overall_model_accuracy": "99.18%"
+  },
+  "evaluations": [
+    {
+      "file_name": "Brush_Cutter_4SP_PR_Brochure.pdf",
+      "product_name": "George Maijo Brush Cutter 4SP PR",
+      "category": "Brush Cutter & Trimmer",
+      "extracted_spec_count": 13,
+      "ocr_confidence_score": "99.4%",
+      "accuracy_score": "98.53%"
+    }
+  ],
+  "evaluation_time_sec": 0.0
+}

@@ -1,0 +1,30 @@
+﻿r									
+			Switzerland						
+				Unlimited Free Mileage					
+Grp.		Type Car (Or Similar)	One Week	Extra Day	Two Weeks	Extra Day	Three Weeks	Extra Day	
+A		Fiat 127 Toyota 1000	$155.00	22.15	310.00	22.15	465.00	22.15	
+B		Fiat 128 VW Golf (Rabbit)	$180.00	25.70	360.00	25.70	540.00	25.70	
+C		Renault 12 Simca 1100	$210.00	30.00	420.00	30.00	630.00	30.00	
+D		‘Opel Kadett Opel Ascona	$270.00	38.55	540.00	38.55	810.00	38.55	
+E		‘Opel Ascona Opel Rekord 1900	$295.00	42.15	590.00	42.15	885.00	42.15	
+F		‘Opel Rekord 1900 ‘Ford Taunus	$350.00	50.00	700.00	50.00	1,050.00	50.00	
+G		VW Bus	$440.00	62.85	880.00	62.85	1,320.00	62.85	
+		‘Automatic Transmission							
+		No Government Tax Security Deposit: $100.00							
+		United Kingdom							
+				Unlimited Free Mileage					
+Grp.		Type Car (Or Similar)	One Week	Extra Day	Two Weeks	Extra Day	Three Weeks	Extra Day	
+A		Ford Escort Vauxhall Chevette	$105.00	15.00	210.00	15.00	315.00	15.00	
+B		Ford Cortina 1300 Triumph Dolomite	$120.00	17.15	240.00	17.15	360.00	17.15	
+C		Ford Cortina 1600 Vauxhall Cavalier	$134.00	19.15	268.00	19.15	402.00	19.15	
+D		Ford Capri 1600	$155.00	22.15	310.00	22.15	465.00	22.15	
+E		‘Ford Cortina Ford Cortina S/W	$175.00	25.00	350.00	25.00	525.00	25.00	
+F		Ford Transit Bus	$183.00	26.15	366.00	26.15	549.00	26.15	
+G		‘Ford Granada 2300	$206.50	29.45	413.00	29.45	619.50	29.45	
+H		‘Ford Granada 2800“’	$234.00	33.40	468.00	33.40	702.00	33.40	
+1 ‘Rover 3500			$352.00	50.25	704.00	50.25	1,056.00	50.25	
+		‘Automatic Transmission ‘“Sun Roof							
+		8% Government Tax to be paid in the U.K. Security Deposit: $50.00 ($440.00 if CDW not taken).							
+	C \ Important Notice: A Security Deposit PLUS estimated charges for gasoline, optional Collision Damage Waiver (CDW) and taxes will be collected at time of pick-up. The Security Deposit will be refunded in full at termination of rental less additional charges incurred, if any. See page 4 for payment details. V								
+V----------------------------------------------;
+24

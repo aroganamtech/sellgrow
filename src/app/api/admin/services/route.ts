@@ -12,7 +12,7 @@ const DEFAULT_SERVICES = [
   { id: "srv_6", name: "Sells CRM", description: "Sales pipeline tracking, lead conversion analytics, and CRM dashboard", status: "Active", successRate: 99.5, latency: 35, requests24h: 7430 },
   { id: "srv_7", name: "Digital Marketing", description: "SEO metrics tracking, ad campaign monitoring, and marketing suite", status: "Active", successRate: 99.0, latency: 60, requests24h: 15400 },
   { id: "srv_8", name: "Website Creation", description: "Automated premium landing page generation and builder engine", status: "Active", successRate: 99.2, latency: 110, requests24h: 2150 },
-  { id: "srv_9", name: "Borcher", description: "Brochure creator, brand material generation, and catalog PDF builder", status: "Active", successRate: 96.5, latency: 140, requests24h: 1200 },
+  { id: "srv_9", name: "Brochure", description: "Brochure creator, brand material generation, and catalog PDF builder", status: "Active", successRate: 96.5, latency: 140, requests24h: 1200 },
   { id: "srv_10", name: "Logo", description: "Branding asset builder, vector logo designs generator, and asset hosting", status: "Active", successRate: 98.9, latency: 85, requests24h: 4620 },
   { id: "srv_11", name: "Social Media", description: "Social platforms auto-posting gateway and feed synchronization engine", status: "Active", successRate: 97.2, latency: 95, requests24h: 8950 }
 ];
@@ -21,11 +21,25 @@ export async function GET() {
   try {
     const db = await getDatabase();
     const collection = db.collection('services');
+    const metaCollection = db.collection<any>('_meta');
     
+    const seedMeta = await metaCollection.findOne({ key: 'services_seeded' });
     let list = await collection.find().toArray();
-    if (list.length === 0) {
+    
+    if (list.length === 0 && !seedMeta) {
       await collection.insertMany(DEFAULT_SERVICES);
+      await metaCollection.updateOne(
+        { key: 'services_seeded' },
+        { $set: { seeded: true, seededAt: new Date() } },
+        { upsert: true }
+      );
       list = await collection.find().toArray();
+    } else if (list.length > 0 && !seedMeta) {
+      await metaCollection.updateOne(
+        { key: 'services_seeded' },
+        { $set: { seeded: true, seededAt: new Date() } },
+        { upsert: true }
+      );
     }
     
     const formatted = list.map((item: any) => ({
@@ -128,7 +142,12 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ status: 'error', message: 'ID is required' }, { status: 400 });
     }
 
-    await collection.deleteOne({ id });
+    let filter: any = { id };
+    if (ObjectId.isValid(id)) {
+      filter = { $or: [{ _id: new ObjectId(id) }, { id }] };
+    }
+
+    await collection.deleteOne(filter);
     return NextResponse.json({ status: 'success' });
   } catch (error: any) {
     return NextResponse.json({ status: 'error', message: error.message }, { status: 500 });

@@ -1,0 +1,22 @@
+﻿FLIGHT LOG
+DEPARTED FROM
+ARRIVED AT____
+CLIPPER_______
+DISTANCE _____
+COMMENTS______
+TIME.
+DATE
+DATE
+FARE
+DAYS
+19____
+19____
+HRS._
+DEPARTED FROM ARRIVED AT
+CLIPPER_______
+DISTANCE _____ COMMENTS______
+___________DATE________19___
+___________DATE________19___
+__________FARE______________
+TIME_______DAYS________HRS._
+3

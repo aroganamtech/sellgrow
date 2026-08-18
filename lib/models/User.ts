@@ -10,6 +10,7 @@ export interface IUser {
   businessName: string;
   businessType: string;
   businessCategory?: string;
+  companyLogo?: string;
   isEmailVerified?: boolean;
   role: 'admin' | 'super-admin' | 'operator';
   status: 'active' | 'pending' | 'suspended';
@@ -27,6 +28,7 @@ export interface UserResponse {
   businessName: string;
   businessType: string;
   businessCategory?: string;
+  companyLogo?: string;
   isEmailVerified?: boolean;
   role: 'admin' | 'super-admin' | 'operator';
   status: string;
@@ -43,6 +45,7 @@ export function formatUserResponse(user: IUser): UserResponse {
     businessName: user.businessName,
     businessType: user.businessType || user.businessCategory || 'Retail Shop',
     businessCategory: user.businessCategory || user.businessType || 'Retail Shop',
+    companyLogo: user.companyLogo || '',
     isEmailVerified: user.isEmailVerified ?? true,
     role: user.role,
     status: user.status,

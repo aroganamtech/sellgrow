@@ -1,0 +1,55 @@
+﻿New York, NY
+Reservations: 973-4000
+Airports K- JFK Int'l L-LaGuardia
+					Stops or		
+	Freq.	Leave	Arrive	Flight No.	Connecting City Aircraft t Meals		
+To Manila*	ExMoTu K 400p		855a +2	811/841	Honolulu	747	S-DSB
+From Manila	Consult your Travel Agent or Pan Am						
+Res. 818-5421							
+To Maracaibo*	ExTu	K 100p	930p	427/409	Miami	1011 S-LD	
+From Maracaibo	ExWe	935a K 426p		410/426	Miami	747	»BL
+Res. 513199							
+To Melbourne	MoWeFrSu K 400p		1035a +2	811	Three-Stop	747	^•DSB
+(Tullamarine Airport)	MoWeFrSu K 400p		Above Flight Effective Mar. 5 1135a+2 811 Three-Stop			747	S-DSB
+			Above Flight Discontinued After Mar. 3				
+From Melbourne	Consult your Travel Agent or Pan Am						
+Res. 654-4788							
+To Mexico City	Daily	K 900a	305p	403/349	Miami	747	S-BL
+	Daily	K 100p	730p	427/499	Miami	1011 S-LD	
+	Daily	K 545p	1145p	51	One-Stop	747	Ö-DS
+From Mexico City	Daily	845a K 458p		52	One-Stop	747	S'BL
+Res. 395-0077	Daily	1130a K 854p		462/238	West Palm Beach	727	ID
+To Miami, FL	Daily	K 900a	1158a	403	NON-STOP	747	&B
+	Daily	K 10Op	400p	427	NON-STOP	1011 &L	
+	Daily	K 400p	830p	111/337	Washington	727	D
+	Daily	K 615p	917p	453	NON-STOP	747	ftD
+	Th	K 7 OOp	1002p	255	NON-STOP	747	&D
+From Miami, FL	Daily	900a K 1145a		454	NON-STOP	747	»B
+Res. 874-5000	Mo	1100a K	145p	244	NON-STOP	747	S-L
+	Daily	130p K 426p		426	NON-STOP	747	S-L
+	Daily	515p K 809p		252	NON-STOP	1011 S-D	
+	Daily	520p K 913p		500	One-Stop	727	D
+To Monrovia*	Tu	K 530p	655a +1	190	NON-STOP	747	5-DS
+(Roberts International	Th	K 530p	850a +1	184	One-Stop	747	Si-DB
+Airport)	Su	K1100P	220p +1	188	One-Stop	747	S-DB
+From Monrovia	Su	1255a K	530a	189	NON-STOP	747	SB
+Res. 72-1000	Th	1030p K	500a +1	191	One-Stop	747	SB
+	Mo	11OOp K	530a +1	185	One-Stop	747	SB
+To Montevideo	Fr	K1000p	155p +1	201/441	Riode Janeiro	747	5-DBL
+	Mo	KlOOOp	155p +1	201	One-Stop	Sf* S-DBL	
+From Montevideo	Sa	645p K	605a +1	440/202	Riode Janeiro	747	5-DDB
+Res. 980-613	Tu	645p K	605a +1	202	One-Stop	sf* f^-DDB	
+To Munichofp	WeThFrSa K 720p		905a +1	76	NON-STOP	1011 ^DS	
+From Munich	ThFrSaSi	1 1100a K	150p	77	NON-STOP	1011 S-LS	
+Res. 558171							
+To Nairobi*	Tu	K 530p	755p +1	190	Two-Stop	747	5-DBL
+(Jomo Kenyatta International Airport)	Th	K 530p	1145p +1	184	Four-Stop	747	$-DBS
+From Nairobi	Th	120p K	500a +1	191	Four-Stop	747	S-LSB
+Res. 23581	Sa	550p K	530a +1	189	Two-Stop	747	S-DSB
+To New Orleans, LA Daily		K 610p	834p	985	NON-STOP	727	D
+From New Orleans, Daily		115p K 504p		986	NON-STOP	727	L
+LA							
+Res. 529-5192							
+»'-Operates with long-range Special Performance 747	t-Enroute plane change from or to another
+A-Through aircraft with enroute change of flight number aircraft type on some flights &-Theatre-in-the-Air® movie flight	O-Inter • Continental Hotel
+^-Airport transfer required	Fp-Forum Hotel

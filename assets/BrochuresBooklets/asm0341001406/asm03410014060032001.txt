@@ -1,0 +1,16 @@
+﻿(2)	“Name of Passenger” box: The number of passengers is spelled out here. For example: “thirty passengers as per attached list.”
+Note: List, with names of all passengers, must be stapled to each flight coupon, as well as the auditor's coupon of the ticket, when reporting to GAO.
+(3)	“Not Transferable” box: Group code number is entered in this space.
+(4)	“Fare Class/Basis” box: Initials “YJ” (economy jet), for travel on PAA, “RJ” (tourist/coach jet), and others to identify travel on U.S. domestic carriers should appear to left of dotted line. To right of dotted line, “E/20” indicates “short limit 20 days validity.”
+(5)	“Valid Until” box: Notes date by which travel must be completed.
+b. Return Portion Flight Coupon (s):
+If 80% or more group members return together and 20% (or less) return separately, separate flight tickets must be re-issued, covering each contingency.
+(1)	“Fare Calculation” column: Shows total fare for the number of passengers listed on each ticket. For example: Using the same itinerary described in a. (1), if 24 members (80%) of a 30-member travel group return together, the fare $8,952 appears (24 times single HNL Group Fare of
+$358). 6 remaining travelers (20%) may travel in small groups or individually. In each case the fare, multiplied by the number of group members, is shown on each ticket.
+(2)	“Name of Passenger” box: Following the example in a. (2), the number of group members is noted: “twenty four passengers as per attached list.” The same type of entry should be made for the remaining members of the group, spelling out the number of travelers on each ticket. Single returnees are listed by name.
+Note: If "Fare Calculation" column lists more than one fare, a list of passenger names must be stapled to each flight coupon and the auditor's coupon.
+(3)	“Not Transferable” box: All reissued tickets note same Group Code number as originals.
+(4)	“Valid Until” box: Original dates are shown on reissued tickets.
+c. Ticketing Through Non-Participating Airlines:
+If group’s itinerary calls for U.S. domestic transportation, on airlines other than those participating in U.S. Main-land/Honolulu Group Fare Tariffs, their permission is necessary before single group tickets are issued on their portions. When clearance is not possible, individual tickets must be issued for those domestic portions. International travel in connection with Hawaii Group Fares also requires individual tickets.
+30

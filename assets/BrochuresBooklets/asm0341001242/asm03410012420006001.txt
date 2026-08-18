@@ -1,0 +1,29 @@
+﻿New York, NY
+Reservations: 973-4000
+Airports K-JFK Inti L-	LaGuardia			
+	Freq. Leave Arrive	Flight No.	Stops or Connecting City	Aircraftf Meals
+To Norfolk/ Virginia Beach, VA	Daily K 430p 550p	535	NON-STOP	727
+From Norfolk/ Virginia Beach, VA Res. 627-2391	Daily 650p K 802p	538	NON-STOP	727
+To Nuremberg	WeTh K 720p 130p+1	76/684	Munich	1011 £DS
+From Nuremberg Res. 523047	Consult your Travel Agent or Pan Am			
+To Orlando, FL	Daily K 900a 1147a Daily K 610p 859p	505 509	NON-STOP NON-STOP	727 B 727 D
+From Orlando, FL Res. 422-0701	Daily 100p K 328p Daily 645p K 913p	504 500	NON-STOP NON-STOP	727 L 727 D
+To Osaka	WeFrSaSu K 1200n 615p+1	801/831	Tokyo	sp ^-LSD
+From Osaka Res. 271-5951	MoThSaSu 355p K 540p	830/800	Tokyo	sp DB
+To Panama City, Panama	Daily K 10Op 81 Op	427	One-Stop	1011 S-LD
+From Panama City, Daily 840a k 426p Panama Res. 25-6500		426	One-Stop	747 S-BL
+To Parisi* (Orly Airport)	Dally K 800p 900a +1	114	NON-STOP	1011 5-DS
+From Paris Res. 266-4545	Daily 1200n K 205p	115	NON-STOP	1011 £LS
+To Phoenix, AZ	Consult your Travel Agent or Pan Am			
+From Phoenix, AZ Res. 258-0132	Daily 915a K 843p	409/24	Houston	727 BD
+To Rio de Janeiro*: (International Airport)	' Daily K1000p 920a+1	201	NON-STOP	sp & DB
+From Rio de Janeiro Res. 398-3353	WeFrSu 1230a K 110p Dally 1030p K 605a +1	456/218 202	Caracas NON-STOP	DC10 &SSL sp $-DB
+To Riyadh*:*	Flight from Dhahran to Riyadh Operated by SAUDIA (SV) MoTuWeThK 1030p 935p+1 24/SV24 Dhahran			sp S-DB
+From Riyadh Res. 465-0779	Flight from Riyadh to Dhahran Operated by SAUDIA (SV) TuThFrSa 815p K 550a+1 SV25/25 Dhahran			sp 55- DSB
+To Rome (Fiumicino Airport)	Daily K 645p 900a +1	110	NON-STOP	1011 &DS
+From Rome Res. 4773	Daily 1115a K 230p	111	NON-STOP	1011 & LS
+Aplus( + )orminus(-)signafterthearrival	MEAL CODES:
+timeindicatesarrival theday(s)followingdeparture	S-Snack L-Lunch
+orthedayprevioustodeparture.	B-Breakfast D-Dinner
+Flight numbersin Bold areoperated by Wide Cabin aircraft.	Alltimesshownarelocallyobserved
+Standard or Daylight Saving Time.

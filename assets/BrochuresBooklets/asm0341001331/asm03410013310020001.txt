@@ -1,0 +1,41 @@
+﻿707 - 727 - 747 - DC-10 - 747SP -
+	BOEING	BOEING	BOEING	BOEING
+	707-321B	727-100	727-200	747-121
+First Service	May, 1962*	December,	December,	January,
+		1964	1967	1970
+Number and	4	3	3	4 1
+Make of Engines	P&W JT3D-3	P&W JT8D-7	P&W JT8D-7	P&W JT9D-7 1
+Takeoff Thrust	18,000 lbs.	14,000 lbs.	14,000 lbs.	45,500 lbs. 1
+Each Engine				?
+Maximum Takeoff	333,100 lbs.	161,000 lbs.	173,000 lbs.	733,600 lbs.
+Gross Weight	(151,094 kg.)	(73,033 kg.)	(78,473 kg.)	(332,761 kg.) (
+Configuration	16 First	12 First	14 First	30 First
+	Class	Class	Class	Class
+	130 Economy	107 Economy	136 Economy	375 Economy
+Space Limit	41,400 lbs.	27,800 lbs.	36,000 lbs.	116,500 lbs.
+Payload	(18,779 kg.)	(12,610 kg.)	(16,330)	(52,844 kg.) 1
+Normal Cockpit		3	3	0
+Crew				
+Average Cabin Crew	5	3	5	11
+Fuel Capacity	23,855 gal.'	7,6S0 gal.	8.059 gal.	47,210 gal.
+	(90,301	(29,072	(30,507	(178,709 ,(
+	liters)	1i ters)	liters)	1i ters)
+Maximum	42,000 ft.	41,000 ft.	41,000 ft.	45,000 ft.
+Altitude	(12,802 m.)	(12,497 m.)	(12,497 m.)	(13,716m.) (1
+Maximum Range	5,700 miles	2,000 miles	1,600 miles	6,300 miles !
+(Statute)	(9,173 km.)	(3,219 km.)	(2,575 km.)	(10,139 km.) (5
+Cruise Speed	540 mph	560 mph	560 mph	555 mph £
+	(.82M)	(.85M)	(.85M)	(.84M) (
+	(869 kph.)	(901 kph.)	(901 kph.)	(893 kph.) (9
+Wingspan	145ft. 9in.	108ft.	108ft.	195ft. 8in.
+	(44.42 m.)	(32.92 m.)	(32.92 m.)	(59.65 m.) j(4
+Length	152ft. Hin.	133ft. 2in.	153ft. 2in.	231ft. 10in.| :
+	(46.62 m.)	(40.57 m.)	(46.63 m.)	(70.66m.) 1(5
+Height of Tail	41ft. 7 i n.	34ft.	34ft.	63ft. 5in. £
+	(12.67 m.)	(10.36 m.)	(10.36 m.)	(19.34m.) (1
+Fuselage Width	12ft.	12ft.	12ft.	21ft. 3in. 1
+	(3.66 m.)	(3.66 m.)	(3.66 m.)	(6.50 m.) (6
+Wing Sweepback	35°	noO Jc	32°	35° ;
+* Par. Am inaugurated the first jet service with the smaller 707-121 on October ; ** 3 engine used initially; later, an improved RB211-524B-4 engine will be usee
+P&W - Pratt & Whitney; GE - General Electric; RR - Rolls Royce
+-16-

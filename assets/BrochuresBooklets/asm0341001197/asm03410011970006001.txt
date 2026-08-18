@@ -1,0 +1,24 @@
+﻿AUSTRIA (E) - Via Pergolesi 3; tei. 841.970; (C) - Via Barberini 3; tei. 487.717.
+BELGIUM (E) - Viale R. Margherita 265; tei. 859.048.
+BOLIVIA (L) - Via Panama 86; tei. 848.987.
+BRAZIL (E) - Piazza Navona 14; tei. 564.286; (C) - Via Salaria 83; tei. 850.461.
+BULGARIA (L) - Via Sassoferrato 11; tei. 872.311.
+CANADA (E) - Via S. Mercadante 15; tei. 847.838; (C) - Via Acherusio 3; tei. 889.985.
+CEYLON (L) - Via Brenta 13; tei. 846.819.
+CHILE (L) - Via G. d'Arezzo 2; tei. 859.612; (C) -tei. 846.602.
+CHINA (E) - Via Tor Fiorenza 13; tei. 819.873.
+COLOMBIA (E) - Via Abruzzi 4; tei. 487.211; (C) -tei. 480.833.
+COSTA RICA (C) - Viale B. Buozzi 105; tei. 875.600.
+CUBA (E) - Grand Hotel, Via delle Terme; tei. 460.141.
+CZECHOSLOVAKIA (L) - Via Luisa di Savoia 16; tei. 31.700.
+DENMARK (L) - Via XXIV Maggio 14; tei. 63.479.
+DOMINICAN REPUBLIC (L) - Via S. Mercadante 30; tel. 847.444.
+ECUADOR (C) - Via Boncompagni 16; tel. 477.842.
+EGYPT (E) - Via Salaria 267; tei. 865.361; (C) - Via Salaria 259; tei. 846.214.
+EIRE (L) - Via Valle delle Camene 3; tei. 760.242.
+EL SALVADOR (E) - Via Circo Massimo 9; tei. 596.711.
+ETHIOPIA (E) - Via A. Vesalio 18; tei. 863.425.
+FINLAND (L) - Via Monti Parioli 49; tei. 873.868.
+FRANCE (E) (C) - Piazza Farnese 67; tei. 565.241.
+GERMANY (E) - Via Don Giovanni Verità 3; tei. 378.241.
+GREAT BRITAIN (E) Via Conte Rosso 25; tei. 776.551; (C) - Piazza di Spagna 16; tei. 689.413.

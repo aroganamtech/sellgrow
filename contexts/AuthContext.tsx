@@ -12,6 +12,8 @@ export interface User {
   businessName: string;
   businessType: string;
   businessCategory?: string;
+  companyLogo?: string;
+  themeColor?: string;
   role: "admin" | "super-admin" | "operator";
 }
 
@@ -22,6 +24,7 @@ export interface RegisterPayload {
   password: string;
   businessName: string;
   businessCategory: string;
+  companyLogo?: string;
 }
 
 interface AuthContextType {
@@ -29,6 +32,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password?: string) => Promise<void>;
   register: (payload: RegisterPayload | any) => Promise<void>;
+  updateUser: (updatedFields: Partial<User>) => void;
   logout: () => void;
   isLoading: boolean;
 }
@@ -67,6 +71,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .replace(/[^a-z0-9]/g, "-")
       .replace(/-+/g, "-")
       .replace(/^-|-$/g, "") || "client";
+  };
+
+  const updateUser = (updatedFields: Partial<User>) => {
+    setUser(prev => {
+      if (!prev) return null;
+      const updated = { ...prev, ...updatedFields };
+      localStorage.setItem("sg_user", JSON.stringify(updated));
+      const slug = getCompanySlug(updated);
+      router.push(`/${slug}/dashboard`);
+      return updated;
+    });
   };
 
   const login = async (email: string, password?: string) => {
@@ -129,7 +144,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, register, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, register, updateUser, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

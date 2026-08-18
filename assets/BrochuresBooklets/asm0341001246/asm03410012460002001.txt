@@ -1,0 +1,35 @@
+﻿Dallas-Ft. Worth service to New York and international cities:
+TO NEW YORK	Flight #002 Leaves Dallas-Ft. Worth Arrives New York (JFK)	(Daily) 1:00pm 5:09pm
+FROM	Flight #001	(Daily)
+NEW YORK	Leaves New York (JFK)	6:15pm
+	Arrives Dallas-Ft. Worth	9:05pm
+TO	Flight #002	(Daily)
+LONDON	Leaves Dallas-Ft. Worth	1:00pm
+	Arrives London (Heathrow)	6:40anr
+TO	Flight #002	(Daily)
+PARIS	Leaves Dallas-Ft. Worth Connect to Flight #114	1:00pm
+	Arrives Paris	9:00anr
+TO	Flight #002	(Daily)
+ROME	Leaves Dallas-Ft. Worth Connect to Flight #110	1:00pm
+	Arrives Rome	9:00anr
+TO	Flight #002	(Daily)
+MUNICH	Leaves Dallas-Ft. Worth Connect to Flight #76 (We Th Fr Sa only)	1:00pm
+	Arrives Munich	9:05anf
+TO	Flight #002	(Daily)
+FRANKFURT	Leaves Dallas-Ft. Worth Connect to Flight #72	1:00pm
+	Arrives Frankfurt	7:35anT
+TO	Flight #002	(Daily)
+RIO de JANEIRO Leaves Dallas-Ft. Worth Connect to Flight #201		1:00pm
+	Arrives Rio de Janeiro	9:20am*
+TO	Flight #002	(Dally)
+DHAHRAN	Leaves Dallas-Ft. Worth Connect to Flight #24 (Except Sa and Su)	1:00pm
+	Arrives Dhahran	6:30pnf
+TO	Flight #002	(Daily)
+DAKAR	Leaves Dallas-Ft. Worth Connect to Flight #188 (Su only)	1:00pm
+	Arrives Dakar	11:00am
+AND	Flight #002	(Daily)
+AROUND THE	Leaves Dallas-Ft. Worth	1:00pm
+WORLD	Stops in London, Frankfurt, Bahrain, Karachi, Bombay, Delhi, Bangkok, Hong Kong, Tokyo, Los Angeles.	
+*Next day	Schedule subject to change without notice.
+Ciotte.®
+Printed in U.S.A. 10/30/81

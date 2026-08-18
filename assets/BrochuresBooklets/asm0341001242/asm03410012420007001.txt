@@ -1,0 +1,55 @@
+﻿New York, NY
+Reservations: 973-4000
+Airports K-JFKInt’l L-LaGuardia
+				Stops or	
+	Freq.	Leave Arrive	Flight No.	Connecting City	Aircraftf Meals
+To San Diego, CA	Consult your Travel Agent or Pan Am				
+From San Diego,	Daily	800a K 843p	926/24	Houston	727 BO
+CA					
+Res. 234-7321					
+To San Francisco,	Daily	K 900a 1204p	5	NON-STOP	Sf>
+CAo	MoWeFrSa K 400p 1112p		811/416	Los Angeles	747 &D
+From San	Daily	1000a K 620p	6	NON-STOP	sr S-L
+Francisco, CA					
+Res. 397-5200					
+To San Juan (International Airport)	Daily	K 100p 926p	427/498	Miami	1011 5rLD
+From San Juan	Sa	1115a K 426p	871/426	Miami	sf 5-LL
+Res. 754-7470	Daily	145p K 809p	499/252	Miami	1011 SrSD
+To Santiago, Chile	WeFrSu K 615p 755a+1		459	One-Stop	747 S-DDS
+		Above Flight Effective Mar. 14			
+	WeFrSu K 615p 855a +1		459	One-Stop	747 S-DDS
+		Above Flight Discontinued After Mar. 12			
+From Santiago,	MoThSa	1159p K 1145a +1	460	One-Stop	747 5-DSB
+Chile		Above Flight Departs 1 Hour Earlier Effective Mar. 14			
+Res. 724-367					
+To Sao Paulo	Portion of Flights between Rio and Congonhas Operated for Pan Am by Transbrasil or VASP				
+Airports: C-Congonhas	Daily	KlOOOp C1110a +1	211	One-Stop	sp & DBS
+V-Viracopos					
+From Sao Paulo	Portion of Flights between Rio and Congonhas Operated for Pan Am by Transbrasil or VASP				
+Res. 257-6655	Daily	C 830p K 605a+1	212	One-Stop	sp S'DB
+To Sarasota/	Daily	K 800a 1140a	523	One-Stop	727 B
+Bradenton, FL	Daily	K 415p 703p	525	NON-STOP	727 D
+From Sarasota/	Daily	1230p K 259p	522	NON-STOP	727 L
+Bradenton, FL					
+Res. 365-2121					
+To Shanghai	Consult your Travel Agent or Pan Am				
+From Shanghai	Fr	140p K 510p	16	One-Stop	sp S'LDB
+Res. 56-3050	MoFr	140p K 540p	16/800	Tokyo	sp 5- LOB
+To Singapore^	Daily	K 900a 115a +2	5	Two-Stop	sp 5-LSB
+	Daily	K 1200n 115a+2	801/1/5	Tokyo/H.K.	sp $-LSD
+			Occasional Fuel Stop At Okinawa On Flight 5.		
+From Singapore	Daily	700a K 620p	6	Two-Stop	sp $-BLS
+Res. 220-0711					
+To Sydney	MoWeFrSu K 400p 800a+2		811	Two-Stop	747 S-DSB
+		Above Flight Effective Mar. 5			
+	MoWeFrSu K 400p 900a+2		811	Two-Stop	747 5-DSB
+		Above Flight Discontinued After Mar. 3			
+	TuThSa K 400p 1110a +2		811	Three-Stop	747 S-DBL
+		Above Flight Effective Mar. 6			
+	TuThSa K 400p 1210p+2		811	Three-Stop	747 S'DBL
+		Above Flight Discontinued After Mar. 4			
+From Sydney	Consult your Travel Agent or Pan Am				
+Res. 233-1111					
+JK^-Operates with long-rangeSpecial Performance 747	f-Enrouteplanechangefromortoanother
+A-Throughaircraftwithenroutechangeofflight number aircrafttypeonsomeflights $-Theatre-in-the-Air®movieflight	i»-lnter« Continental Hotel
+*-Airporttransfer required	^J-Forum Hotel

@@ -1,0 +1,22 @@
+﻿INTERNATIONAL DATE LINE
+Keep in mind that every 15 degrees west of zero meridian calls for the subtraction of one hour of time. Every 15 degrees east of zero meridian calls for the addition of one hour of time. This process continues until the half-way mark, at the 180 degree meridian. Here we find the International Date Line, which follows the meridian of 180 degrees east and west of Greenwich. It goes from north to south through the Pacific Ocean, being deflected somewhat to separate cities and islands conveniently. Since 24 hours . . . one hour for each 15 degrees ... is gained in making a complete turn of the globe, a change of one full day must occur. On this line, each day actually begins.
+Monday begins here and proceeds westward around the world with the sun. By the time Monday has gone westward around the world with the sun, and the Date Line is again reached, it becomes Tuesday. Therefore, when it is Tuesday directly to the west of the Date Line, it is Monday directly to the east of the Date Line. Thus, a ship, or a plane crossing the Date Line in a westerly direction would go from that particular time on Monday to the same time on Tuesday, and the passengers would lose a day. Going east, the date is set back, from Tuesday to Monday, for when it is midnight, or eleven o’clock, or whatever time on Tuesday directly to the west of the Date Line, it is that same time on Monday directly to the east of the Date Line.
+Every 15 decrees
+SUBTRACT ONE HOUR
+to 180°
+
+'00A
+
+ZERO MERIDIAN
+Everij 15* degrees ADD ONE HOUR
+to 1800
+
+THE 24 HOUR CLOCK
+In everyday practice, we divide our day into two equal periods of 12 hours each. The period following midnight is indicated by writing A.M. (Ante Meridian) after the hours, and the period following noon is indicated by writing P.M. (Post Meridian) after the hours.
+However, in order to avoid confusion and possible error . . . and to increase our efficiency . . . the 24 hour clock is used in all of our schedules and operations.
+This method numbers the hours from 0000 (midnight) straight through to 2400 (the following midnight)—and eliminates the need for A.M. and P.M. designations. In other words instead of repeating the hours from noon on, we continue them for the full span of our 24 hour day.
+For example, to express 2 o’clock in the afternoon according to our 24 hour clock, we simply add 2 hours to the 12 o’clock noon figure, and write it as: 1400. The first two digits refer to the hours . . . and the second two digits refer to the minutes.
+Thus—in Pan Am’s Time Table—1:45 A.M. becomes 0145 . . . 6:30 P.M. becomes 1830 . . . midnight becomes 2400 ... 7:50 P.M. becomes 1950 . . . and so on.
+This shows how our 24 hour clock works. The important thing to remember is that, from the noon hour on, we continue to add hours—up until midnight (2400)—at which time a new day starts. The first minute after midnight would be written: 0001.
+P.M. HOURS
+46

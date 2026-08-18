@@ -1,0 +1,4 @@
+﻿HOW A
+I he jet turbine operates in much the same manner as a toy balloon. If you blow up a balloon, then hold it up and suddenly release the stem, it will travel at a fairly high speed for a few seconds.
+It is not the escaping air pushing against the outside air that makes the balloon move. Releasing the stem removes a section of the skin on that side of the balloon against which air has been pushing. On the side directly opposite the stem, however, the air continues to push on an equal area of skin. It is the push on this area that causes the balloon to move in the direction away from the stem.
+The balloon’s flight is short because the pressure within the skin is lost quickly. This handicap could be overcome by pumping air into the balloon with a bicycle pump so that the pressure and air flow are maintained. This, in effect, is a complete jet engine using all of the principles of the power unit that propels an airplane.

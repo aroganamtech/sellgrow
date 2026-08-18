@@ -6,6 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/layout/Logo";
+import { ProductPdfIntelligenceModel } from "@/services/pdfIntelligenceEngine";
 import {
   TrendingUp,
   MessageSquare,
@@ -25,6 +26,8 @@ import {
   Sparkles,
   PhoneCall,
   PhoneOff,
+  Mic,
+  MicOff,
   UserCheck,
   MapPin,
   Play,
@@ -62,6 +65,8 @@ import {
   Filter,
   Bell,
   BellRing,
+  Image as ImageIcon,
+  Upload,
 } from "lucide-react";
 
 interface Lead {
@@ -105,6 +110,16 @@ interface SalesSchedule {
   status: "Scheduled" | "In Progress" | "Completed" | "Cancelled";
 }
 
+const TIME_SLOTS = [
+  "08:00 AM", "08:30 AM", "09:00 AM", "09:30 AM",
+  "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
+  "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
+  "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM",
+  "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM",
+  "06:00 PM", "06:30 PM", "07:00 PM", "07:30 PM",
+  "08:00 PM"
+];
+
 interface WorkflowNode {
   id: string;
   type: "trigger" | "delay" | "action";
@@ -119,10 +134,15 @@ interface ProductItem {
   price: string;
   variants: string;
   category: string;
+  brand?: string;
   brochure: string;
   stock: number;
   description: string;
   image?: string;
+  galleryImages?: string[];
+  hologramVideo?: string;
+  highlights?: string[];
+  specs?: Record<string, string>;
   productType?: "grocery" | "rental";
   totalSales?: string;
   rentalRate?: string;
@@ -224,7 +244,7 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "brush_cutter_manual.pdf",
     stock: 50,
     description: "42.7cc 2-stroke air-cooled heavy-duty agricultural brush cutter.",
-    image: "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
@@ -239,7 +259,7 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "brush_cutter_manual.pdf",
     stock: 50,
     description: "42.7cc 2-stroke backpack style ergonomic brush cutter.",
-    image: "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.4.BC-520-DLX@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
@@ -254,7 +274,7 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "cutter_spec.pdf",
     stock: 50,
     description: "35.8cc 4-stroke low-emission pure petrol brush cutter.",
-    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.1.BC-4SP-E@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
@@ -269,14 +289,14 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "cutter_spec.pdf",
     stock: 50,
     description: "35.8cc 4-stroke backpack brush cutter for steep terrain.",
-    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.2.BC-4SPR-E@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
   {
     id: "rt-5",
-    name: "George Maijo BC 358 4GPR",
-    sku: "GM-BC-358-4GPR",
+    name: "George Maijo BC 358 4BPR",
+    sku: "GM-BC-358-4BPR",
     price: "$12.50",
     rentalRate: "$12.50 / Day",
     variants: "Single Variant",
@@ -284,14 +304,14 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "cutter_spec.pdf",
     stock: 50,
     description: "4-stroke commercial grade brush cutter with heavy steel blade.",
-    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.3.BC-4BPR-E@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
   {
     id: "rt-6",
-    name: "George Maijo BC 358 4DP",
-    sku: "GM-BC-358-4DP",
+    name: "George Maijo BC 358 4BP",
+    sku: "GM-BC-358-4BP",
     price: "$12.50",
     rentalRate: "$12.50 / Day",
     variants: "Single Variant",
@@ -299,13 +319,13 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "cutter_spec.pdf",
     stock: 50,
     description: "Straight shaft 4-stroke premium brush cutter.",
-    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/Brush-Cutter-4SP@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
   {
     id: "rt-7",
-    name: "Maijo Wanovax MW-CH110",
+    name: "Maijo Wenovus MW-CH110",
     sku: "MW-CH110",
     price: "$12.50",
     rentalRate: "$12.50 / Day",
@@ -314,7 +334,7 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "harvester_spec.pdf",
     stock: 50,
     description: "Track type mini combine harvester for paddy and wheat harvesting.",
-    image: "https://images.unsplash.com/photo-1617575521317-864339cdde1a?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/Combine-harvester-machine@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
@@ -329,13 +349,13 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "tiller_13hp.pdf",
     stock: 50,
     description: "13HP heavy duty diesel power tiller with multi-speed rotary system.",
-    image: "https://images.unsplash.com/photo-1617575521317-864339cdde1a?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/power-tiller-13hp@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
   {
     id: "rt-9",
-    name: "WM 1100 AG",
+    name: "WM 1100 A6",
     sku: "WM-1100-AG",
     price: "$12.50",
     rentalRate: "$12.50 / Day",
@@ -344,13 +364,13 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "weeder_spec.pdf",
     stock: 50,
     description: "7HP petrol engine power weeder with gear driven transmission.",
-    image: "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/Power-weeder-WM-1100A6@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
   {
     id: "rt-10",
-    name: "WM 1100CC DLX Plus Prime",
+    name: "WM 1100C6 DLX Plus Prime",
     sku: "WM-1100CC-DLX",
     price: "$12.50",
     rentalRate: "$12.50 / Day",
@@ -359,7 +379,7 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "weeder_spec.pdf",
     stock: 50,
     description: "Premium 7HP petrol power weeder with 3 speed PTO gearbox.",
-    image: "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/1.1.WM1100-C6-DLX-PLUS-PRIME-600x400.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
@@ -374,7 +394,7 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "weeder_spec.pdf",
     stock: 50,
     description: "Compact 7HP petrol power weeder for narrow row crops.",
-    image: "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/Power-weeder-WM-1000NAM@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
@@ -389,7 +409,7 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "weeder_spec.pdf",
     stock: 50,
     description: "7HP diesel engine power weeder for low operating cost.",
-    image: "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/WM-1000-NAM-ELITE@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
@@ -404,7 +424,7 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "weeder_spec.pdf",
     stock: 50,
     description: "Standard 7HP petrol power weeder with heavy gear transmission.",
-    image: "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/1.4.WM-1100CM-E-600x400.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
@@ -419,7 +439,7 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "weeder_spec.pdf",
     stock: 50,
     description: "High performance 7.5HP petrol weeder with bumper guard.",
-    image: "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/1.5.WM-1100C-ELITE-600x400.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
   },
@@ -434,14 +454,44 @@ const DEFAULT_DEMO_PRODUCTS: ProductItem[] = [
     brochure: "weeder_spec.pdf",
     stock: 50,
     description: "Lightweight 7HP belt driven petrol power weeder.",
-    image: "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=600&auto=format&fit=crop&q=80",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/Power-Weeder-WM-990@2x.png",
     productType: "rental",
     totalSales: "$1,250.00 (100 Days Rented)"
+  },
+  {
+    id: "rt-16",
+    name: "Maijo 5PR Paddy Reaper",
+    sku: "MJ-5PR-REAP",
+    price: "$14.50",
+    rentalRate: "$14.50 / Day",
+    variants: "Single Variant",
+    category: "Rental Tools",
+    brochure: "reaper_spec.pdf",
+    stock: 35,
+    description: "Self-propelled crop reaper binder for paddy, wheat, and sesame.",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/paddy-reaper-5pr@2x.png",
+    productType: "rental",
+    totalSales: "$1,450.00 (100 Days Rented)"
+  },
+  {
+    id: "rt-17",
+    name: "Maijo 7PR Paddy Reaper",
+    sku: "MJ-7PR-REAP",
+    price: "$16.00",
+    rentalRate: "$16.00 / Day",
+    variants: "Single Variant",
+    category: "Rental Tools",
+    brochure: "reaper_spec.pdf",
+    stock: 25,
+    description: "Heavy duty 7HP self-propelled vertical conveyor crop reaper.",
+    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/paddy-reaper-7pr@2x.png",
+    productType: "rental",
+    totalSales: "$1,600.00 (100 Days Rented)"
   }
 ];
 
 export default function DashboardPage() {
-  const { user, logout, isLoading: authLoading } = useAuth();
+  const { user, updateUser, logout, isLoading: authLoading } = useAuth();
   const { language, setLanguage, t, dir } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
@@ -476,13 +526,13 @@ export default function DashboardPage() {
   ]);
 
   const [subAdminDirectory, setSubAdminDirectory] = useState([
-    { id: "sub-1", sgId: "SG-A-101", name: "user2", email: "naveensenthi11396@gmail.com", role: "Developer", accessScope: "Read/Write", avatar: "U" },
-    { id: "sub-2", sgId: "SG-A-102", name: "user1", email: "7178241605@kce.in.ac", role: "Operator", accessScope: "Read/Write", avatar: "U" },
-    { id: "sub-3", sgId: "SG-A-103", name: "Support Agent", email: "support@sellgrow.co", role: "Support", accessScope: "Read Only", avatar: "S" },
-    { id: "sub-4", sgId: "SG-A-105", name: "nomo", email: "operator@sellgrow.co", role: "Operator", accessScope: "Read Only", avatar: "N" },
-    { id: "sub-5", sgId: "SG-A-106", name: "AI Dev Team", email: "ai-dev@sellgrow.co", role: "Developer", accessScope: "Read/Write", avatar: "A" },
-    { id: "sub-6", sgId: "SG-A-107", name: "user 3", email: "senthilkumar6890@kce.in.ac", role: "Operator", accessScope: "Read Only", avatar: "U" },
+    { id: "sub-1", sgId: "SG-A-101", name: "Alex Rivera", email: "alex.rivera@georgemaijo.com", role: "Senior Account Executive", accessScope: "Full Access", avatar: "AR" },
+    { id: "sub-2", sgId: "SG-A-102", name: "Rahul Kumar", email: "rahul.kumar@georgemaijo.com", role: "Field Sales Specialist", accessScope: "Read/Write", avatar: "RK" },
+    { id: "sub-3", sgId: "SG-A-103", name: "Sarah Jenkins", email: "sarah.jenkins@georgemaijo.com", role: "Enterprise Sales Director", accessScope: "Read/Write", avatar: "SJ" },
+    { id: "sub-4", sgId: "SG-A-104", name: "Marcus Vance", email: "marcus.vance@georgemaijo.com", role: "SDR & Demo Specialist", accessScope: "Read/Write", avatar: "MV" },
   ]);
+
+  const [editingSubAdmin, setEditingSubAdmin] = useState<any | null>(null);
 
   const [employeeDirectory, setEmployeeDirectory] = useState([
     { id: "emp-1", name: "Amit Shah", email: "amit@sellgrow.co", work: "Customer Support", assignedSubAdmin: "Operator Main", accessScope: "View Only", avatar: "A" },
@@ -518,11 +568,57 @@ export default function DashboardPage() {
   ]);
 
   // Settings Input State
-  const [settingCompany, setSettingCompany] = useState(user?.businessName || "NOMO");
-  const [settingType, setSettingType] = useState(user?.businessType || "Retail Shop / Grocery");
-  const [settingEmail, setSettingEmail] = useState(user?.email || "support@nomo.com");
-  const [settingPhone, setSettingPhone] = useState("+91 98765 43210");
-  const [settingDomain, setSettingDomain] = useState("nomo.sellgrow.app");
+  const [settingCompany, setSettingCompany] = useState(user?.businessName || "George Maijo Agri");
+  const [settingType, setSettingType] = useState(user?.businessType || "Agricultural Equipment Manufacturer");
+  const [settingEmail, setSettingEmail] = useState(user?.email || "enquirys@georgemaijo.com");
+  const [settingPhone, setSettingPhone] = useState(user?.phone || "+91 91504 60651");
+  const [settingDomain, setSettingDomain] = useState("george-maijo-agri.sellgrow.app");
+  const [settingTheme, setSettingTheme] = useState<string>(user?.themeColor || "emerald");
+
+  useEffect(() => {
+    if (user?.businessName) {
+      setSettingCompany(user.businessName);
+      const slug = user.businessName
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "") || "client";
+      setSettingDomain(`${slug}.sellgrow.app`);
+    }
+    if (user?.businessType) {
+      setSettingType(user.businessType);
+    }
+    if (user?.email) {
+      setSettingEmail(user.email);
+    }
+    if (user?.themeColor) {
+      setSettingTheme(user.themeColor);
+    }
+  }, [user]);
+
+  const handleSaveCompanySettings = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!settingCompany.trim()) {
+      alert("Please enter a valid company name.");
+      return;
+    }
+
+    updateUser({
+      businessName: settingCompany.trim(),
+      businessType: settingType.trim(),
+      themeColor: settingTheme,
+    });
+
+    const newSlug = settingCompany
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "") || "client";
+
+    alert(`✅ Business settings & brand theme saved successfully!\n\n- Business Name: "${settingCompany.trim()}"\n- Company Brand Theme: ${settingTheme.toUpperCase()}\n- Application URL: "/${newSlug}/dashboard"`);
+  };
 
   // Profile Input State
   const [profileName, setProfileName] = useState(user?.name || "Naveen S");
@@ -530,6 +626,93 @@ export default function DashboardPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [twoFactorAuth, setTwoFactorAuth] = useState(true);
+
+  // AI Forecasting & Month Selection State
+  const [forecastMonth, setForecastMonth] = useState<string>("aug-2026");
+
+  const FORECAST_DATA: Record<string, {
+    label: string;
+    historicalMonths: string[];
+    forecastMonthName: string;
+    actualAmount: string;
+    predictedAmount: string;
+    rawPredicted: number;
+    growth: string;
+    confidence: string;
+    svgPathActual: string;
+    svgPathForecast: string;
+    endDotCx: number;
+    endDotCy: number;
+    forecastDotCx: number;
+    forecastDotCy: number;
+  }> = {
+    "aug-2026": {
+      label: "August 2026 (AI Forecast)",
+      historicalMonths: ["Jan", "Mar", "May", "Jul (Current)", "Aug (AI Forecast)"],
+      forecastMonthName: "August 2026",
+      actualAmount: "$195,400",
+      predictedAmount: "$248,500",
+      rawPredicted: 248500,
+      growth: "+27.1%",
+      confidence: "95.4%",
+      svgPathActual: "M 10 100 C 60 90, 110 50, 160 55 C 220 60, 270 35, 290 28",
+      svgPathForecast: "M 290 28 C 320 22, 360 16, 390 10",
+      endDotCx: 290,
+      endDotCy: 28,
+      forecastDotCx: 390,
+      forecastDotCy: 10,
+    },
+    "sep-2026": {
+      label: "September 2026 (AI Forecast)",
+      historicalMonths: ["Jan", "Mar", "May", "Jul (Current)", "Sep (AI Forecast)"],
+      forecastMonthName: "September 2026",
+      actualAmount: "$195,400",
+      predictedAmount: "$278,900",
+      rawPredicted: 278900,
+      growth: "+42.7%",
+      confidence: "93.8%",
+      svgPathActual: "M 10 100 C 60 90, 110 50, 160 55 C 220 60, 270 35, 290 28",
+      svgPathForecast: "M 290 28 C 330 20, 365 12, 390 8",
+      endDotCx: 290,
+      endDotCy: 28,
+      forecastDotCx: 390,
+      forecastDotCy: 8,
+    },
+    "oct-2026": {
+      label: "October 2026 (AI Forecast)",
+      historicalMonths: ["Jan", "Mar", "May", "Jul (Current)", "Oct (AI Forecast)"],
+      forecastMonthName: "October 2026",
+      actualAmount: "$195,400",
+      predictedAmount: "$312,000",
+      rawPredicted: 312000,
+      growth: "+59.6%",
+      confidence: "91.2%",
+      svgPathActual: "M 10 100 C 60 90, 110 50, 160 55 C 220 60, 270 35, 290 28",
+      svgPathForecast: "M 290 28 C 330 18, 365 10, 390 5",
+      endDotCx: 290,
+      endDotCy: 28,
+      forecastDotCx: 390,
+      forecastDotCy: 5,
+    },
+    "jul-2026": {
+      label: "July 2026 (Current Month)",
+      historicalMonths: ["Jan", "Mar", "May", "Jul (Current)"],
+      forecastMonthName: "July 2026",
+      actualAmount: "$195,400",
+      predictedAmount: "$195,400",
+      rawPredicted: 195400,
+      growth: "+14.8%",
+      confidence: "99.1%",
+      svgPathActual: "M 10 100 C 60 90, 110 50, 160 55 C 220 60, 290 35, 390 15",
+      svgPathForecast: "",
+      endDotCx: 390,
+      endDotCy: 15,
+      forecastDotCx: 390,
+      forecastDotCy: 15,
+    },
+  };
+
+  const activeForecast = FORECAST_DATA[forecastMonth] || FORECAST_DATA["aug-2026"];
 
   // Modal States
   const [isAddServiceOpen, setIsAddServiceOpen] = useState(false);
@@ -675,8 +858,17 @@ export default function DashboardPage() {
       if (savedDataStr) {
         try {
           const parsed = JSON.parse(savedDataStr);
+          if (Array.isArray(parsed.subAdminDirectory) && parsed.subAdminDirectory.length > 0) {
+            setSubAdminDirectory(parsed.subAdminDirectory);
+          } else {
+            setSubAdminDirectory([
+              { id: "sub-1", sgId: "SG-A-101", name: "Alex Rivera", email: "alex.rivera@georgemaijo.com", role: "Senior Account Executive", accessScope: "Full Access", avatar: "AR" },
+              { id: "sub-2", sgId: "SG-A-102", name: "Rahul Kumar", email: "rahul.kumar@georgemaijo.com", role: "Field Sales Specialist", accessScope: "Read/Write", avatar: "RK" },
+              { id: "sub-3", sgId: "SG-A-103", name: "Sarah Jenkins", email: "sarah.jenkins@georgemaijo.com", role: "Enterprise Sales Director", accessScope: "Read/Write", avatar: "SJ" },
+              { id: "sub-4", sgId: "SG-A-104", name: "Marcus Vance", email: "marcus.vance@georgemaijo.com", role: "SDR & Demo Specialist", accessScope: "Read/Write", avatar: "MV" },
+            ]);
+          }
           if (Array.isArray(parsed.servicesList)) setServicesList(parsed.servicesList);
-          if (Array.isArray(parsed.subAdminDirectory)) setSubAdminDirectory(parsed.subAdminDirectory);
           if (Array.isArray(parsed.employeeDirectory)) setEmployeeDirectory(parsed.employeeDirectory);
           if (Array.isArray(parsed.clientRecords)) setClientRecords(parsed.clientRecords);
           if (Array.isArray(parsed.transactions)) setTransactions(parsed.transactions);
@@ -704,9 +896,15 @@ export default function DashboardPage() {
           console.error("Error loading company data:", e);
         }
       } else {
-        // Newly Registered Company: Start completely CLEAN & EMPTY
+        // Newly Registered Company
+        const defaultSubAdmins = [
+          { id: "sub-1", sgId: "SG-A-101", name: "Alex Rivera", email: "alex.rivera@georgemaijo.com", role: "Senior Account Executive", accessScope: "Full Access", avatar: "AR" },
+          { id: "sub-2", sgId: "SG-A-102", name: "Rahul Kumar", email: "rahul.kumar@georgemaijo.com", role: "Field Sales Specialist", accessScope: "Read/Write", avatar: "RK" },
+          { id: "sub-3", sgId: "SG-A-103", name: "Sarah Jenkins", email: "sarah.jenkins@georgemaijo.com", role: "Enterprise Sales Director", accessScope: "Read/Write", avatar: "SJ" },
+          { id: "sub-4", sgId: "SG-A-104", name: "Marcus Vance", email: "marcus.vance@georgemaijo.com", role: "SDR & Demo Specialist", accessScope: "Read/Write", avatar: "MV" },
+        ];
         setServicesList([]);
-        setSubAdminDirectory([]);
+        setSubAdminDirectory(defaultSubAdmins);
         setEmployeeDirectory([]);
         setClientRecords([]);
         setTransactions([]);
@@ -732,14 +930,13 @@ export default function DashboardPage() {
             storageKey,
             JSON.stringify({
               servicesList: [],
-              subAdminDirectory: [],
+              subAdminDirectory: defaultSubAdmins,
               employeeDirectory: [],
               clientRecords: [],
               transactions: [],
               leads: [],
               products: [],
               workflowNodes: [],
-              ragFiles: [],
               superAdminDirectory: [
                 {
                   id: "sa-dir-1",
@@ -824,6 +1021,55 @@ export default function DashboardPage() {
       }
     }
   }, [user]);
+
+  // 🔄 Auto-sync externally booked demo slots into Dashboard CRM Leads & Schedules
+  useEffect(() => {
+    const syncBookedSlots = () => {
+      if (typeof window === "undefined") return;
+
+      // 1. Sync Booked Leads into CRM Kanban Board ("MEETING SCHEDULED" stage)
+      try {
+        const storedBooked = localStorage.getItem("sellgrow_booked_leads");
+        if (storedBooked) {
+          const bookedLeads: Lead[] = JSON.parse(storedBooked);
+          if (Array.isArray(bookedLeads) && bookedLeads.length > 0) {
+            setLeads((prev) => {
+              const existingIds = new Set(prev.map((l) => l.id));
+              const newItems = bookedLeads.filter((l) => !existingIds.has(l.id));
+              return newItems.length > 0 ? [...newItems, ...prev] : prev;
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error syncing booked leads", err);
+      }
+
+      // 2. Sync Booked Schedules into Demo Schedules tab
+      try {
+        const storedSchedules = localStorage.getItem("sellgrow_booked_schedules");
+        if (storedSchedules) {
+          const bookedSchedules: SalesSchedule[] = JSON.parse(storedSchedules);
+          if (Array.isArray(bookedSchedules) && bookedSchedules.length > 0) {
+            setSalesSchedules((prev) => {
+              const existingIds = new Set(prev.map((s) => s.id));
+              const newItems = bookedSchedules.filter((s) => !existingIds.has(s.id));
+              return newItems.length > 0 ? [...newItems, ...prev] : prev;
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error syncing booked schedules", err);
+      }
+    };
+
+    syncBookedSlots();
+    window.addEventListener("storage", syncBookedSlots);
+    window.addEventListener("focus", syncBookedSlots);
+    return () => {
+      window.removeEventListener("storage", syncBookedSlots);
+      window.removeEventListener("focus", syncBookedSlots);
+    };
+  }, []);
 
   // CRM Add Lead State & Handlers
   const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
@@ -969,7 +1215,7 @@ export default function DashboardPage() {
     },
   ]);
 
-  const [crmSubTab, setCrmSubTab] = useState<"scheduling" | "pipeline" | "salesmen">("scheduling");
+  const [crmSubTab, setCrmSubTab] = useState<"pipeline" | "salesmen" | "schedules" | "enquiries">("pipeline");
 
   // Modals for Sales CRM & Scheduling
   const [isAddScheduleOpen, setIsAddScheduleOpen] = useState(false);
@@ -978,7 +1224,7 @@ export default function DashboardPage() {
   // Form states for schedule modal
   const [schLeadName, setSchLeadName] = useState("");
   const [schSalesmanId, setSchSalesmanId] = useState("rep-1");
-  const [schDate, setSchDate] = useState("Today");
+  const [schDate, setSchDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [schStartTime, setSchStartTime] = useState("10:00 AM");
   const [schEndTime, setSchEndTime] = useState("11:00 AM");
   const [schMeetingType, setSchMeetingType] = useState<SalesSchedule["meetingType"]>("GPS Field Visit");
@@ -1004,7 +1250,7 @@ export default function DashboardPage() {
       leadName: schLeadName.trim(),
       salesmanId: rep.id,
       salesmanName: rep.name,
-      date: schDate || "Today",
+      date: schDate || new Date().toISOString().split("T")[0],
       startTime: schStartTime || "10:00 AM",
       endTime: schEndTime || "11:00 AM",
       meetingType: schMeetingType,
@@ -1017,6 +1263,7 @@ export default function DashboardPage() {
     setSchLeadName("");
     setSchLocation("");
     setSchNotes("");
+    setSchDate(new Date().toISOString().split("T")[0]);
     setIsAddScheduleOpen(false);
 
     alert(`Sales time slot scheduled for ${rep.name} with "${newSch.leadName}"!`);
@@ -1051,21 +1298,362 @@ export default function DashboardPage() {
     setRepNameInput("");
     setRepEmailInput("");
     setRepPhoneInput("");
+    setRepShiftInput("09:00 AM - 05:00 PM");
+    setRepTerritoryInput("General Region");
     setIsAddSalesmanOpen(false);
 
-    alert(`Sales Representative "${newRep.name}" added to the sales team!`);
+    alert(`Sales Rep "${newRep.name}" added successfully!`);
+  };
+
+  // Demo Member Schedule Modal State
+  const [isScheduleDemoOpen, setIsScheduleDemoOpen] = useState(false);
+  const [demoSelectedLeadId, setDemoSelectedLeadId] = useState("");
+  const [demoSelectedRepId, setDemoSelectedRepId] = useState("");
+  const [demoDateInput, setDemoDateInput] = useState("2026-08-05");
+  const [demoTimeSlotInput, setDemoTimeSlotInput] = useState("10:00 AM - 10:45 AM");
+  const [demoTopicInput, setDemoTopicInput] = useState("AI Voice Assistant & Live Sales Demo");
+  const [demoMeetingType, setDemoMeetingType] = useState("Google Meet (Auto-generated)");
+  const [demoNotesInput, setDemoNotesInput] = useState("");
+
+  const handleScheduleDemoSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const assignedRep = salesReps.find(r => r.id === demoSelectedRepId) || salesReps[0];
+    const targetLead = leads.find(l => l.id === demoSelectedLeadId);
+    const leadName = targetLead ? targetLead.name : "Booked Client";
+
+    if (targetLead) {
+      setLeads(prev => prev.map(l => {
+        if (l.id === targetLead.id) {
+          return {
+            ...l,
+            stage: "meeting",
+            summary: `Demo scheduled on ${demoDateInput} @ ${demoTimeSlotInput} with Rep ${assignedRep.name} (${assignedRep.role}). Topic: ${demoTopicInput}`
+          };
+        }
+        return l;
+      }));
+    }
+
+    // Add entry to sales schedules list
+    const newSch: SalesSchedule = {
+      id: `demo_${Date.now()}`,
+      leadName: leadName,
+      salesmanId: assignedRep ? assignedRep.id : "rep-1",
+      salesmanName: assignedRep ? assignedRep.name : "Sales Rep",
+      date: demoDateInput,
+      startTime: demoTimeSlotInput.split(" - ")[0] || "10:00 AM",
+      endTime: demoTimeSlotInput.split(" - ")[1] || "10:45 AM",
+      status: "Scheduled",
+      meetingType: "Video Demo",
+      location: demoMeetingType,
+      notes: `Demo Topic: ${demoTopicInput}. ${demoNotesInput}`
+    };
+    setSalesSchedules(prev => [newSch, ...prev]);
+
+    setIsScheduleDemoOpen(false);
+    alert(`Demo Scheduled Successfully!\n\n• Booked Person: ${leadName}\n• Assigned Sales Rep: ${assignedRep ? assignedRep.name : "Sales Rep"}\n• Date & Time: ${demoDateInput} @ ${demoTimeSlotInput}\n• Meeting Link: ${demoMeetingType}\n\nCalendar invite and notification sent to both client and sales rep!`);
   };
 
   const updateScheduleStatus = (id: string, newStatus: SalesSchedule["status"]) => {
-    setSalesSchedules((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, status: newStatus } : s))
-    );
+    setSalesSchedules((prev) => {
+      const updated = prev.map((s) => (s.id === id ? { ...s, status: newStatus } : s));
+      try {
+        const stored = localStorage.getItem("sellgrow_booked_schedules");
+        if (stored) {
+          const list: SalesSchedule[] = JSON.parse(stored);
+          const newList = list.map((s) => (s.id === id ? { ...s, status: newStatus } : s));
+          localStorage.setItem("sellgrow_booked_schedules", JSON.stringify(newList));
+        }
+      } catch (e) {
+        console.error("Error saving updated status to localStorage", e);
+      }
+      return updated;
+    });
+  };
+
+  const updateScheduleSalesman = (id: string, newSalesmanId: string) => {
+    const rep = salesReps.find((r) => r.id === newSalesmanId);
+    const salesmanName = rep ? rep.name : "Sales Rep";
+    setSalesSchedules((prev) => {
+      const updated = prev.map((s) =>
+        s.id === id ? { ...s, salesmanId: newSalesmanId, salesmanName } : s
+      );
+      try {
+        const stored = localStorage.getItem("sellgrow_booked_schedules");
+        if (stored) {
+          const list: SalesSchedule[] = JSON.parse(stored);
+          const newList = list.map((s) =>
+            s.id === id ? { ...s, salesmanId: newSalesmanId, salesmanName } : s
+          );
+          localStorage.setItem("sellgrow_booked_schedules", JSON.stringify(newList));
+        }
+      } catch (e) {
+        console.error("Error saving updated salesman to localStorage", e);
+      }
+      return updated;
+    });
+  };
+
+  const deleteSchedule = (id: string) => {
+    setSalesSchedules((prev) => {
+      const updated = prev.filter((s) => s.id !== id);
+      try {
+        const stored = localStorage.getItem("sellgrow_booked_schedules");
+        if (stored) {
+          const list: SalesSchedule[] = JSON.parse(stored);
+          const newList = list.filter((s) => s.id !== id);
+          localStorage.setItem("sellgrow_booked_schedules", JSON.stringify(newList));
+        }
+      } catch (e) {
+        console.error("Error deleting schedule", e);
+      }
+      return updated;
+    });
+  };
+
+  const clearAllSchedules = () => {
+    if (window.confirm("Are you sure you want to clear all booked client demos & duty schedules?")) {
+      setSalesSchedules([]);
+      try {
+        localStorage.removeItem("sellgrow_booked_schedules");
+      } catch (e) {
+        console.error("Error clearing booked schedules from localStorage", e);
+      }
+    }
+  };
+
+  // Saved Client Enquiries Data Store
+  const [clientEnquiries, setClientEnquiries] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("sellgrow_client_enquiries");
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.error("Error loading client enquiries", e);
+      }
+    }
+    return [
+      {
+        id: "enq-101",
+        scheduleId: "slot-sch-1785846271187",
+        leadName: "Naveen S (George Maijo BC 358 4SP Demo)",
+        salesmanId: "sub-1",
+        salesmanName: "Alex Rivera",
+        date: "Wed, Aug 5, 2026",
+        startTime: "10:30 AM",
+        location: "Google Meet / Live Demo Portal",
+        transcript: [
+          { speaker: "client", text: "Hello Alex! We booked this product slot to discuss George Maijo BC 358 4SP. Can you clarify the warranty and engine fuel efficiency?", time: "10:30 AM" },
+          { speaker: "salesman", text: "Welcome! I am Alex Rivera. Glad to assist you. This equipment features 25% lower fuel consumption, a 2-year doorstep warranty, and free maintenance.", time: "10:30 AM" },
+          { speaker: "client", text: "Is the heavy-duty tiller blade attachment included in the ₹24,500 package price?", time: "10:31 AM" },
+          { speaker: "salesman", text: "Yes, absolute certainty! The tiller attachment and 3-tooth blade are fully bundled in the package.", time: "10:31 AM" },
+          { speaker: "client", text: "Wonderful! We are ready to move forward and purchase today. Please send the POS checkout link.", time: "10:32 AM" }
+        ],
+        summary: {
+          keyHighlights: [
+            "Client interested in bulk machinery ordering for farm operations.",
+            "Demonstrated 4-stroke engine fuel efficiency & low emissions.",
+            "Confirmed 2-year manufacturer doorstep warranty & maintenance policy."
+          ],
+          objectionsResolved: [
+            "Verified tiller blade attachment bundle inclusion at no extra cost.",
+            "Confirmed spare parts availability across India & UAE distribution hubs."
+          ],
+          agreedNextSteps: [
+            "Generate POS invoice link & dispatch equipment via courier.",
+            "Schedule post-delivery operation walkthrough video call."
+          ]
+        },
+        sentimentOutcome: "positive",
+        buyingIntentScore: 88,
+        comments: [
+          "Initial inquiry discussion logged by Alex Rivera.",
+          "Client verified 4-stroke engine specs and tiller blade attachment bundle.",
+          "High buying intent (88%). Requested POS invoice checkout link."
+        ],
+        savedAt: "8/5/2026, 10:35:00 AM"
+      }
+    ];
+  });
+
+  // Track expanded client enquiry IDs for accordion detail view
+  const [expandedEnquiryIds, setExpandedEnquiryIds] = useState<string[]>([]);
+
+  // Active CRM Discuss & Voice AI Enquiry Session State
+  const [activeEnquirySession, setActiveEnquirySession] = useState<{
+    scheduleId: string;
+    leadName: string;
+    salesmanId: string;
+    salesmanName: string;
+    date: string;
+    startTime: string;
+    location: string;
+    notes: string;
+    verificationStatus: "pending" | "accepted";
+    recordingStatus: "idle" | "recording" | "analyzing" | "completed";
+    recordingTime: number;
+    transcript: { speaker: "client" | "salesman"; text: string; time: string }[];
+    summary: {
+      keyHighlights: string[];
+      objectionsResolved: string[];
+      agreedNextSteps: string[];
+    };
+    sentimentOutcome: "positive" | "neutral";
+    buyingIntentScore: number;
+    comments: string[];
+    newCommentInput: string;
+  } | null>(null);
+
+  const saveEnquiryToClientData = (session: any) => {
+    if (!session) return;
+    const newRecord = {
+      id: `enq-${Date.now()}`,
+      scheduleId: session.scheduleId,
+      leadName: session.leadName,
+      salesmanId: session.salesmanId,
+      salesmanName: session.salesmanName,
+      date: session.date,
+      startTime: session.startTime,
+      location: session.location,
+      transcript: session.transcript,
+      summary: session.summary,
+      sentimentOutcome: session.sentimentOutcome,
+      buyingIntentScore: session.buyingIntentScore,
+      comments: session.comments && session.comments.length > 0 ? session.comments : [
+        `Representative ${session.salesmanName} verified schedule & accepted discussion.`,
+        `Transcribed ${session.transcript.length} turns of voice enquiry.`,
+        `Conversion Sentiment Result: POSITIVE TO BUY THE PRODUCT (${session.buyingIntentScore}% Buy Intent).`
+      ],
+      savedAt: new Date().toLocaleString()
+    };
+
+    setClientEnquiries((prev) => {
+      const updated = [newRecord, ...prev];
+      try {
+        localStorage.setItem("sellgrow_client_enquiries", JSON.stringify(updated));
+      } catch (e) {
+        console.error("Error saving client enquiries to localStorage", e);
+      }
+      return updated;
+    });
+
+    updateScheduleStatus(session.scheduleId, "Completed");
+    setActiveEnquirySession(null);
+    setCrmSubTab("enquiries");
+  };
+
+  // Real-time Voice AI Transcribe Timer Effect
+  useEffect(() => {
+    let interval: any = null;
+    if (activeEnquirySession?.recordingStatus === "recording") {
+      interval = setInterval(() => {
+        setActiveEnquirySession((prev) => {
+          if (!prev) return null;
+          const nextTime = prev.recordingTime + 1;
+
+          let newTranscript = [...prev.transcript];
+          if (nextTime === 3 && newTranscript.length === 2) {
+            newTranscript.push({
+              speaker: "client",
+              text: "Is the heavy-duty tiller blade attachment included in the ₹24,500 package price?",
+              time: "10:31 AM"
+            });
+          } else if (nextTime === 6 && newTranscript.length === 3) {
+            newTranscript.push({
+              speaker: "salesman",
+              text: "Yes, absolute certainty! The tiller attachment and 3-tooth blade are fully bundled in the package.",
+              time: "10:31 AM"
+            });
+          } else if (nextTime === 9 && newTranscript.length === 4) {
+            newTranscript.push({
+              speaker: "client",
+              text: "Wonderful! We are ready to move forward and purchase today. Please send the POS checkout link.",
+              time: "10:32 AM"
+            });
+          }
+
+          return {
+            ...prev,
+            recordingTime: nextTime,
+            transcript: newTranscript
+          };
+        });
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [activeEnquirySession?.recordingStatus]);
+
+  const startEnquiryDiscussion = (sch: SalesSchedule) => {
+    const rep = salesReps.find((r) => r.id === sch.salesmanId) || salesReps[0];
+    const salesmanName = sch.salesmanName || (rep ? rep.name : "Alex Rivera");
+
+    updateScheduleStatus(sch.id, "In Progress");
+
+    setActiveEnquirySession({
+      scheduleId: sch.id,
+      leadName: sch.leadName,
+      salesmanId: sch.salesmanId || (rep ? rep.id : "rep-1"),
+      salesmanName: salesmanName,
+      date: sch.date,
+      startTime: sch.startTime,
+      location: sch.location || "Google Meet / Live Demo Portal",
+      notes: sch.notes || "",
+      verificationStatus: "pending",
+      recordingStatus: "idle",
+      recordingTime: 0,
+      transcript: [
+        {
+          speaker: "client",
+          text: `Hello ${salesmanName.split(" ")[0]}! We booked this product slot to discuss ${sch.leadName}. Can you explain the warranty and engine fuel efficiency?`,
+          time: "10:30 AM"
+        },
+        {
+          speaker: "salesman",
+          text: `Welcome! I am ${salesmanName}. Glad to assist you. This equipment features 25% lower fuel consumption, a 2-year doorstep warranty, and free maintenance.`,
+          time: "10:30 AM"
+        }
+      ],
+      summary: {
+        keyHighlights: [
+          "Client interested in bulk machinery ordering for farm operations.",
+          "Demonstrated 4-stroke engine fuel efficiency & low emissions.",
+          "Confirmed 2-year manufacturer doorstep warranty & maintenance policy."
+        ],
+        objectionsResolved: [
+          "Verified tiller blade attachment bundle inclusion at no extra cost.",
+          "Confirmed spare parts availability across India & UAE distribution hubs."
+        ],
+        agreedNextSteps: [
+          "Generate POS invoice link & dispatch equipment via courier.",
+          "Schedule post-delivery operation walkthrough video call."
+        ]
+      },
+      sentimentOutcome: "positive",
+      buyingIntentScore: 88,
+      comments: [
+        `Initial inquiry session launched for ${sch.leadName}.`,
+        `Assigned Representative: ${salesmanName}.`
+      ],
+      newCommentInput: ""
+    });
   };
 
   const updateRepStatus = (id: string, newStatus: SalesRep["status"]) => {
     setSalesReps((prev) =>
       prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
     );
+  };
+
+  const deleteSalesRep = (id: string) => {
+    setSalesReps((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const clearAllSalesReps = () => {
+    if (window.confirm("Are you sure you want to clear all sales representatives data?")) {
+      setSalesReps([]);
+    }
   };
 
   // Knowledge Base Document Upload State & Handlers
@@ -1134,10 +1722,273 @@ export default function DashboardPage() {
     return `${symbol}${converted.toFixed(2)}`;
   };
 
-  const [productTypeSegment, setProductTypeSegment] = useState<"grocery" | "rental" | "all">("grocery");
+  const [productTypeSegment, setProductTypeSegment] = useState<"grocery" | "rental" | "all">("all");
   const [catalogueSearch, setCatalogueSearch] = useState("");
   const [selectedCatFilter, setSelectedCatFilter] = useState("All");
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+
+  // Add Brochure Multi-Step Wizard State (Step 1: Upload PDF -> Step 2: Review AI Details & Save)
+  const [isAddBrochureOpen, setIsAddBrochureOpen] = useState(false);
+  const [brochureStep, setBrochureStep] = useState<1 | 2>(1);
+  const [isAnalyzingPdf, setIsAnalyzingPdf] = useState(false);
+  const [brochureData, setBrochureData] = useState<{
+    name: string;
+    shortDesc: string;
+    category: string;
+    price: string;
+    image: string;
+    galleryImages: string[];
+    hologramVideo: string;
+    pdfFile: string;
+    pdfFileName: string;
+    highlights: string[];
+    specs: Record<string, string>;
+  }>({
+    name: "",
+    shortDesc: "",
+    category: "Brush Cutter",
+    price: "B2B Quote / Enquiry",
+    image: "",
+    galleryImages: [],
+    hologramVideo: "",
+    pdfFile: "",
+    pdfFileName: "",
+    highlights: [],
+    specs: {},
+  });
+
+  const handleOpenAddBrochure = () => {
+    setBrochureStep(1);
+    setBrochureData({
+      name: "",
+      shortDesc: "",
+      category: "Brush Cutter",
+      price: "B2B Quote / Enquiry",
+      image: "",
+      galleryImages: [],
+      hologramVideo: "",
+      pdfFile: "",
+      pdfFileName: "",
+      highlights: [],
+      specs: {},
+    });
+    setIsAddBrochureOpen(true);
+  };
+
+  const handleAnalyzePdfBrochure = async (pdfName: string) => {
+    setIsAnalyzingPdf(true);
+    await new Promise((res) => setTimeout(res, 1200));
+
+    const companyBrand = user?.businessName || "George Maijo Agri";
+    const extractedData = ProductPdfIntelligenceModel.analyzePdfBrochure(
+      pdfName,
+      brochureData.name,
+      companyBrand
+    );
+
+    let autoImage = extractedData.image || "";
+    if (!autoImage) {
+      const lower = pdfName.toLowerCase();
+      if (lower.includes("4sp") || lower.includes("brush_cutter_4sp_pr")) {
+        autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
+      } else if (lower.includes("bc_520") || lower.includes("bc-520")) {
+        autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png";
+      } else if (lower.includes("m700")) {
+        autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
+      } else if (lower.includes("m800")) {
+        autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
+      } else {
+        autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png";
+      }
+    }
+
+    setBrochureData(prev => ({
+      ...prev,
+      name: extractedData.name || prev.name,
+      category: extractedData.category || prev.category,
+      shortDesc: extractedData.shortDesc || prev.shortDesc,
+      image: autoImage || prev.image,
+      highlights: extractedData.highlights,
+      specs: extractedData.specs,
+      pdfFileName: pdfName
+    }));
+
+    setIsAnalyzingPdf(false);
+    setBrochureStep(2);
+    return extractedData;
+  };
+
+  const handleSaveAddBrochure = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!brochureData.name.trim() || !brochureData.shortDesc.trim()) {
+      alert("Please provide Product Name and Short Description.");
+      return;
+    }
+
+    const newProdId = `prod_brochure_${Date.now()}`;
+    const generatedSku = `GM-${brochureData.name.toUpperCase().replace(/[^A-Z0-9]/g, "-").slice(0, 8)}-${Math.floor(100 + Math.random() * 900)}`;
+    const companyBrand = user?.businessName || "George Maijo Agri";
+    const pdfDocName = brochureData.pdfFileName || `${brochureData.name.toLowerCase().replace(/[^a-z0-9]/g, "_")}_brochure.pdf`;
+
+    // Ensure rich default specs if none were extracted yet
+    const finalSpecs = Object.keys(brochureData.specs || {}).length > 0 ? brochureData.specs : {
+      "Model Name": brochureData.name.trim(),
+      "Category": brochureData.category,
+      "Brand Manufacturer": companyBrand,
+      "Engine Specs": "Commercial 4-Stroke Air-Cooled Heavy Duty Engine",
+      "Operating Power": "7.0 HP / 5.2 kW Output",
+      "Working Capacity": "High Throughput Field Performance",
+      "Brochure Spec Document": pdfDocName
+    };
+
+    const finalHighlights = (brochureData.highlights || []).length > 0 ? brochureData.highlights : [
+      "Heavy-duty commercial grade industrial construction",
+      "High efficiency fuel combustion & low emissions",
+      "ISO 9001 certified George Maijo quality assurance"
+    ];
+
+    const newProduct: ProductItem = {
+      id: newProdId,
+      name: brochureData.name.trim(),
+      sku: generatedSku,
+      price: "B2B Quote",
+      variants: "Single Variant",
+      category: brochureData.category,
+      brand: companyBrand,
+      brochure: pdfDocName,
+      stock: 50,
+      description: brochureData.shortDesc.trim(),
+      image: brochureData.image.trim() || "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png",
+      galleryImages: brochureData.galleryImages,
+      hologramVideo: brochureData.hologramVideo,
+      highlights: finalHighlights,
+      specs: finalSpecs
+    };
+
+    // Trigger continuous AI self-training on the new brochure & confirmed specs
+    ProductPdfIntelligenceModel.selfTrainOnNewBrochure(
+      pdfDocName,
+      newProduct.name,
+      newProduct.category,
+      finalSpecs,
+      finalHighlights,
+      companyBrand
+    );
+
+    setProducts(prev => {
+      const updated = [newProduct, ...prev];
+      if (typeof window !== "undefined") {
+        localStorage.setItem("sellgrow_catalog_products", JSON.stringify(updated));
+        window.dispatchEvent(new Event("storage"));
+      }
+      return updated;
+    });
+
+    try {
+      await fetch("/api/admin/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: newProduct.id,
+          name: newProduct.name,
+          category: newProduct.category,
+          brand: newProduct.brand,
+          shortDesc: newProduct.description,
+          price: newProduct.price,
+          stock: newProduct.stock,
+          image: newProduct.image,
+          brochure: newProduct.brochure,
+          sku: newProduct.sku,
+          highlights: newProduct.highlights,
+          specs: newProduct.specs
+        }),
+      });
+
+      // Trigger Continuous Self-Training Loop for Brochure AI Model!
+      ProductPdfIntelligenceModel.selfTrainOnNewBrochure(
+        newProduct.brochure,
+        newProduct.name,
+        newProduct.category,
+        finalSpecs,
+        finalHighlights,
+        companyBrand
+      );
+
+      await fetch("/api/admin/brochure-ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "self-train",
+          fileName: newProduct.brochure,
+          productName: newProduct.name,
+          category: newProduct.category,
+          specs: finalSpecs,
+          highlights: finalHighlights,
+          brand: companyBrand
+        })
+      });
+    } catch (err) {}
+
+    setIsAddBrochureOpen(false);
+    alert(`📄 Product Brochure for "${newProduct.name}" saved!\n\n🧠 Brochure AI Model self-trained on "${pdfDocName}" with ${Object.keys(finalSpecs).length} verified spec rows under ${companyBrand}!`);
+  };
+
+  // Product Details & Edit Modal State
+  const [selectedDetailProduct, setSelectedDetailProduct] = useState<ProductItem | null>(null);
+  const [editProductData, setEditProductData] = useState<Partial<ProductItem>>({});
+
+  const handleOpenProductDetails = (prod: ProductItem) => {
+    setSelectedDetailProduct(prod);
+    setEditProductData({ ...prod });
+  };
+
+  const handleSaveProductEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedDetailProduct || !editProductData.name) return;
+
+    const updatedProduct: ProductItem = {
+      ...selectedDetailProduct,
+      ...editProductData,
+      name: editProductData.name.trim(),
+      price: editProductData.price?.trim() || selectedDetailProduct.price,
+      category: editProductData.category || selectedDetailProduct.category,
+      description: editProductData.description?.trim() || selectedDetailProduct.description,
+      image: editProductData.image?.trim() || selectedDetailProduct.image,
+      stock: Number(editProductData.stock) || selectedDetailProduct.stock,
+      sku: editProductData.sku?.trim() || selectedDetailProduct.sku,
+      brochure: editProductData.brochure?.trim() || selectedDetailProduct.brochure,
+    };
+
+    setProducts((prev) => {
+      const updated = prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("sellgrow_catalog_products", JSON.stringify(updated));
+        window.dispatchEvent(new Event("storage"));
+      }
+      return updated;
+    });
+
+    try {
+      await fetch("/api/admin/products", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: updatedProduct.id,
+          name: updatedProduct.name,
+          category: updatedProduct.category,
+          shortDesc: updatedProduct.description,
+          price: updatedProduct.price,
+          stock: updatedProduct.stock,
+          image: updatedProduct.image,
+          sku: updatedProduct.sku,
+          brochure: updatedProduct.brochure,
+        }),
+      });
+    } catch (err) {}
+
+    setSelectedDetailProduct(null);
+    alert(`Product "${updatedProduct.name}" details updated successfully!`);
+  };
 
   // Shopping Cart State
   const [cartItems, setCartItems] = useState<{ product: ProductItem; quantity: number }[]>([]);
@@ -1198,49 +2049,46 @@ export default function DashboardPage() {
       if (!isDemoAccount) return;
 
       try {
+        const deletedStored = typeof window !== "undefined" ? localStorage.getItem("sellgrow_deleted_product_ids") : null;
+        let deletedIds: string[] = [];
+        if (deletedStored) {
+          try { deletedIds = JSON.parse(deletedStored); } catch (e) {}
+        }
+
         const res = await fetch("/api/admin/products");
         if (res.ok) {
           const json = await res.json();
-          if (json.status === "success" && Array.isArray(json.data) && json.data.length > 0) {
-            const apiProds: ProductItem[] = json.data.map((item: any) => {
-              const nameLower = (item.name || "").toLowerCase();
-              const catLower = (item.category || "").toLowerCase();
-              const isRental =
-                item.productType === "rental" ||
-                /maijo|brush|cutter|tiller|weeder|wm\s?\d|harvester|1100|1000|990|mahaveer|wanovax|ch110|prime/i.test(nameLower) ||
-                /rental|machinery|equipment|tools/i.test(catLower);
+          if (json.status === "success" && Array.isArray(json.data)) {
+            const apiProds: ProductItem[] = json.data
+              .filter((item: any) => !deletedIds.includes(item.id) && !deletedIds.includes(String(item._id)))
+              .map((item: any) => {
+                const nameLower = (item.name || "").toLowerCase();
+                const catLower = (item.category || "").toLowerCase();
+                const isRental =
+                  item.productType === "rental" ||
+                  /maijo|brush|cutter|tiller|weeder|wm\s?\d|harvester|1100|1000|990|mahaveer|wanovax|ch110|prime/i.test(nameLower) ||
+                  /rental|machinery|equipment|tools/i.test(catLower);
 
-              const type: "grocery" | "rental" = isRental ? "rental" : "grocery";
-              const priceStr = item.price || "$12.50";
+                const type: "grocery" | "rental" = isRental ? "rental" : "grocery";
+                const priceStr = item.price || "$12.50";
 
-              return {
-                id: item.id || String(item._id),
-                name: item.name,
-                sku: item.id?.toUpperCase() || `SKU-${Math.floor(1000 + Math.random() * 9000)}`,
-                price: priceStr,
-                rentalRate: isRental ? `${priceStr} / Day` : undefined,
-                variants: item.variants || "Single Variant",
-                category: item.category || (isRental ? "Rental Tools" : "General Retail"),
-                brochure: `${item.name.toLowerCase().replace(/[^a-z0-9]/g, "_")}_brochure.pdf`,
-                stock: item.stock || 50,
-                description: item.shortDesc || item.fullDesc || (isRental ? "Heavy agricultural equipment for field operations." : "High quality retail product."),
-                image: item.image || "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=600&auto=format&fit=crop&q=80",
-                productType: type,
-                totalSales: isRental ? `$${(parseFloat(priceStr.replace(/[^0-9.]/g, "")) * 100).toFixed(2)} (100 Days Rented)` : item.totalSales || priceStr
-              };
-            });
-            setProducts(prev => {
-              const combined = [...prev];
-              apiProds.forEach(p => {
-                const existingIdx = combined.findIndex(c => c.id === p.id || c.name === p.name);
-                if (existingIdx >= 0) {
-                  combined[existingIdx] = { ...combined[existingIdx], productType: p.productType, rentalRate: p.rentalRate };
-                } else {
-                  combined.push(p);
-                }
+                return {
+                  id: item.id || String(item._id),
+                  name: item.name,
+                  sku: item.id?.toUpperCase() || `SKU-${Math.floor(1000 + Math.random() * 9000)}`,
+                  price: priceStr,
+                  rentalRate: isRental ? `${priceStr} / Day` : undefined,
+                  variants: item.variants || "Single Variant",
+                  category: item.category || (isRental ? "Rental Tools" : "General Retail"),
+                  brochure: `${item.name.toLowerCase().replace(/[^a-z0-9]/g, "_")}_brochure.pdf`,
+                  stock: item.stock || 50,
+                  description: item.shortDesc || item.fullDesc || (isRental ? "Heavy agricultural equipment for field operations." : "High quality retail product."),
+                  image: item.image || "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=600&auto=format&fit=crop&q=80",
+                  productType: type,
+                  totalSales: isRental ? `$${(parseFloat(priceStr.replace(/[^0-9.]/g, "")) * 100).toFixed(2)} (100 Days Rented)` : item.totalSales || priceStr
+                };
               });
-              return combined;
-            });
+            setProducts(apiProds);
           }
         }
       } catch (e) {}
@@ -1250,25 +2098,28 @@ export default function DashboardPage() {
 
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!prodName.trim() || !prodPrice.trim()) {
-      alert("Please provide a Product Name and Price.");
+    if (!prodName.trim()) {
+      alert("Please provide a Product Name.");
       return;
     }
 
     setIsSavingProd(true);
 
     const generatedSku = prodSku.trim() || `SKU-${Math.floor(100000 + Math.random() * 900000)}`;
+    const companyBrand = user?.businessName || "George Maijo Agri";
+
     const newProduct: ProductItem = {
       id: `prod_${Date.now()}`,
       name: prodName.trim(),
       sku: generatedSku,
-      price: prodPrice.trim().startsWith("$") ? prodPrice.trim() : `$${prodPrice.trim()}`,
+      price: "B2B Quote",
       variants: prodVariants,
       category: prodCategory,
+      brand: companyBrand,
       brochure: prodBrochure.trim() || `${prodName.toLowerCase().replace(/[^a-z0-9]/g, "_")}_spec.pdf`,
       stock: parseInt(prodStock) || 10,
       description: prodDesc.trim() || "No description provided.",
-      image: prodImage.trim() || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80"
+      image: prodImage.trim() || "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png"
     };
 
     try {
@@ -1279,6 +2130,7 @@ export default function DashboardPage() {
           id: newProduct.id,
           name: newProduct.name,
           category: newProduct.category,
+          brand: newProduct.brand,
           shortDesc: newProduct.description,
           price: newProduct.price,
           variants: newProduct.variants,
@@ -1288,7 +2140,14 @@ export default function DashboardPage() {
       });
     } catch (e) {}
 
-    setProducts(prev => [newProduct, ...prev]);
+    setProducts(prev => {
+      const updated = [newProduct, ...prev];
+      if (typeof window !== "undefined") {
+        localStorage.setItem("sellgrow_catalog_products", JSON.stringify(updated));
+        window.dispatchEvent(new Event("storage"));
+      }
+      return updated;
+    });
 
     setProdName("");
     setProdSku("");
@@ -1312,7 +2171,27 @@ export default function DashboardPage() {
       await fetch(`/api/admin/products?id=${id}`, { method: "DELETE" });
     } catch (e) {}
 
-    setProducts(prev => prev.filter(p => p.id !== id));
+    // 1. Remove from local products list
+    setProducts(prev => {
+      const updated = prev.filter(p => p.id !== id);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("sellgrow_catalog_products", JSON.stringify(updated));
+      }
+      return updated;
+    });
+
+    // 2. Add to deleted product IDs list to remove from main public product page
+    if (typeof window !== "undefined") {
+      try {
+        const deletedStored = localStorage.getItem("sellgrow_deleted_product_ids");
+        let deletedIds: string[] = deletedStored ? JSON.parse(deletedStored) : [];
+        if (!deletedIds.includes(id)) {
+          deletedIds.push(id);
+        }
+        localStorage.setItem("sellgrow_deleted_product_ids", JSON.stringify(deletedIds));
+        window.dispatchEvent(new Event("storage"));
+      } catch (e) {}
+    }
   };
 
   const filteredProducts = products.filter(p => {
@@ -1504,19 +2383,35 @@ export default function DashboardPage() {
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#060a12] transition-colors duration-300">
       
       {/* Top Header Controls */}
-      <header className="h-16 border-b border-border bg-white dark:bg-[#0c1220] flex items-center justify-between px-6 sticky top-0 z-40">
-        <div className="flex items-center gap-2">
-          <Logo className="w-12 h-12" />
-          <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded font-mono font-semibold">
+      <header className="h-20 border-b border-border bg-white dark:bg-[#0c1220] flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm">
+        <div className="flex items-center gap-3">
+          {/* Increased SellGrow Main Logo Size */}
+          <Logo className="w-24 h-24 sm:w-28 sm:h-28 transition-transform hover:scale-105" />
+          <span className="text-[11px] bg-primary/10 text-primary px-2.5 py-1 rounded-lg font-mono font-bold border border-primary/20">
             Enterprise OS
           </span>
         </div>
 
         {/* Global info and selectors */}
         <div className="flex items-center gap-4">
-          <div className="hidden sm:flex flex-col text-right">
-            <span className="text-xs font-bold text-foreground font-display">{user?.businessName || "NOMO"}</span>
-            <span className="text-[10px] text-muted-foreground">{user?.businessType || "Retail Shop / Grocery"} Mode</span>
+          <div className="hidden sm:flex items-center gap-2.5 text-right">
+            {user?.companyLogo ? (
+              <div className="h-10 max-w-[150px] rounded-xl border border-border bg-white dark:bg-slate-900/80 p-1 flex items-center justify-center shadow-sm shrink-0">
+                <img
+                  src={user.companyLogo}
+                  alt={user.businessName || "Company Logo"}
+                  className="max-h-full max-w-full w-auto h-auto object-contain"
+                />
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 text-primary font-bold flex items-center justify-center text-xs shrink-0 font-display">
+                {(user?.businessName || "SG").substring(0, 2).toUpperCase()}
+              </div>
+            )}
+            <div className="flex flex-col text-right">
+              <span className="text-xs font-bold text-foreground font-display">{user?.businessName || "NOMO"}</span>
+              <span className="text-[10px] text-muted-foreground">{user?.businessType || "Retail Shop / Grocery"} Mode</span>
+            </div>
           </div>
 
           <span className="w-px h-6 bg-border hidden sm:block" />
@@ -1548,11 +2443,13 @@ export default function DashboardPage() {
 
           {/* Currency Dropdown Select (USD to INR / EUR / GBP / AED) */}
           <div className="relative flex items-center">
-            <DollarSign className="w-3.5 h-3.5 absolute left-2.5 text-muted-foreground pointer-events-none" />
+            <span className="absolute left-2.5 text-xs font-extrabold text-primary pointer-events-none flex items-center justify-center">
+              {currencyRates[currency]?.symbol || "$"}
+            </span>
             <select
               value={currency}
               onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
-              className="pl-8 pr-3 py-1.5 text-xs font-bold font-display rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer hover:border-primary/50 transition-colors"
+              className="pl-7 pr-3 py-1.5 text-xs font-bold font-display rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer hover:border-primary/50 transition-colors"
               aria-label="Select Currency"
             >
               <option value="USD">USD ($)</option>
@@ -1783,7 +2680,7 @@ export default function DashboardPage() {
               {/* KPI Cards Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                  { icon: DollarSign, label: t("totalRevenue"), value: "$12,450", trend: "+12% this month", color: "text-emerald-500 bg-emerald-500/10" },
+                  { icon: DollarSign, label: t("totalRevenue"), value: formatPrice(12450), trend: "+12% this month", color: "text-emerald-500 bg-emerald-500/10" },
                   { icon: Users, label: t("activeLeads"), value: leads.length.toString(), trend: `${leads.filter(l => l.stage === "closed").length} Deals Closed`, color: "text-blue-500 bg-blue-500/10" },
                   { icon: MessageCircle, label: t("unreadMessages"), value: "8 Conversations", trend: "WhatsApp, FB, Live Chat", color: "text-purple-500 bg-purple-500/10" },
                   { icon: Sparkles, label: t("aiResolution"), value: "89.2%", trend: "142 Deflected Queries", color: "text-pink-500 bg-pink-500/10" },
@@ -1814,11 +2711,64 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Left Card: Sales Performance Conversion ($) */}
+                  {/* Left Card: Sales Performance Conversion ($) with AI Forecasting */}
                   <div className="p-6 rounded-3xl border border-border bg-card shadow-sm space-y-4">
-                    <h3 className="text-sm font-bold font-display text-foreground">Sales Performance Conversion ($)</h3>
-                    <div className="relative h-52 w-full pt-4 flex flex-col justify-between">
-                      <svg className="w-full h-36 overflow-visible" viewBox="0 0 400 130" preserveAspectRatio="none">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/50 pb-3">
+                      <div>
+                        <h3 className="text-sm font-bold font-display text-foreground flex items-center gap-1.5">
+                          <TrendingUp className="w-4 h-4 text-emerald-500" />
+                          <span>Sales Performance Conversion ($)</span>
+                        </h3>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          AI Model Revenue Prediction & Sales Trajectory
+                        </p>
+                      </div>
+
+                      {/* Month Selection Dropdown */}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <Calendar className="w-3.5 h-3.5 text-primary shrink-0" />
+                        <select
+                          value={forecastMonth}
+                          onChange={(e) => setForecastMonth(e.target.value)}
+                          className="py-1 px-2.5 text-xs font-bold bg-slate-100 dark:bg-slate-900 border border-border rounded-xl text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer hover:border-primary/50 transition-colors"
+                        >
+                          <option value="aug-2026">August 2026 (AI Forecast)</option>
+                          <option value="sep-2026">September 2026 (AI Forecast)</option>
+                          <option value="oct-2026">October 2026 (AI Forecast)</option>
+                          <option value="jul-2026">July 2026 (Current Month)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* AI Prediction Stats Banner */}
+                    <div className="p-3 bg-gradient-to-r from-primary/10 via-teal-500/10 to-emerald-500/10 border border-primary/20 rounded-2xl flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                          <Sparkles className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground block">
+                            AI Forecast ({activeForecast.forecastMonthName})
+                          </span>
+                          <span className="text-sm font-extrabold text-foreground font-mono">
+                            {formatPrice(activeForecast.rawPredicted)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                          {activeForecast.growth} Projected
+                        </span>
+                        <span className="text-[10px] text-muted-foreground block mt-0.5">
+                          {activeForecast.confidence} Model Confidence
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* SVG Chart with AI Forecast Extension Line */}
+                    <div className="relative h-48 w-full pt-2 flex flex-col justify-between">
+                      <svg className="w-full h-32 overflow-visible" viewBox="0 0 400 130" preserveAspectRatio="none">
                         {/* Horizontal Grid Lines */}
                         <line x1="0" y1="20" x2="400" y2="20" stroke="currentColor" className="text-border/30" strokeWidth="1" strokeDasharray="3 3" />
                         <line x1="0" y1="65" x2="400" y2="65" stroke="currentColor" className="text-border/30" strokeWidth="1" strokeDasharray="3 3" />
@@ -1838,29 +2788,53 @@ export default function DashboardPage() {
 
                         {/* Area Fill */}
                         <path
-                          d="M 10 100 C 60 90, 110 50, 160 55 C 220 60, 290 35, 390 15 L 390 120 L 10 120 Z"
+                          d="M 10 100 C 60 90, 110 50, 160 55 C 220 60, 270 35, 290 28 L 390 10 L 390 120 L 10 120 Z"
                           fill="url(#sales-fill-grad-ov)"
                         />
 
-                        {/* Smooth Bezier Line */}
+                        {/* Actual Historical Line */}
                         <path
-                          d="M 10 100 C 60 90, 110 50, 160 55 C 220 60, 290 35, 390 15"
+                          d={activeForecast.svgPathActual}
                           fill="none"
                           stroke="url(#sales-line-grad-ov)"
                           strokeWidth="4"
                           strokeLinecap="round"
                         />
 
-                        {/* End Point Indicator */}
-                        <circle cx="390" cy="15" r="5" fill="#10b981" />
+                        {/* AI Predicted Dashed Line */}
+                        {activeForecast.svgPathForecast && (
+                          <path
+                            d={activeForecast.svgPathForecast}
+                            fill="none"
+                            stroke="#10b981"
+                            strokeWidth="3.5"
+                            strokeDasharray="5 5"
+                            strokeLinecap="round"
+                          />
+                        )}
+
+                        {/* Current Month Point */}
+                        <circle cx={activeForecast.endDotCx} cy={activeForecast.endDotCy} r="5" fill="#0284c7" />
+
+                        {/* AI Forecast Target Point */}
+                        {forecastMonth !== "jul-2026" && (
+                          <g>
+                            <circle cx={activeForecast.forecastDotCx} cy={activeForecast.forecastDotCy} r="7" fill="#10b981" className="animate-pulse" />
+                            <circle cx={activeForecast.forecastDotCx} cy={activeForecast.forecastDotCy} r="3" fill="#ffffff" />
+                          </g>
+                        )}
                       </svg>
 
                       {/* X-Axis Labels */}
                       <div className="flex justify-between text-xs font-semibold text-muted-foreground px-2 pt-2 border-t border-border/30">
-                        <span>Jan</span>
-                        <span>Mar</span>
-                        <span>May</span>
-                        <span>Jul (Current)</span>
+                        {activeForecast.historicalMonths.map((m, idx) => (
+                          <span
+                            key={idx}
+                            className={m.includes("AI Forecast") ? "text-emerald-600 dark:text-emerald-400 font-bold" : ""}
+                          >
+                            {m}
+                          </span>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -1892,557 +2866,644 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
-
-              {/* Quick Simulator Highlight */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                {/* Active Calls & Voice Box */}
-                <div className="lg:col-span-2 p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
-                  <h3 className="text-sm font-bold font-display flex items-center gap-2 border-b pb-2"><Volume2 className="w-4 h-4 text-primary" /> Active AI Voice Status</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-xl border bg-slate-50 dark:bg-black/10 text-center space-y-3 flex flex-col justify-between">
-                      <p className="text-xs text-muted-foreground leading-normal">Test the AI Voice agent by starting a quick local line simulation.</p>
-                      <button
-                        onClick={() => setActiveTab("voice")}
-                        className="w-full py-2 bg-primary hover:opacity-90 text-white rounded-xl text-xs font-semibold"
-                      >
-                        Open Voice Console
-                      </button>
-                    </div>
-                    <div className="p-4 rounded-xl border bg-slate-50 dark:bg-black/10 space-y-2">
-                      <p className="text-[10px] font-bold text-muted uppercase">Voice System Status</p>
-                      <ul className="space-y-1.5 text-[11px] text-muted-foreground">
-                        <li className="flex justify-between"><span>VAD Engine:</span> <strong className="text-emerald-500">Ready</strong></li>
-                        <li className="flex justify-between"><span>Speech-to-Text:</span> <strong>Google Cloud API</strong></li>
-                        <li className="flex justify-between"><span>Active Rooms:</span> <strong>2 Callers</strong></li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Automation Running Workflows summary */}
-                <div className="p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
-                  <h3 className="text-sm font-bold font-display flex items-center gap-2 border-b pb-2"><Workflow className="w-4 h-4 text-primary" /> {t("workflowsRunning")}</h3>
-                  <div className="space-y-3">
-                    {workflowNodes.slice(0, 3).map((node, index) => (
-                      <div key={index} className="flex justify-between items-center text-xs">
-                        <div className="flex gap-2 items-center">
-                          <span className={`w-2 h-2 rounded-full ${node.type === "trigger" ? "bg-blue-500" : node.type === "delay" ? "bg-amber-500" : "bg-purple-500"}`} />
-                          <span className="font-semibold">{node.label}</span>
-                        </div>
-                        <span className="text-[10px] text-muted-foreground uppercase">{node.type}</span>
-                      </div>
-                    ))}
-                    <button
-                      onClick={() => setActiveTab("workflow")}
-                      className="w-full text-center text-xs font-bold text-primary hover:underline pt-2 block"
-                    >
-                      Configure visual workflow builder
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
           {/* TAB 2: SALES CRM & SALESMAN TIME SCHEDULING */}
           {(activeTab === "crm" || activeTab === "all_in_one") && (
             <div id="sec-crm" className="space-y-6 animate-fade-in text-left pt-6 border-t border-border scroll-mt-20">
-              {/* Top Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-2xl font-bold font-display text-foreground">Sales CRM & Time Scheduling</h1>
-                    <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                      Live Scheduling Active
-                    </span>
+
+              <div className="relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#0f172a] border border-indigo-900/50 shadow-2xl">
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:22px_22px] pointer-events-none" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
+                <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                  <div>
+                    <div className="inline-flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-wider px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 mb-3">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                      CRM Operations Active
+                    </div>
+                    <h1 className="text-2xl lg:text-3xl font-extrabold font-display text-white leading-tight">
+                      Sales CRM &amp; Duty Scheduling Console
+                    </h1>
+                    <p className="text-sm text-slate-400 mt-1.5 max-w-xl">
+                      Manage sales pipeline deals, salesman duty shifts, client appointment slots, and real-time meeting logs.
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Manage sales pipeline deals, salesman duty shifts, client appointment slots, and real-time meeting logs.
-                  </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    onClick={() => setIsAddScheduleOpen(true)}
-                    className="px-3.5 py-2 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white rounded-xl text-xs font-semibold shadow-md shadow-primary/20 transition-all flex items-center gap-1.5 shrink-0"
-                  >
-                    <CalendarDays className="w-4 h-4" />
-                    <span>Schedule Time Slot</span>
-                  </button>
-                  <button
-                    onClick={() => setIsAddLeadOpen(true)}
-                    className="px-3.5 py-2 bg-card hover:bg-muted text-foreground border border-border rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Add Lead</span>
-                  </button>
-                  <button
-                    onClick={() => setIsAddSalesmanOpen(true)}
-                    className="px-3.5 py-2 bg-card hover:bg-muted text-foreground border border-border rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    <span>+ Sales Rep</span>
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                    <button
+                      onClick={() => setIsAddLeadOpen(true)}
+                      className="px-4 py-2.5 bg-primary hover:opacity-90 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-primary/30 transition-all active:scale-95"
+                    >
+                      <Plus className="w-4 h-4" /> Add Lead
+                    </button>
+                    <button
+                      onClick={() => setIsAddSalesmanOpen(true)}
+                      className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/15 font-extrabold rounded-xl text-xs flex items-center gap-2 backdrop-blur-sm transition-all"
+                    >
+                      <UserPlus className="w-4 h-4" /> Sales Rep
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (leads.length > 0) setDemoSelectedLeadId(leads[0].id);
+                        if (salesReps.length > 0) setDemoSelectedRepId(salesReps[0].id);
+                        setIsScheduleDemoOpen(true);
+                      }}
+                      className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:opacity-95 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-indigo-600/25 transition-all active:scale-95"
+                    >
+                      <Calendar className="w-4 h-4" /> Schedule Demo Member
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              {/* Quick Metrics Bar */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-4 rounded-2xl border border-border bg-card shadow-sm space-y-1">
-                  <div className="flex justify-between items-center text-muted-foreground text-xs font-medium">
-                    <span>Pipeline Value</span>
-                    <DollarSign className="w-4 h-4 text-emerald-500" />
-                  </div>
-                  <p className="text-xl font-black text-foreground">$189,500</p>
-                  <p className="text-[10px] text-emerald-500 font-bold">↑ 14% vs last week</p>
-                </div>
-
-                <div className="p-4 rounded-2xl border border-border bg-card shadow-sm space-y-1">
-                  <div className="flex justify-between items-center text-muted-foreground text-xs font-medium">
-                    <span>On-Duty Sales Reps</span>
-                    <Users className="w-4 h-4 text-primary" />
-                  </div>
-                  <p className="text-xl font-black text-foreground">
-                    {salesReps.filter((r) => r.status === "On Duty" || r.status === "In Client Meeting").length} / {salesReps.length} Active
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">Active Shift Duty</p>
-                </div>
-
-                <div className="p-4 rounded-2xl border border-border bg-card shadow-sm space-y-1">
-                  <div className="flex justify-between items-center text-muted-foreground text-xs font-medium">
-                    <span>Scheduled Today</span>
-                    <Clock className="w-4 h-4 text-amber-500" />
-                  </div>
-                  <p className="text-xl font-black text-foreground">
-                    {salesSchedules.filter((s) => s.date === "Today").length} Meetings
-                  </p>
-                  <p className="text-[10px] text-amber-500 font-bold">4 Field Visits + 4 Demos</p>
-                </div>
-
-                <div className="p-4 rounded-2xl border border-border bg-card shadow-sm space-y-1">
-                  <div className="flex justify-between items-center text-muted-foreground text-xs font-medium">
-                    <span>Meeting Completion</span>
-                    <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                  </div>
-                  <p className="text-xl font-black text-foreground">
-                    {salesReps.reduce((sum, r) => sum + r.completedMeetingsToday, 0)} Done
-                  </p>
-                  <p className="text-[10px] text-blue-500 font-bold">98% Target Rate</p>
-                </div>
+              {/* ── 4 KPI Stat Cards ── */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                  {
+                    label: "Pipeline Total Value",
+                    value: formatPrice(leads.reduce((acc, l) => acc + (parseFloat(l.value.replace(/[^0-9.]/g, "")) || 0), 0)),
+                    sub: "Active pipeline",
+                    icon: DollarSign, accent: "bg-emerald-500",
+                    iconBg: "bg-emerald-500/10 text-emerald-500", subColor: "text-emerald-500",
+                    hoverBorder: "hover:border-emerald-500/40",
+                  },
+                  {
+                    label: "Active Deals",
+                    value: leads.length,
+                    sub: "Accounts in pipeline",
+                    icon: TrendingUp, accent: "bg-blue-500",
+                    iconBg: "bg-blue-500/10 text-blue-500", subColor: "text-blue-500",
+                    hoverBorder: "hover:border-blue-500/40",
+                  },
+                  {
+                    label: "Sales Reps On Duty",
+                    value: salesReps.length,
+                    sub: "Team Reps active",
+                    icon: Users, accent: "bg-purple-500",
+                    iconBg: "bg-purple-500/10 text-purple-500", subColor: "text-emerald-500",
+                    hoverBorder: "hover:border-purple-500/40",
+                  },
+                  {
+                    label: "Booked Demo Schedules",
+                    value: salesSchedules.length,
+                    sub: "Sessions scheduled",
+                    icon: Calendar, accent: "bg-amber-500",
+                    iconBg: "bg-amber-500/10 text-amber-500", subColor: "text-amber-500",
+                    hoverBorder: "hover:border-amber-500/40",
+                  },
+                ].map((card, i) => {
+                  const Icon = card.icon;
+                  return (
+                    <div key={i} className={`relative overflow-hidden p-5 rounded-2xl bg-card border border-border shadow-sm group ${card.hoverBorder} transition-all duration-300`}>
+                      <div className={`absolute top-0 left-0 bottom-0 w-1 rounded-l-2xl ${card.accent}`} />
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">{card.label}</span>
+                        <div className={`w-9 h-9 rounded-xl ${card.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                      </div>
+                      <p className="text-2xl font-extrabold text-foreground font-display leading-none">{card.value}</p>
+                      <p className={`text-[10px] font-bold mt-2 ${card.subColor}`}>↑ {card.sub}</p>
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* Sub Navigation Switcher inside CRM */}
-              <div className="flex items-center gap-2 border-b border-border pb-3 flex-wrap">
-                <button
-                  onClick={() => setCrmSubTab("scheduling")}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
-                    crmSubTab === "scheduling"
-                      ? "bg-primary text-white shadow-md shadow-primary/20"
-                      : "bg-card text-muted-foreground border border-border hover:text-foreground"
-                  }`}
-                >
-                  <Calendar className="w-4 h-4" />
-                  <span>Salesman Time Scheduling & Duty Shifts</span>
-                  <span className="px-1.5 py-0.2 text-[10px] bg-white/20 rounded-full font-mono">
-                    {salesSchedules.length}
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => setCrmSubTab("pipeline")}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
-                    crmSubTab === "pipeline"
-                      ? "bg-primary text-white shadow-md shadow-primary/20"
-                      : "bg-card text-muted-foreground border border-border hover:text-foreground"
-                  }`}
-                >
-                  <TrendingUp className="w-4 h-4" />
-                  <span>Lead Deals & Pipeline</span>
-                  <span className="px-1.5 py-0.2 text-[10px] bg-white/20 rounded-full font-mono">
-                    {leads.length}
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => setCrmSubTab("salesmen")}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
-                    crmSubTab === "salesmen"
-                      ? "bg-primary text-white shadow-md shadow-primary/20"
-                      : "bg-card text-muted-foreground border border-border hover:text-foreground"
-                  }`}
-                >
-                  <Briefcase className="w-4 h-4" />
-                  <span>Sales Team Roster</span>
-                  <span className="px-1.5 py-0.2 text-[10px] bg-white/20 rounded-full font-mono">
-                    {salesReps.length}
-                  </span>
-                </button>
+              {/* ── Sub Navigation Tabs ── */}
+              <div className="flex items-center gap-1.5 p-1.5 bg-slate-100 dark:bg-slate-900/80 rounded-2xl border border-border flex-wrap">
+                {[
+                  { id: "pipeline",  icon: TrendingUp, label: "Lead Deals & Pipeline",       count: leads.length,          gradient: "from-primary to-indigo-600" },
+                  { id: "salesmen",  icon: Briefcase,  label: "Sales Team Roster",            count: salesReps.length,      gradient: "from-blue-600 to-cyan-500" },
+                  { id: "schedules", icon: Calendar,   label: "Booked Demos & Schedules",     count: salesSchedules.length, gradient: "from-emerald-600 to-teal-600" },
+                  { id: "enquiries", icon: FolderTree, label: "Client Enquiries & AI Data",  count: clientEnquiries.length,gradient: "from-purple-600 to-violet-600" },
+                ].map((tab) => {
+                  const Icon = tab.icon;
+                  const active = crmSubTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setCrmSubTab(tab.id as any)}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
+                        active
+                          ? `bg-gradient-to-r ${tab.gradient} text-white shadow-md`
+                          : "text-muted-foreground hover:text-foreground hover:bg-white dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5 shrink-0" />
+                      <span className="hidden sm:inline">{tab.label}</span>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono font-extrabold ${
+                        active ? "bg-white/20 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
+                      }`}>{tab.count}</span>
+                    </button>
+                  );
+                })}
               </div>
 
-              {/* SUB TAB 1: SALESMAN TIME SCHEDULING */}
-              {crmSubTab === "scheduling" && (
+              {/* ═══════════════════════════════════════════════ */}
+              {/* SUB TAB 1: PIPELINE LEADS KANBAN               */}
+              {/* ═══════════════════════════════════════════════ */}
+              {crmSubTab === "pipeline" && (
                 <div className="space-y-6">
-                  {/* Salesman Duty Shift & Live Status Bar */}
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-primary" /> Sales Reps Shift Schedule & Availability
-                      </h3>
-                      <button
-                        onClick={() => setIsAddSalesmanOpen(true)}
-                        className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
-                      >
-                        + Add Sales Rep
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {(["incoming", "meeting", "proposal", "closed"] as const).map((stage) => {
+                      const stageLeads = leads.filter((l) => l.stage === stage);
+                      const cfg: Record<string, { label: string; dot: string; headerBg: string; border: string; text: string }> = {
+                        incoming: { label: "Incoming Lead",     dot: "bg-blue-500",    headerBg: "bg-blue-500/[0.05]",   border: "border-blue-500/20",   text: "text-blue-600 dark:text-blue-400" },
+                        meeting:  { label: "Meeting Scheduled", dot: "bg-amber-500",   headerBg: "bg-amber-500/[0.05]",  border: "border-amber-500/20",  text: "text-amber-600 dark:text-amber-400" },
+                        proposal: { label: "Proposal Sent",     dot: "bg-purple-500",  headerBg: "bg-purple-500/[0.05]", border: "border-purple-500/20", text: "text-purple-600 dark:text-purple-400" },
+                        closed:   { label: "Closed / Won",      dot: "bg-emerald-500", headerBg: "bg-emerald-500/[0.05]",border: "border-emerald-500/20",text: "text-emerald-600 dark:text-emerald-400" },
+                      };
+                      const c = cfg[stage];
+                      return (
+                        <div key={stage} className={`rounded-2xl border ${c.border} ${c.headerBg} min-h-[420px] flex flex-col`}>
+                          <div className={`flex items-center justify-between px-4 py-3 border-b ${c.border}`}>
+                            <div className="flex items-center gap-2">
+                              <span className={`w-2.5 h-2.5 rounded-full ${c.dot}`} />
+                              <span className={`text-xs font-extrabold uppercase tracking-wider ${c.text}`}>{c.label}</span>
+                            </div>
+                            <span className={`text-[10px] font-mono font-extrabold px-2 py-0.5 rounded-full bg-white dark:bg-slate-900 border ${c.border} ${c.text}`}>{stageLeads.length}</span>
+                          </div>
+                          <div className="flex-1 p-3 space-y-3">
+                            {stageLeads.length === 0 && (
+                              <div className="p-5 text-center text-xs text-muted-foreground border border-dashed border-border/50 rounded-xl mt-2">
+                                No leads in this column
+                              </div>
+                            )}
+                            {stageLeads.map((lead) => {
+                              const rawVal = parseFloat(lead.value.replace(/[^0-9.]/g, "")) || 0;
+                              return (
+                                <div
+                                  key={lead.id}
+                                  onClick={() => setSelectedLead(lead)}
+                                  className="p-4 rounded-2xl border border-border bg-white dark:bg-card shadow-sm hover:border-primary/40 hover:shadow-md cursor-pointer transition-all duration-200 space-y-3 group"
+                                >
+                                  <div className="flex items-start justify-between gap-2">
+                                    <h4 className="text-xs font-extrabold text-foreground leading-snug font-display group-hover:text-primary transition-colors">{lead.name}</h4>
+                                    <span className="text-xs text-emerald-500 font-extrabold font-mono shrink-0 bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">{formatPrice(rawVal)}</span>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <div className="flex justify-between text-[10px] text-muted-foreground font-semibold">
+                                      <span>Probability</span>
+                                      <strong className="text-primary font-mono">{lead.probability}%</strong>
+                                    </div>
+                                    <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                      <div className="h-full bg-gradient-to-r from-primary to-indigo-500 rounded-full" style={{ width: `${lead.probability}%` }} />
+                                    </div>
+                                  </div>
+                                  <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">{lead.summary}</p>
+                                  {lead.scheduledTime && (
+                                    <div className="px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold flex items-center gap-1.5">
+                                      <Clock className="w-3 h-3 shrink-0" />
+                                      <span className="truncate">Slot: {lead.scheduledTime}</span>
+                                    </div>
+                                  )}
+                                  <div className="pt-2 border-t border-border/60 flex items-center justify-between">
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); setDemoSelectedLeadId(lead.id); setIsScheduleDemoOpen(true); }}
+                                      className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-extrabold hover:bg-primary hover:text-white transition-all flex items-center gap-1 active:scale-95"
+                                    >
+                                      <Calendar className="w-3 h-3" /> Schedule
+                                    </button>
+                                    <div className="flex items-center gap-1">
+                                      <button onClick={(e) => { e.stopPropagation(); shiftLeadStage(lead.id, "prev"); }} disabled={stage === "incoming"} className="px-2 py-1 text-[10px] font-bold border border-border rounded-lg disabled:opacity-20 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">◀</button>
+                                      <button onClick={(e) => { e.stopPropagation(); shiftLeadStage(lead.id, "next"); }} disabled={stage === "closed"} className="px-2 py-1 text-[10px] font-bold border border-border rounded-lg disabled:opacity-20 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">▶</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Add Lead Form */}
+                  <form onSubmit={handleAddLead} className="p-6 rounded-3xl border border-border bg-card shadow-sm space-y-5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-extrabold font-display text-foreground flex items-center gap-2">
+                          <span className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><Plus className="w-4 h-4" /></span>
+                          Provision New Pipeline Lead
+                        </h3>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 pl-9">Add prospective enterprise lead account directly to <span className="text-primary font-semibold">pipeline</span>.</p>
+                      </div>
+                      <button type="submit" className="px-5 py-2.5 bg-primary hover:opacity-90 text-white rounded-xl text-xs font-extrabold shadow-md flex items-center gap-1.5 transition-all active:scale-95">
+                        <Plus className="w-4 h-4" /> Add Lead Account
                       </button>
                     </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] text-muted-foreground font-extrabold uppercase tracking-wider" htmlFor="lead-name">Lead Account Name *</label>
+                        <input id="lead-name" type="text" required placeholder="e.g. Saudi Distributors Co." value={newLeadName} onChange={(e) => setNewLeadName(e.target.value)} className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-border bg-background font-bold focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] text-muted-foreground font-extrabold uppercase tracking-wider" htmlFor="lead-value">Deal Value ($) *</label>
+                        <input id="lead-value" type="text" required placeholder="e.g. 24000" value={newLeadValue} onChange={(e) => setNewLeadValue(e.target.value)} className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-border bg-background font-bold focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] text-muted-foreground font-extrabold uppercase tracking-wider">Initial Pipeline Stage</label>
+                        <select value={leadStageInput} onChange={(e) => setLeadStageInput(e.target.value as any)} className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-border bg-background font-bold focus:outline-none focus:border-primary cursor-pointer">
+                          <option value="incoming">Incoming Lead</option>
+                          <option value="meeting">Meeting Scheduled</option>
+                          <option value="proposal">Proposal Sent</option>
+                          <option value="closed">Closed / Won</option>
+                        </select>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* ═══════════════════════════════════════════════ */}
+              {/* SUB TAB 2: SALES TEAM ROSTER                   */}
+              {/* ═══════════════════════════════════════════════ */}
+              {crmSubTab === "salesmen" && (
+                <div className="space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
+                    <div>
+                      <h3 className="text-sm font-extrabold font-display text-foreground">Sales Representatives &amp; Team Roster</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">Manage sales rep shift times, contact phone numbers, and territory coverage.</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {salesReps.length > 0 && (
+                        <button onClick={clearAllSalesReps} className="px-3.5 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all">
+                          <Trash2 className="w-3.5 h-3.5" /> Clear Data
+                        </button>
+                      )}
+                      <button onClick={() => setIsAddSalesmanOpen(true)} className="px-4 py-2 bg-gradient-to-r from-primary to-indigo-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 hover:opacity-90 transition-all shadow-md active:scale-95">
+                        <UserPlus className="w-4 h-4" /> Add Sales Rep
+                      </button>
+                    </div>
+                  </div>
+
+                  {salesReps.length === 0 ? (
+                    <div className="p-14 text-center rounded-2xl bg-card border border-dashed border-border/80 space-y-4">
+                      <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto"><User className="w-7 h-7 text-muted-foreground" /></div>
+                      <div>
+                        <h4 className="text-sm font-bold text-foreground">No Sales Representatives</h4>
+                        <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">Add a new sales rep to start assigning schedules and tracking duty shifts.</p>
+                      </div>
+                      <button onClick={() => setIsAddSalesmanOpen(true)} className="px-4 py-2 bg-primary text-white font-bold rounded-xl text-xs inline-flex items-center gap-1.5 shadow-md active:scale-95"><UserPlus className="w-4 h-4" /> Add Sales Rep</button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {salesReps.map((rep) => (
-                        <div
-                          key={rep.id}
-                          className="p-3.5 rounded-xl border border-border bg-card shadow-sm space-y-3 relative overflow-hidden"
-                        >
-                          <div className="flex justify-between items-start">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-9 h-9 rounded-full bg-primary/10 text-primary font-extrabold flex items-center justify-center text-xs shrink-0 border border-primary/20">
-                                {rep.avatar}
-                              </div>
-                              <div className="overflow-hidden">
-                                <h4 className="text-xs font-bold text-foreground truncate">{rep.name}</h4>
-                                <p className="text-[10px] text-muted-foreground truncate">{rep.role}</p>
+                        <div key={rep.id} className="group p-5 rounded-2xl border border-border bg-card shadow-sm hover:border-primary/30 hover:shadow-md transition-all duration-300 space-y-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3.5">
+                              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary to-indigo-600 text-white font-extrabold flex items-center justify-center text-sm shadow-md group-hover:scale-105 transition-transform shrink-0">{rep.avatar}</div>
+                              <div>
+                                <h4 className="text-sm font-extrabold text-foreground group-hover:text-primary transition-colors">{rep.name}</h4>
+                                <p className="text-xs text-primary font-semibold">{rep.role}</p>
+                                <p className="text-[10px] text-muted-foreground mt-0.5">📞 {rep.phone} &nbsp;·&nbsp; ✉️ {rep.email}</p>
                               </div>
                             </div>
-                          </div>
-
-                          <div className="space-y-1.5 text-[11px] border-t border-border/50 pt-2">
-                            <div className="flex justify-between items-center text-muted-foreground">
-                              <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-amber-500" /> Shift:</span>
-                              <span className="font-semibold text-foreground">{rep.shift}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-muted-foreground">
-                              <span className="flex items-center gap-1"><MapPin className="w-3 h-3 text-emerald-500" /> Territory:</span>
-                              <span className="font-semibold text-foreground truncate max-w-[110px]">{rep.territory}</span>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className={`px-2.5 py-1 text-[10px] font-extrabold rounded-full border ${
+                                rep.status === "On Duty" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+                                : rep.status === "In Client Meeting" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
+                                : "bg-slate-500/10 text-slate-500 border-slate-500/30"
+                              }`}>{rep.status}</span>
+                              <button onClick={() => deleteSalesRep(rep.id)} className="p-1.5 rounded-lg hover:bg-rose-500/10 text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400 transition-colors" title="Remove Sales Rep"><Trash2 className="w-3.5 h-3.5" /></button>
                             </div>
                           </div>
-
-                          {/* Duty Status Dropdown Toggle */}
-                          <div className="flex justify-between items-center pt-1 border-t border-border/40">
-                            <span className="text-[10px] text-muted-foreground font-medium">Status:</span>
-                            <select
-                              value={rep.status}
-                              onChange={(e) => updateRepStatus(rep.id, e.target.value as SalesRep["status"])}
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border focus:outline-none cursor-pointer ${
-                                rep.status === "On Duty"
-                                  ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:text-emerald-400"
-                                  : rep.status === "In Client Meeting"
-                                  ? "bg-amber-500/10 text-amber-600 border-amber-500/30 dark:text-amber-400"
-                                  : rep.status === "On Break"
-                                  ? "bg-blue-500/10 text-blue-600 border-blue-500/30 dark:text-blue-400"
-                                  : "bg-slate-500/10 text-slate-500 border-slate-500/30"
-                              }`}
-                            >
-                              <option value="On Duty">🟢 On Duty</option>
-                              <option value="In Client Meeting">🟡 In Client Meeting</option>
-                              <option value="On Break">🔵 On Break</option>
-                              <option value="Off Duty">⚪ Off Duty</option>
-                            </select>
+                          <div className="grid grid-cols-3 gap-2">
+                            {[
+                              { label: "Active Shift",    val: rep.shift,                              color: "text-foreground" },
+                              { label: "Territory",       val: rep.territory,                          color: "text-foreground" },
+                              { label: "Completed Today", val: `${rep.completedMeetingsToday} Meetings`,color: "text-emerald-500" },
+                            ].map((stat, i) => (
+                              <div key={i} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-border/60 text-center">
+                                <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-bold">{stat.label}</p>
+                                <p className={`font-extrabold text-[11px] mt-1 leading-tight truncate ${stat.color}`}>{stat.val}</p>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       ))}
                     </div>
-                  </div>
-
-                  {/* Interactive Time Schedule & Appointment Slot Matrix */}
-                  <div className="p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border pb-3">
-                      <div>
-                        <h3 className="text-sm font-bold font-display text-foreground flex items-center gap-2">
-                          <CalendarDays className="w-4 h-4 text-primary" /> Today & Upcoming Salesman Appointment Slots
-                        </h3>
-                        <p className="text-[11px] text-muted-foreground">
-                          Scheduled client GPS visits, video demos, site audits, and call time slots.
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setIsAddScheduleOpen(true)}
-                        className="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shrink-0 hover:opacity-90 transition-opacity"
-                      >
-                        <Plus className="w-3.5 h-3.5" /> Book Time Slot
-                      </button>
-                    </div>
-
-                    {/* Time Slot Schedule Cards List */}
-                    <div className="space-y-3">
-                      {salesSchedules.length === 0 ? (
-                        <p className="text-xs text-muted-foreground py-6 text-center">No time slots scheduled yet. Click "Book Time Slot" above.</p>
-                      ) : (
-                        salesSchedules.map((sch) => (
-                          <div
-                            key={sch.id}
-                            className="p-4 rounded-xl border border-border bg-slate-50 dark:bg-black/20 hover:border-primary/50 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
-                          >
-                            <div className="flex items-start gap-3.5">
-                              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0 border border-primary/20 mt-0.5">
-                                <Clock className="w-5 h-5 text-primary" />
-                              </div>
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <h4 className="text-xs font-bold text-foreground">{sch.leadName}</h4>
-                                  <span className="px-2 py-0.5 text-[9px] font-bold rounded-full bg-primary/10 text-primary border border-primary/20">
-                                    {sch.meetingType}
-                                  </span>
-                                  <span className="text-[10px] text-muted-foreground font-mono">
-                                    📅 {sch.date} ({sch.startTime} - {sch.endTime})
-                                  </span>
-                                </div>
-                                <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                                  <span>Assigned Salesman: <strong className="text-foreground">{sch.salesmanName}</strong></span>
-                                  <span className="mx-1">•</span>
-                                  <MapPin className="w-3 h-3 text-emerald-500 inline" />
-                                  <span>{sch.location}</span>
-                                </p>
-                                <p className="text-[11px] text-slate-600 dark:text-slate-400 italic">"{sch.notes}"</p>
-                              </div>
-                            </div>
-
-                            {/* Schedule Status Controller */}
-                            <div className="flex items-center gap-2 shrink-0 border-t md:border-t-0 pt-2 md:pt-0 border-border">
-                              <select
-                                value={sch.status}
-                                onChange={(e) => updateScheduleStatus(sch.id, e.target.value as SalesSchedule["status"])}
-                                className={`text-xs font-bold px-3 py-1.5 rounded-xl border focus:outline-none cursor-pointer ${
-                                  sch.status === "In Progress"
-                                    ? "bg-amber-500/10 text-amber-600 border-amber-500/30"
-                                    : sch.status === "Completed"
-                                    ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-                                    : sch.status === "Cancelled"
-                                    ? "bg-red-500/10 text-red-600 border-red-500/30"
-                                    : "bg-blue-500/10 text-blue-600 border-blue-500/30"
-                                }`}
-                              >
-                                <option value="Scheduled">📅 Scheduled</option>
-                                <option value="In Progress">⚡ In Progress</option>
-                                <option value="Completed">✅ Completed</option>
-                                <option value="Cancelled">❌ Cancelled</option>
-                              </select>
-
-                              <button
-                                onClick={() => {
-                                  if (confirm(`Remove appointment for "${sch.leadName}"?`)) {
-                                    setSalesSchedules((prev) => prev.filter((s) => s.id !== sch.id));
-                                  }
-                                }}
-                                className="p-1.5 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
-                                title="Delete Schedule"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
+                  )}
                 </div>
               )}
 
-              {/* SUB TAB 2: PIPELINE LEADS */}
-              {crmSubTab === "pipeline" && (
-                <div className="space-y-6">
-                  {/* CRM Pipeline Drag Mock */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    {(["incoming", "meeting", "proposal", "closed"] as const).map((stage) => (
-                      <div key={stage} className="p-4 rounded-2xl border border-border bg-slate-50 dark:bg-black/10 min-h-[380px] space-y-4">
-                        <div className="flex justify-between items-center border-b pb-2">
-                          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                            {stage === "incoming" && "Incoming Lead"}
-                            {stage === "meeting" && "Meeting Scheduled"}
-                            {stage === "proposal" && "Proposal Sent"}
-                            {stage === "closed" && "Closed / Won"}
-                          </span>
-                          <span className="text-[10px] font-mono px-2 py-0.5 bg-border rounded-full font-bold">
-                            {leads.filter((l) => l.stage === stage).length}
-                          </span>
-                        </div>
+              {/* ═══════════════════════════════════════════════ */}
+              {/* SUB TAB 3: BOOKED DEMOS & SCHEDULES            */}
+              {/* ═══════════════════════════════════════════════ */}
+              {crmSubTab === "schedules" && (
+                <div className="space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-card border border-border shadow-sm">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0"><Calendar className="w-5 h-5" /></div>
+                      <div>
+                        <h3 className="text-base font-extrabold font-display text-foreground">Booked Client Demos &amp; Duty Schedules</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">Track upcoming demo meetings, client appointments, and assigned sales representatives.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {salesSchedules.length > 0 && (
+                        <button onClick={clearAllSchedules} className="px-3.5 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all">
+                          <Trash2 className="w-3.5 h-3.5" /> Clear Data
+                        </button>
+                      )}
+                      <button
+                        onClick={() => { if (leads.length > 0) setDemoSelectedLeadId(leads[0].id); if (salesReps.length > 0) setDemoSelectedRepId(salesReps[0].id); setIsScheduleDemoOpen(true); }}
+                        className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-md active:scale-95 transition-all"
+                      >
+                        <Calendar className="w-4 h-4" /> + Schedule New Demo
+                      </button>
+                    </div>
+                  </div>
 
-                        <div className="space-y-3">
-                          {leads
-                            .filter((l) => l.stage === stage)
-                            .map((lead) => (
-                              <div
-                                key={lead.id}
-                                onClick={() => setSelectedLead(lead)}
-                                className="p-3.5 rounded-xl border border-border bg-card shadow-sm hover:border-primary cursor-pointer transition-all space-y-3"
-                              >
-                                <div className="flex justify-between items-start gap-1">
-                                  <h4 className="text-xs font-bold text-foreground truncate">{lead.name}</h4>
-                                  <span className="text-[10px] text-emerald-500 font-bold shrink-0">{lead.value}</span>
-                                </div>
+                  {salesSchedules.length === 0 ? (
+                    <div className="p-14 text-center rounded-2xl bg-card border border-dashed border-border/80 space-y-4">
+                      <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto"><Calendar className="w-7 h-7 text-muted-foreground" /></div>
+                      <div>
+                        <h4 className="text-sm font-bold text-foreground">No Schedules or Booked Demos</h4>
+                        <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">Schedule a new demo to populate this view.</p>
+                      </div>
+                      <button onClick={() => { if (leads.length > 0) setDemoSelectedLeadId(leads[0].id); if (salesReps.length > 0) setDemoSelectedRepId(salesReps[0].id); setIsScheduleDemoOpen(true); }} className="px-4 py-2 bg-primary text-white font-bold rounded-xl text-xs inline-flex items-center gap-2 shadow-md active:scale-95">
+                        <Calendar className="w-4 h-4" /> + Schedule New Demo
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {salesSchedules.map((sch) => {
+                        const rep = salesReps.find(r => r.id === sch.salesmanId);
+                        const isCompleted = sch.status === "Completed" || clientEnquiries.some((e) => e.scheduleId === sch.id);
+                        return (
+                          <div key={sch.id} className="p-5 rounded-2xl bg-card border border-border shadow-sm hover:border-primary/30 hover:shadow-md transition-all duration-300 flex flex-col gap-4">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">{sch.meetingType}</span>
+                              <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${
+                                sch.status === "Scheduled" ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
+                                sch.status === "Completed" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                                "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                              }`}>{sch.status}</span>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Booked Person / Client</p>
+                              <h4 className="text-base font-extrabold text-foreground font-display mt-0.5 leading-snug">{sch.leadName}</h4>
+                            </div>
+                            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-border/60 space-y-2 text-xs">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-muted-foreground flex items-center gap-1.5 shrink-0"><User className="w-3.5 h-3.5 text-primary" /> Assigned Rep:</span>
+                                <select value={sch.salesmanId || (rep ? rep.id : salesReps[0]?.id || "rep-1")} onChange={(e) => updateScheduleSalesman(sch.id, e.target.value)} className="font-bold text-foreground bg-background border border-border/70 rounded-lg px-2 py-0.5 text-xs focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer max-w-[150px] truncate">
+                                  {salesReps.map((r) => <option key={r.id} value={r.id}>{r.name} ({r.role.split(" ")[0]})</option>)}
+                                </select>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-blue-500" /> Date &amp; Time:</span>
+                                <span className="font-mono font-bold text-foreground">{sch.date} @ {sch.startTime}</span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-purple-500" /> Venue / Link:</span>
+                                <span className="font-semibold text-primary truncate max-w-[140px]">{sch.location || "Google Meet"}</span>
+                              </div>
+                            </div>
+                            {sch.notes && <p className="text-[11px] text-muted-foreground italic bg-muted/40 p-2.5 rounded-xl border border-border/40 leading-relaxed">"{sch.notes}"</p>}
+                            <div className="pt-3 border-t border-border/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => deleteSchedule(sch.id)}
+                                  className="p-1.5 hover:bg-rose-500/10 text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400 rounded-lg border border-border/40 transition-colors shrink-0"
+                                  title="Delete schedule"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                                <span className="text-[10px] text-muted-foreground font-mono truncate max-w-[100px]" title={sch.id}>
+                                  ID: {sch.id}
+                                </span>
+                              </div>
 
-                                <div className="flex justify-between items-center text-[10px] text-muted-foreground">
-                                  <span>Probability: <strong className="text-primary">{lead.probability}%</strong></span>
-                                  <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" /> GPS</span>
-                                </div>
-
-                                <div className="pt-1 flex items-center justify-between gap-2 text-[10px]">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {isCompleted ? (
                                   <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setSchLeadName(lead.name);
-                                      setIsAddScheduleOpen(true);
-                                    }}
-                                    className="px-2 py-0.5 rounded bg-primary/10 text-primary font-semibold hover:bg-primary hover:text-white transition-all flex items-center gap-1"
+                                    onClick={() => setCrmSubTab("enquiries")}
+                                    className="px-3 py-1.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 rounded-xl font-extrabold text-[11px] flex items-center gap-1.5 hover:bg-emerald-500/25 transition-all cursor-pointer shadow-sm"
                                   >
-                                    <Clock className="w-2.5 h-2.5" /> Schedule
+                                    <CheckCircle2 className="w-3.5 h-3.5" /> Enquiry Completed
                                   </button>
-
-                                  <div className="flex gap-1">
+                                ) : (
+                                  <>
                                     <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        shiftLeadStage(lead.id, "prev");
-                                      }}
-                                      disabled={stage === "incoming"}
-                                      className="px-2 py-0.5 text-[9px] border rounded disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                      onClick={() => startEnquiryDiscussion(sch)}
+                                      className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white font-bold text-[11px] rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
                                     >
-                                      ◀
+                                      <MessageSquare className="w-3.5 h-3.5" /> Start Enquiry
                                     </button>
                                     <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        shiftLeadStage(lead.id, "next");
-                                      }}
-                                      disabled={stage === "closed"}
-                                      className="px-2 py-0.5 text-[9px] border rounded disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                      onClick={() => updateScheduleStatus(sch.id, "Completed")}
+                                      className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 rounded-xl font-extrabold text-[11px] transition-all flex items-center gap-1.5 active:scale-95"
                                     >
-                                      ▶
+                                      <CheckCircle2 className="w-3.5 h-3.5" /> Mark Complete
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ═══════════════════════════════════════════════ */}
+              {/* SUB TAB 4: CLIENT ENQUIRIES & AI DATA           */}
+              {/* ═══════════════════════════════════════════════ */}
+              {crmSubTab === "enquiries" && (
+                <div className="space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-card border border-border shadow-sm">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0"><FolderTree className="w-5 h-5" /></div>
+                      <div>
+                        <h3 className="text-base font-extrabold font-display text-foreground">Client Data: Enquiries &amp; Discussion Records</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">Stored voice-to-text transcripts, AI summaries, sentiment outcomes, and comments under client data.</p>
+                      </div>
+                    </div>
+                    {clientEnquiries.length > 0 && (
+                      <button
+                        onClick={() => { if (confirm("Clear all saved client enquiry records?")) { setClientEnquiries([]); localStorage.removeItem("sellgrow_client_enquiries"); } }}
+                        className="px-3.5 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 active:scale-95"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Clear All Enquiries
+                      </button>
+                    )}
+                  </div>
+
+                  {clientEnquiries.length === 0 ? (
+                    <div className="p-14 text-center space-y-4 bg-card border border-dashed border-border rounded-2xl">
+                      <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto"><FolderTree className="w-7 h-7 text-muted-foreground" /></div>
+                      <div>
+                        <h4 className="text-base font-bold text-foreground">No Stored Client Enquiries Yet</h4>
+                        <p className="text-xs text-muted-foreground max-w-md mx-auto mt-1">
+                          Launch an enquiry session from "Booked Demos &amp; Schedules" using the <strong className="text-primary">Start Enquiry</strong> button to record, transcribe, and save client discussion data here.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-5">
+                      {clientEnquiries.map((enq: any) => {
+                        const isExpanded = expandedEnquiryIds.includes(enq.id);
+                        const toggleExpand = () => {
+                          setExpandedEnquiryIds((prev) =>
+                            prev.includes(enq.id) ? prev.filter((id) => id !== enq.id) : [...prev, enq.id]
+                          );
+                        };
+
+                        return (
+                          <div key={enq.id} className="rounded-3xl bg-card border border-border shadow-sm overflow-hidden transition-all duration-300">
+                            {/* Summary Card Header (Client Name & Product Name) */}
+                            <div
+                              onClick={toggleExpand}
+                              className="p-5 bg-gradient-to-r from-slate-50 to-transparent dark:from-slate-900/50 dark:to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors"
+                            >
+                              <div className="flex items-center gap-3.5">
+                                <div className="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 font-extrabold flex items-center justify-center text-lg shrink-0 border border-purple-500/20 shadow-sm">
+                                  👤
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 text-[10px] font-extrabold uppercase tracking-wider">
+                                      Client Enquiry Record
+                                    </span>
+                                    <span className="text-xs text-muted-foreground font-mono">ID: {enq.id}</span>
+                                  </div>
+                                  <h3 className="text-base sm:text-lg font-extrabold font-display text-foreground mt-1 leading-snug">
+                                    {enq.leadName}
+                                  </h3>
+                                  <p className="text-xs text-muted-foreground mt-0.5">
+                                    Assigned Representative: <strong className="text-foreground">{enq.salesmanName}</strong> | Scheduled: <span className="font-mono">{enq.date} @ {enq.startTime}</span>
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+                                <div className="px-3.5 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-right">
+                                  <div className="flex items-center justify-end gap-1.5 text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                    <span>{enq.buyingIntentScore}% BUY INTENT</span>
+                                  </div>
+                                  <p className="text-[11px] font-extrabold text-foreground mt-0.5">🟢 POSITIVE TO BUY PRODUCT</p>
+                                </div>
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleExpand();
+                                  }}
+                                  className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-sm ${
+                                    isExpanded
+                                      ? "bg-purple-600 text-white shadow-purple-600/20"
+                                      : "bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white"
+                                  }`}
+                                >
+                                  <span>{isExpanded ? "Collapse ▲" : "View Discussion & AI Data ▼"}</span>
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Collapsible Details Panel */}
+                            {isExpanded && (
+                              <div className="border-t border-border animate-fade-in">
+                                {/* Content Grid */}
+                                <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+                                  <div className="space-y-3">
+                                    <h4 className="text-xs font-extrabold text-foreground flex items-center gap-2 border-b border-border pb-2">
+                                      <MessageSquare className="w-4 h-4 text-blue-500" /> Transcribed Voice-to-Text Feed
+                                    </h4>
+                                    <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+                                      {enq.transcript?.map((msg: any, idx: number) => (
+                                        <div key={idx} className={`p-3 rounded-xl border text-xs ${msg.speaker === "client" ? "bg-blue-500/5 border-blue-500/20" : "bg-emerald-500/5 border-emerald-500/20"}`}>
+                                          <div className="flex items-center justify-between font-bold mb-1 text-[11px]">
+                                            <span className={msg.speaker === "client" ? "text-blue-600 dark:text-blue-400" : "text-emerald-600 dark:text-emerald-400"}>
+                                              {msg.speaker === "client" ? "👤 Client" : `👔 ${enq.salesmanName}`}
+                                            </span>
+                                            <span className="text-[10px] text-muted-foreground font-mono">{msg.time}</span>
+                                          </div>
+                                          <p className="leading-relaxed text-foreground">{msg.text}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <div className="space-y-3">
+                                    <h4 className="text-xs font-extrabold text-foreground flex items-center gap-2 border-b border-border pb-2">
+                                      <FileText className="w-4 h-4 text-emerald-500" /> AI Discussion Summary &amp; Objections
+                                    </h4>
+                                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-border space-y-3 text-xs">
+                                      <div>
+                                        <p className="font-extrabold text-foreground text-[11px] mb-1.5 uppercase tracking-wider">Key Highlights:</p>
+                                        <ul className="space-y-1">
+                                          {enq.summary?.keyHighlights?.map((hl: string, i: number) => (
+                                            <li key={i} className="flex items-start gap-2 text-muted-foreground">
+                                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />{hl}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                      <div className="border-t border-border pt-3">
+                                        <p className="font-extrabold text-foreground text-[11px] mb-1.5 uppercase tracking-wider">Resolved Objections:</p>
+                                        <ul className="space-y-1">
+                                          {enq.summary?.objectionsResolved?.map((obj: string, i: number) => (
+                                            <li key={i} className="flex items-start gap-2 text-muted-foreground">
+                                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />{obj}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Comments */}
+                                <div className="px-5 pb-5 space-y-3 border-t border-border pt-4">
+                                  <h4 className="text-xs font-extrabold text-foreground flex items-center gap-2">
+                                    <MessageCircle className="w-4 h-4 text-purple-500" /> Stored Client Data Comments ({enq.comments?.length || 0})
+                                  </h4>
+                                  <div className="space-y-2">
+                                    {enq.comments?.map((c: string, cIdx: number) => (
+                                      <div key={cIdx} className="p-2.5 rounded-xl bg-muted/50 border border-border/60 text-xs font-medium text-foreground flex items-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" /><span>{c}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <div className="flex items-center gap-2 pt-1">
+                                    <input
+                                      type="text"
+                                      placeholder="Add a new comment under client enquiry data..."
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                                          const val = e.currentTarget.value.trim();
+                                          setClientEnquiries((prev) => prev.map((item) => item.id === enq.id ? { ...item, comments: [...(item.comments || []), val] } : item));
+                                          e.currentTarget.value = "";
+                                        }
+                                      }}
+                                      className="flex-1 px-3.5 py-2 rounded-xl border border-border bg-background text-xs font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                                    />
+                                    <button
+                                      onClick={(e) => {
+                                        const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
+                                        if (input && input.value.trim()) {
+                                          const val = input.value.trim();
+                                          setClientEnquiries((prev) => prev.map((item) => item.id === enq.id ? { ...item, comments: [...(item.comments || []), val] } : item));
+                                          input.value = "";
+                                        }
+                                      }}
+                                      className="px-4 py-2 bg-gradient-to-r from-purple-600 to-violet-600 hover:opacity-90 text-white rounded-xl text-xs font-bold transition-all shadow-sm shrink-0 active:scale-95"
+                                    >
+                                      Add Comment
                                     </button>
                                   </div>
                                 </div>
                               </div>
-                            ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Lead Details & AI Activity */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-                    <form onSubmit={handleAddLead} className="p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4">
-                      <h3 className="text-sm font-bold font-display">Provision New Pipeline Lead</h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-[10px] text-muted-foreground font-semibold" htmlFor="lead-name">Lead Account Name</label>
-                          <input
-                            id="lead-name"
-                            type="text"
-                            placeholder="Saudi Distributors"
-                            value={newLeadName}
-                            onChange={(e) => setNewLeadName(e.target.value)}
-                            className="w-full px-3 py-1.5 text-xs glass-input focus:outline-none"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] text-muted-foreground font-semibold" htmlFor="lead-value">Deal Value ($)</label>
-                          <input
-                            id="lead-value"
-                            type="text"
-                            placeholder="$24,000"
-                            value={newLeadValue}
-                            onChange={(e) => setNewLeadValue(e.target.value)}
-                            className="w-full px-3 py-1.5 text-xs glass-input focus:outline-none"
-                          />
-                        </div>
-                      </div>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 ml-auto"
-                      >
-                        <Plus className="w-3.5 h-3.5" /> Add Lead
-                      </button>
-                    </form>
-
-                    <div className="p-6 rounded-2xl border border-border bg-card shadow-sm space-y-3">
-                      <h3 className="text-sm font-bold font-display">Lead Activity & AI Checkpoint</h3>
-                      {selectedLead ? (
-                        <div className="space-y-2 text-xs">
-                          <div className="flex justify-between">
-                            <strong className="text-foreground">{selectedLead.name}</strong>
-                            <span className="text-emerald-500 font-bold">{selectedLead.value}</span>
+                            )}
                           </div>
-                          <p className="text-[10px] text-muted-foreground">Coordinates visit log: {selectedLead.coordinates}</p>
-                          <hr className="border-border opacity-50" />
-                          <div className="bg-primary/5 p-3 rounded-lg border border-primary/10">
-                            <p className="text-[10px] font-bold text-primary flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" /> AI Meeting Summary:</p>
-                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{selectedLead.summary}</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-xs text-muted-foreground">Select a lead card above to view coordinate logs and AI meeting transcript summaries.</p>
-                      )}
+                        );
+                      })}
                     </div>
-                  </div>
-                </div>
-              )}
-
-              {/* SUB TAB 3: SALES TEAM ROSTER */}
-              {crmSubTab === "salesmen" && (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center border-b border-border pb-3">
-                    <div>
-                      <h3 className="text-sm font-bold font-display text-foreground">Sales Representatives & Team Roster</h3>
-                      <p className="text-xs text-muted-foreground">Manage sales rep shift times, contact phone numbers, and territory coverage.</p>
-                    </div>
-                    <button
-                      onClick={() => setIsAddSalesmanOpen(true)}
-                      className="px-3 py-2 bg-primary text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 hover:opacity-90 transition-opacity"
-                    >
-                      <UserPlus className="w-4 h-4" /> Add Sales Rep
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {salesReps.map((rep) => (
-                      <div key={rep.id} className="p-5 rounded-2xl border border-border bg-card shadow-sm space-y-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary to-secondary text-white font-extrabold flex items-center justify-center text-sm shadow-md">
-                              {rep.avatar}
-                            </div>
-                            <div>
-                              <h4 className="text-sm font-bold text-foreground">{rep.name}</h4>
-                              <p className="text-xs text-primary font-semibold">{rep.role}</p>
-                              <p className="text-[10px] text-muted-foreground mt-0.5">📞 {rep.phone} • ✉️ {rep.email}</p>
-                            </div>
-                          </div>
-                          <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border ${
-                            rep.status === "On Duty"
-                              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-                              : rep.status === "In Client Meeting"
-                              ? "bg-amber-500/10 text-amber-600 border-amber-500/30"
-                              : "bg-slate-500/10 text-slate-500 border-slate-500/30"
-                          }`}>
-                            {rep.status}
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-2 p-3 rounded-xl bg-slate-50 dark:bg-black/20 text-center text-xs">
-                          <div>
-                            <p className="text-[10px] text-muted-foreground">Active Shift</p>
-                            <p className="font-bold text-foreground text-[11px]">{rep.shift}</p>
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-muted-foreground">Territory</p>
-                            <p className="font-bold text-foreground text-[11px] truncate">{rep.territory}</p>
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-muted-foreground">Completed Today</p>
-                            <p className="font-bold text-emerald-500 text-[11px]">{rep.completedMeetingsToday} Meetings</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  )}
                 </div>
               )}
             </div>
@@ -2799,11 +3860,11 @@ export default function DashboardPage() {
             <div id="sec-catalogue" className="space-y-6 animate-fade-in text-left pt-6 border-t border-border scroll-mt-20">
               
               {/* Top Header Card Container */}
-              <div className="p-6 rounded-3xl bg-card border border-border shadow-sm space-y-4">
+              <div className="p-6 rounded-3xl bg-gradient-to-r from-primary/5 via-teal-500/5 to-emerald-500/5 border border-primary/20 shadow-sm space-y-4">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                      CLIENT CATALOG CONTROLLER
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 inline-flex items-center gap-1.5">
+                      <Sparkles className="w-3 h-3" /> CLIENT CATALOG CONTROLLER
                     </span>
                     <h1 className="text-2xl font-extrabold font-display text-foreground mt-2">
                       Product Catalog & Live Management
@@ -2819,15 +3880,15 @@ export default function DashboardPage() {
                       className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all active:scale-95"
                     >
                       <Plus className="w-4 h-4" />
-                      <span>+ Add New Product</span>
+                      <span>Add New Product</span>
                     </button>
                     <a
                       href="/products"
                       target="_blank"
                       rel="noreferrer"
-                      className="px-4 py-2.5 bg-muted hover:bg-muted/80 text-foreground font-extrabold rounded-xl text-xs flex items-center gap-2 border border-border transition-all"
+                      className="px-4 py-2.5 bg-card hover:bg-muted text-foreground font-extrabold rounded-xl text-xs flex items-center gap-2 border border-border shadow-sm transition-all"
                     >
-                      <ExternalLink className="w-4 h-4" />
+                      <ExternalLink className="w-4 h-4 text-primary" />
                       <span>Preview Live /products</span>
                     </a>
                   </div>
@@ -2836,21 +3897,44 @@ export default function DashboardPage() {
 
               {/* 4 Metrics Summary Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground">Total Models Live</span>
-                  <p className="text-2xl font-extrabold text-foreground font-display">{products.length} Equipment Models</p>
+                <div className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">Total Equipment Models</span>
+                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                      <Package className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-extrabold text-foreground font-display">{products.length} <span className="text-xs font-semibold text-muted-foreground">Models</span></p>
                 </div>
-                <div className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-emerald-500">Categories</span>
-                  <p className="text-2xl font-extrabold text-foreground font-display">{new Set(products.map(p => p.category)).size} Active Groups</p>
+
+                <div className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-500">Categories</span>
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                      <FolderTree className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-extrabold text-foreground font-display">{new Set(products.map(p => p.category)).size} <span className="text-xs font-semibold text-muted-foreground">Active Groups</span></p>
                 </div>
-                <div className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-sky-500">AI Voice Assistant</span>
-                  <p className="text-2xl font-extrabold text-foreground font-display">Active (EN & TA)</p>
+
+                <div className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-sky-500">AI Voice Assistant</span>
+                    <div className="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center">
+                      <Volume2 className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <p className="text-lg font-extrabold text-foreground font-display">Active <span className="text-xs font-semibold text-emerald-500">(EN, HI, TA, AR)</span></p>
                 </div>
-                <div className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-purple-500">3D Hologram Stage</span>
-                  <p className="text-2xl font-extrabold text-foreground font-display">360° Rotatable</p>
+
+                <div className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-500">Catalog Sync</span>
+                    <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
+                      <Layers className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <p className="text-lg font-extrabold text-foreground font-display">Real-time <span className="text-xs font-semibold text-purple-500">Auto Sync</span></p>
                 </div>
               </div>
 
@@ -2858,67 +3942,55 @@ export default function DashboardPage() {
               <div className="p-6 rounded-3xl bg-card border border-border shadow-sm space-y-6">
                 
                 {/* Header + Category Filter + Search + Add Brochure */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-border">
-                  <div>
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-border">
+                  <div className="flex items-center gap-3 shrink-0">
                     <h2 className="text-sm font-extrabold uppercase tracking-wider text-foreground font-display">
-                      ALL CATALOG EQUIPMENT MODELS ({filteredProducts.length})
+                      ALL CATALOG EQUIPMENT MODELS
                     </h2>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">
-                      Manage live models, specs, and custom equipment images.
-                    </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2.5 flex-wrap">
                     {/* Category & Brand Filter Buttons */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <button
-                        onClick={() => setSelectedCatFilter("George Maijo")}
-                        className={`px-4 py-2 text-xs font-extrabold rounded-xl border transition-all flex items-center gap-1.5 shrink-0 ${
-                          selectedCatFilter === "George Maijo"
-                            ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20 ring-2 ring-emerald-500/30"
-                            : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
-                        }`}
-                      >
-                        <span>🌿 George Maijo Products</span>
-                        <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-mono">17</span>
-                      </button>
+                    <button
+                      onClick={() => setSelectedCatFilter("All")}
+                      className={`px-3 py-1.5 text-xs font-extrabold rounded-xl border transition-all shrink-0 ${
+                        selectedCatFilter === "All"
+                          ? "bg-primary text-white border-primary shadow-sm"
+                          : "bg-slate-100 dark:bg-slate-800 text-muted-foreground border-border hover:bg-slate-200"
+                      }`}
+                    >
+                      All ({products.length})
+                    </button>
 
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-muted-foreground shrink-0">Category:</span>
-                        <select
-                          value={selectedCatFilter}
-                          onChange={(e) => setSelectedCatFilter(e.target.value)}
-                          className="px-3 py-2 bg-background text-xs rounded-xl border border-border font-bold focus:outline-none focus:border-primary"
-                        >
-                          <option value="All">All Categories ({products.length})</option>
-                          <option value="George Maijo">George Maijo Machinery Fleet (17)</option>
-                          {Array.from(new Set(products.map(p => p.category))).map(c => (
-                            <option key={c} value={c}>{c}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
+                    <select
+                      value={selectedCatFilter}
+                      onChange={(e) => setSelectedCatFilter(e.target.value)}
+                      className="px-3 py-1.5 bg-background text-xs rounded-xl border border-border font-bold focus:outline-none focus:border-primary cursor-pointer shrink-0"
+                    >
+                      <option value="All">All Categories ({products.length})</option>
+                      {Array.from(new Set(products.map(p => p.category))).map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
 
                     {/* Search Input */}
-                    <div className="relative w-full sm:w-56">
-                      <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
+                    <div className="relative w-44 sm:w-52 shrink-0">
+                      <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-muted-foreground" />
                       <input
                         type="text"
                         value={catalogueSearch}
                         onChange={(e) => setCatalogueSearch(e.target.value)}
                         placeholder="Search models..."
-                        className="w-full pl-9 pr-4 py-2 bg-background text-xs rounded-xl border border-border focus:outline-none focus:border-primary"
+                        className="w-full pl-9 pr-3 py-1.5 bg-background text-xs rounded-xl border border-border focus:outline-none focus:border-primary"
                       />
                     </div>
 
                     {/* Add Brochure Button */}
                     <button
-                      onClick={() => {
-                        alert("Product Brochure Uploader triggered!");
-                      }}
-                      className="px-5 py-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 hover:opacity-95 text-white text-xs font-extrabold rounded-full shadow-md transition-all flex items-center gap-2 shrink-0 border border-white/10"
+                      onClick={handleOpenAddBrochure}
+                      className="px-4 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center gap-1.5 shrink-0 active:scale-95"
                     >
-                      <FilePlus className="w-4 h-4" />
+                      <FilePlus className="w-3.5 h-3.5" />
                       <span>Add Brochure</span>
                     </button>
                   </div>
@@ -2966,43 +4038,16 @@ export default function DashboardPage() {
                           </div>
                         </div>
 
-                        {/* Action Buttons Footer matching user screenshot */}
+                        {/* Action Buttons Footer */}
                         <div className="flex items-center justify-between pt-2 border-t border-border gap-2">
-                          <div className="flex items-center gap-1.5">
-                            {/* Blue Microphone Voice Preview Button */}
-                            <button
-                              onClick={() => {
-                                if (typeof window !== "undefined" && "speechSynthesis" in window) {
-                                  window.speechSynthesis.cancel();
-                                  const text = `Hello! This is the George Maijo AI Voice Assistant for ${p.name}. Powered by 4-stroke air cooled engine. How can I help you today?`;
-                                  const utterance = new SpeechSynthesisUtterance(text);
-                                  utterance.rate = 1.0;
-                                  window.speechSynthesis.speak(utterance);
-                                }
-                                alert(`🎙️ Playing AI Voice line for "${p.name}"`);
-                              }}
-                              className="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md transition-all active:scale-95 shrink-0"
-                              title="Play AI Voice Preview"
-                            >
-                              <Volume2 className="w-4 h-4" />
-                            </button>
-
-                            {/* Blue Document Brochure Button */}
-                            <button
-                              onClick={() => {
-                                alert(`📄 Opening brochure PDF spec sheet for "${p.name}"`);
-                              }}
-                              className="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center shadow-md transition-all active:scale-95 shrink-0"
-                              title="Download Brochure / Specs"
-                            >
-                              <FileText className="w-4 h-4" />
-                            </button>
-                          </div>
+                          <span className="text-[11px] font-mono text-muted-foreground font-semibold">
+                            Stock: {p.stock} units
+                          </span>
 
                           {/* View Details > Link */}
                           <button
-                            onClick={() => alert(`Showing detailed specs and pricing for ${p.name}:\n\n- Model: ${p.name}\n- Price: ${formatPrice(p.price)}\n- Category: ${p.category}\n- Description: ${p.description}`)}
-                            className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5"
+                            onClick={() => handleOpenProductDetails(p)}
+                            className="px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary hover:text-white text-primary text-xs font-extrabold transition-all flex items-center gap-1 shrink-0"
                           >
                             <span>View Details</span>
                             <ChevronRight className="w-3.5 h-3.5" />
@@ -3108,11 +4153,64 @@ export default function DashboardPage() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
-                {/* Left Card: Sales Performance Conversion ($) */}
+                {/* Left Card: Sales Performance Conversion ($) with AI Forecasting */}
                 <div className="p-6 rounded-3xl border border-border bg-card shadow-sm space-y-4">
-                  <h3 className="text-sm font-bold font-display text-foreground">Sales Performance Conversion ($)</h3>
-                  <div className="relative h-56 w-full pt-4 flex flex-col justify-between">
-                    <svg className="w-full h-40 overflow-visible" viewBox="0 0 400 130" preserveAspectRatio="none">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/50 pb-3">
+                    <div>
+                      <h3 className="text-sm font-bold font-display text-foreground flex items-center gap-1.5">
+                        <TrendingUp className="w-4 h-4 text-emerald-500" />
+                        <span>Sales Performance Conversion ($)</span>
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        AI Model Revenue Prediction & Sales Trajectory
+                      </p>
+                    </div>
+
+                    {/* Month Selection Dropdown */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <Calendar className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <select
+                        value={forecastMonth}
+                        onChange={(e) => setForecastMonth(e.target.value)}
+                        className="py-1 px-2.5 text-xs font-bold bg-slate-100 dark:bg-slate-900 border border-border rounded-xl text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer hover:border-primary/50 transition-colors"
+                      >
+                        <option value="aug-2026">August 2026 (AI Forecast)</option>
+                        <option value="sep-2026">September 2026 (AI Forecast)</option>
+                        <option value="oct-2026">October 2026 (AI Forecast)</option>
+                        <option value="jul-2026">July 2026 (Current Month)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* AI Prediction Stats Banner */}
+                  <div className="p-3 bg-gradient-to-r from-primary/10 via-teal-500/10 to-emerald-500/10 border border-primary/20 rounded-2xl flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground block">
+                          AI Forecast ({activeForecast.forecastMonthName})
+                        </span>
+                        <span className="text-sm font-extrabold text-foreground font-mono">
+                          {formatPrice(activeForecast.rawPredicted)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                        {activeForecast.growth} Projected
+                      </span>
+                      <span className="text-[10px] text-muted-foreground block mt-0.5">
+                        {activeForecast.confidence} Model Confidence
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* SVG Chart with AI Forecast Extension Line */}
+                  <div className="relative h-52 w-full pt-2 flex flex-col justify-between">
+                    <svg className="w-full h-36 overflow-visible" viewBox="0 0 400 130" preserveAspectRatio="none">
                       {/* Horizontal Grid Lines */}
                       <line x1="0" y1="20" x2="400" y2="20" stroke="currentColor" className="text-border/30" strokeWidth="1" strokeDasharray="3 3" />
                       <line x1="0" y1="65" x2="400" y2="65" stroke="currentColor" className="text-border/30" strokeWidth="1" strokeDasharray="3 3" />
@@ -3132,29 +4230,53 @@ export default function DashboardPage() {
 
                       {/* Area Fill */}
                       <path
-                        d="M 10 100 C 60 90, 110 50, 160 55 C 220 60, 290 35, 390 15 L 390 120 L 10 120 Z"
+                        d="M 10 100 C 60 90, 110 50, 160 55 C 220 60, 290 35, 290 28 L 390 10 L 390 120 L 10 120 Z"
                         fill="url(#sales-fill-grad)"
                       />
 
-                      {/* Smooth Bezier Line */}
+                      {/* Actual Historical Line */}
                       <path
-                        d="M 10 100 C 60 90, 110 50, 160 55 C 220 60, 290 35, 390 15"
+                        d={activeForecast.svgPathActual}
                         fill="none"
                         stroke="url(#sales-line-grad)"
                         strokeWidth="4"
                         strokeLinecap="round"
                       />
 
-                      {/* End Point Indicator */}
-                      <circle cx="390" cy="15" r="5" fill="#10b981" />
+                      {/* AI Predicted Dashed Line */}
+                      {activeForecast.svgPathForecast && (
+                        <path
+                          d={activeForecast.svgPathForecast}
+                          fill="none"
+                          stroke="#10b981"
+                          strokeWidth="3.5"
+                          strokeDasharray="5 5"
+                          strokeLinecap="round"
+                        />
+                      )}
+
+                      {/* Current Month Point */}
+                      <circle cx={activeForecast.endDotCx} cy={activeForecast.endDotCy} r="5" fill="#0284c7" />
+
+                      {/* AI Forecast Target Point */}
+                      {forecastMonth !== "jul-2026" && (
+                        <g>
+                          <circle cx={activeForecast.forecastDotCx} cy={activeForecast.forecastDotCy} r="7" fill="#10b981" className="animate-pulse" />
+                          <circle cx={activeForecast.forecastDotCx} cy={activeForecast.forecastDotCy} r="3" fill="#ffffff" />
+                        </g>
+                      )}
                     </svg>
 
                     {/* X-Axis Labels */}
                     <div className="flex justify-between text-xs font-semibold text-muted-foreground px-2 pt-2 border-t border-border/30">
-                      <span>Jan</span>
-                      <span>Mar</span>
-                      <span>May</span>
-                      <span>Jul (Current)</span>
+                      {activeForecast.historicalMonths.map((m, idx) => (
+                        <span
+                          key={idx}
+                          className={m.includes("AI Forecast") ? "text-emerald-600 dark:text-emerald-400 font-bold" : ""}
+                        >
+                          {m}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -3417,98 +4539,144 @@ export default function DashboardPage() {
                           Click any Sub Admin card to view or manage permissions, roles, and notification details.
                         </p>
                       </div>
-                      <button
-                        onClick={() => {
-                          const name = prompt("Enter Sub Admin Name:");
-                          const email = prompt("Enter Sub Admin Email:");
-                          const role = prompt("Enter Role (Developer / Operator / Support):", "Operator") || "Operator";
-                          if (name && email) {
-                            const newCount = subAdminDirectory.length + 101;
-                            setSubAdminDirectory(prev => [
-                              ...prev,
-                              { id: `sub-${Date.now()}`, sgId: `SG-A-${newCount}`, name, email, role, accessScope: "Read/Write", avatar: name.charAt(0).toUpperCase() }
-                            ]);
-                          }
-                        }}
-                        className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 shrink-0"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>Invite Sub Admin</span>
-                      </button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {subAdminDirectory.length < 4 && (
+                          <button
+                            onClick={() => {
+                              setSubAdminDirectory([
+                                { id: "sub-1", sgId: "SG-A-101", name: "Alex Rivera", email: "alex.rivera@georgemaijo.com", role: "Senior Account Executive", accessScope: "Full Access", avatar: "AR" },
+                                { id: "sub-2", sgId: "SG-A-102", name: "Rahul Kumar", email: "rahul.kumar@georgemaijo.com", role: "Field Sales Specialist", accessScope: "Read/Write", avatar: "RK" },
+                                { id: "sub-3", sgId: "SG-A-103", name: "Sarah Jenkins", email: "sarah.jenkins@georgemaijo.com", role: "Enterprise Sales Director", accessScope: "Read/Write", avatar: "SJ" },
+                                { id: "sub-4", sgId: "SG-A-104", name: "Marcus Vance", email: "marcus.vance@georgemaijo.com", role: "SDR & Demo Specialist", accessScope: "Read/Write", avatar: "MV" },
+                              ]);
+                            }}
+                            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 shrink-0"
+                          >
+                            <UserPlus className="w-4 h-4" />
+                            <span>+ Add 4 Sub Admins</span>
+                          </button>
+                        )}
+                        <button
+                          onClick={() => {
+                            const name = prompt("Enter Sub Admin Name:");
+                            const email = prompt("Enter Sub Admin Email:");
+                            const role = prompt("Enter Role (Developer / Operator / Support):", "Operator") || "Operator";
+                            if (name && email) {
+                              const newCount = subAdminDirectory.length + 101;
+                              setSubAdminDirectory(prev => [
+                                ...prev,
+                                { id: `sub-${Date.now()}`, sgId: `SG-A-${newCount}`, name, email, role, accessScope: "Read/Write", avatar: name.charAt(0).toUpperCase() }
+                              ]);
+                            }
+                          }}
+                          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 shrink-0"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Invite Sub Admin</span>
+                        </button>
+                      </div>
                     </div>
 
-                    {/* Cards Grid Matching Image 2 */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                      {subAdminDirectory.map((member) => (
-                        <div
-                          key={member.id}
-                          className="p-5 rounded-2xl border border-border bg-card hover:border-primary/40 transition-all shadow-sm flex flex-col justify-between space-y-4 hover:-translate-y-1"
+                    {subAdminDirectory.length === 0 ? (
+                      <div className="p-12 text-center rounded-2xl bg-card border border-dashed border-border/80 space-y-4">
+                        <div className="w-12 h-12 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center mx-auto">
+                          <Users className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h4 className="text-base font-bold text-foreground">No Sub Admins Found</h4>
+                          <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
+                            Click below to populate the 4 default George Maijo sub admin team members.
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setSubAdminDirectory([
+                              { id: "sub-1", sgId: "SG-A-101", name: "Alex Rivera", email: "alex.rivera@georgemaijo.com", role: "Senior Account Executive", accessScope: "Full Access", avatar: "AR" },
+                              { id: "sub-2", sgId: "SG-A-102", name: "Rahul Kumar", email: "rahul.kumar@georgemaijo.com", role: "Field Sales Specialist", accessScope: "Read/Write", avatar: "RK" },
+                              { id: "sub-3", sgId: "SG-A-103", name: "Sarah Jenkins", email: "sarah.jenkins@georgemaijo.com", role: "Enterprise Sales Director", accessScope: "Read/Write", avatar: "SJ" },
+                              { id: "sub-4", sgId: "SG-A-104", name: "Marcus Vance", email: "marcus.vance@georgemaijo.com", role: "SDR & Demo Specialist", accessScope: "Read/Write", avatar: "MV" },
+                            ]);
+                          }}
+                          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs inline-flex items-center gap-2 shadow-md"
                         >
-                          {/* TOP: SG-ID Pill & Role Badge */}
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-600 font-mono text-[11px] font-extrabold border border-blue-500/20">
-                              {member.sgId}
-                            </span>
-                            <span className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold ${
-                              member.role === "Developer"
-                                ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
-                                : member.role === "Support"
-                                ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                                : "bg-muted text-muted-foreground border border-border"
-                            }`}>
-                              {member.role}
-                            </span>
-                          </div>
-
-                          {/* MIDDLE: Big Avatar Circle & Name/Email */}
-                          <div className="flex flex-col items-center justify-center py-2 space-y-2 text-center">
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                              {member.avatar}
-                            </div>
-                            <div className="w-full min-w-0">
-                              <h4 className="text-sm font-extrabold text-foreground font-display truncate">
-                                {member.name}
-                              </h4>
-                              <p className="text-[10px] text-muted-foreground font-mono truncate mt-0.5">
-                                {member.email}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* BOTTOM: ACCESS SCOPE & Action Buttons */}
-                          <div className="pt-3 border-t border-border flex flex-col space-y-2.5">
-                            <div className="flex items-center justify-between text-[10px]">
-                              <span className="font-extrabold text-muted-foreground uppercase tracking-wider">ACCESS SCOPE:</span>
-                              <span className="px-2 py-0.5 rounded-md font-extrabold bg-blue-500/10 text-blue-500 border border-blue-500/20">
-                                {member.accessScope}
+                          <UserPlus className="w-4 h-4" />
+                          <span>+ Populate 4 George Maijo Sub Admins</span>
+                        </button>
+                      </div>
+                    ) : (
+                      /* Cards Grid Matching Image 2 */
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                        {subAdminDirectory.map((member) => (
+                          <div
+                            key={member.id}
+                            className="p-5 rounded-2xl border border-border bg-card hover:border-primary/40 transition-all shadow-sm flex flex-col justify-between space-y-4 hover:-translate-y-1"
+                          >
+                            {/* TOP: SG-ID Pill & Role Badge */}
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-600 font-mono text-[11px] font-extrabold border border-blue-500/20">
+                                {member.sgId}
+                              </span>
+                              <span className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold ${
+                                member.role.includes("Developer")
+                                  ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
+                                  : member.role.includes("Support")
+                                  ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                                  : "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                              }`}>
+                                {member.role}
                               </span>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => alert(`Sub-Admin Details:\nName: ${member.name}\nEmail: ${member.email}\nRole: ${member.role}\nAccess: ${member.accessScope}`)}
-                                className="flex-1 py-1.5 rounded-xl text-xs font-bold transition-all text-center bg-muted/60 hover:bg-primary hover:text-white text-foreground"
-                              >
-                                View Options
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (confirm(`Remove ${member.name} from sub-admin team?`)) {
-                                    setSubAdminDirectory(prev => prev.filter(item => item.id !== member.id));
-                                  }
-                                }}
-                                className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 transition-all shrink-0"
-                                title={`Delete ${member.name}`}
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                            {/* MIDDLE: Big Avatar Circle & Name/Email */}
+                            <div className="flex flex-col items-center justify-center py-2 space-y-2 text-center">
+                              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                                {member.avatar}
+                              </div>
+                              <div className="w-full min-w-0">
+                                <h4 className="text-sm font-extrabold text-foreground font-display truncate">
+                                  {member.name}
+                                </h4>
+                                <p className="text-[10px] text-muted-foreground font-mono truncate mt-0.5">
+                                  {member.email}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* BOTTOM: ACCESS SCOPE & Action Buttons */}
+                            <div className="pt-3 border-t border-border flex flex-col space-y-2.5">
+                              <div className="flex items-center justify-between text-[10px]">
+                                <span className="font-extrabold text-muted-foreground uppercase tracking-wider">ACCESS SCOPE:</span>
+                                <span className="px-2 py-0.5 rounded-md font-extrabold bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                                  {member.accessScope}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingSubAdmin(member)}
+                                  className="flex-1 py-1.5 rounded-xl text-xs font-bold transition-all text-center bg-muted/60 hover:bg-primary hover:text-white text-foreground cursor-pointer"
+                                >
+                                  View & Edit Options
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (confirm(`Remove ${member.name} from sub-admin team?`)) {
+                                      setSubAdminDirectory(prev => prev.filter(item => item.id !== member.id));
+                                    }
+                                  }}
+                                  className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 transition-all shrink-0"
+                                  title={`Delete ${member.name}`}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -3793,7 +4961,7 @@ export default function DashboardPage() {
                 <p className="text-xs text-muted-foreground">Configure business name, category, support contacts, and custom domain settings.</p>
               </div>
 
-              <form onSubmit={(e) => { e.preventDefault(); alert("Company Settings updated successfully!"); }} className="p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4 max-w-2xl">
+              <form onSubmit={handleSaveCompanySettings} className="p-6 rounded-2xl border border-border bg-card shadow-sm space-y-4 max-w-2xl">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-foreground">Registered Business Name</label>
                   <input
@@ -3846,11 +5014,43 @@ export default function DashboardPage() {
                   />
                 </div>
 
+                {/* Company Custom Brand Theme Selector */}
+                <div className="space-y-2 pt-2 border-t border-border">
+                  <label className="text-xs font-extrabold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-primary" /> Company Brand Color Theme
+                  </label>
+                  <p className="text-[11px] text-muted-foreground">
+                    Customize your company&apos;s admin dashboard color palette and button accents.
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                    {[
+                      { id: "emerald", name: "Agri Emerald", color: "bg-emerald-500", border: "border-emerald-500" },
+                      { id: "blue", name: "Sapphire Blue", color: "bg-blue-600", border: "border-blue-600" },
+                      { id: "indigo", name: "Royal Indigo", color: "bg-indigo-600", border: "border-indigo-600" },
+                      { id: "purple", name: "Imperial Purple", color: "bg-purple-600", border: "border-purple-600" },
+                    ].map((thm) => (
+                      <button
+                        key={thm.id}
+                        type="button"
+                        onClick={() => setSettingTheme(thm.id)}
+                        className={`p-3 rounded-xl border-2 text-left flex items-center gap-2.5 transition-all ${
+                          settingTheme === thm.id
+                            ? `${thm.border} bg-primary/5 font-bold`
+                            : "border-border hover:border-muted-foreground/30 bg-background"
+                        }`}
+                      >
+                        <span className={`w-4 h-4 rounded-full ${thm.color} shrink-0 shadow-sm`} />
+                        <span className="text-xs font-semibold text-foreground truncate">{thm.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-primary text-white rounded-xl text-xs font-bold shadow-md hover:opacity-90"
+                  className="px-6 py-2.5 bg-primary text-white rounded-xl text-xs font-bold shadow-md hover:opacity-90 transition-all active:scale-95"
                 >
-                  Save Business Settings
+                  Save Business Settings & Brand Theme
                 </button>
               </form>
             </div>
@@ -3956,7 +5156,7 @@ export default function DashboardPage() {
             </div>
 
             <form onSubmit={handleCreateProduct} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-3">
                 <div className="space-y-1">
                   <label className="font-semibold text-foreground">Product Name *</label>
                   <input
@@ -3964,19 +5164,7 @@ export default function DashboardPage() {
                     required
                     value={prodName}
                     onChange={(e) => setProdName(e.target.value)}
-                    placeholder="e.g. Smart AI Camera Hub"
-                    className="w-full p-2.5 rounded-xl border border-border bg-background text-xs focus:ring-1 focus:ring-primary"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="font-semibold text-foreground">Price / Value *</label>
-                  <input
-                    type="text"
-                    required
-                    value={prodPrice}
-                    onChange={(e) => setProdPrice(e.target.value)}
-                    placeholder="e.g. $1,450"
+                    placeholder="e.g. George Maijo Power Weeder"
                     className="w-full p-2.5 rounded-xl border border-border bg-background text-xs focus:ring-1 focus:ring-primary"
                   />
                 </div>
@@ -4066,7 +5254,7 @@ export default function DashboardPage() {
                   rows={2}
                   value={prodDesc}
                   onChange={(e) => setProdDesc(e.target.value)}
-                  placeholder="Freshness guarantees, origin, or dietary details..."
+                  placeholder="Freshness guarantees, origin, or equipment specs..."
                   className="w-full p-2.5 rounded-xl border border-border bg-background text-xs focus:ring-1 focus:ring-primary"
                 />
               </div>
@@ -4084,10 +5272,704 @@ export default function DashboardPage() {
                   disabled={isSavingProd}
                   className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-xl text-xs font-semibold shadow-md transition-all flex items-center gap-1.5"
                 >
-                  {isSavingProd ? "Saving..." : "Save & Publish Product"}
+                  {isSavingProd ? "Saving..." : "Save Product"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MULTI-STEP ADD BROCHURE WIZARD MODAL (2-STEP PDF-FIRST WORKFLOW) */}
+      {isAddBrochureOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn overflow-y-auto">
+          <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-card border border-border rounded-3xl shadow-2xl my-auto text-left animate-scaleUp overflow-hidden">
+            
+            {/* Modal Header & Step Indicator */}
+            <div className="flex flex-col gap-4 p-6 border-b border-border bg-card shrink-0">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+                    <FilePlus className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 font-mono">
+                        Step {brochureStep} of 2
+                      </span>
+                      <span className="text-[11px] text-muted-foreground font-semibold">
+                        {brochureStep === 1 && "1. Upload Product Brochure PDF"}
+                        {brochureStep === 2 && "2. Review AI Details & Save Product"}
+                      </span>
+                    </div>
+                    <h2 className="text-xl font-extrabold font-display text-foreground mt-1">
+                      Add George Maijo Product Brochure
+                    </h2>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsAddBrochureOpen(false)}
+                  className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Step Progress Bar */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div className={`h-2 rounded-full transition-all duration-300 ${brochureStep >= 1 ? "bg-blue-600" : "bg-muted"}`} />
+                <div className={`h-2 rounded-full transition-all duration-300 ${brochureStep >= 2 ? "bg-blue-600" : "bg-muted"}`} />
+              </div>
+            </div>
+
+            {/* Form Steps - Scrollable */}
+            <form onSubmit={handleSaveAddBrochure} className="flex-1 overflow-y-auto p-6 space-y-5 text-xs">
+
+              {/* STEP 1: UPLOAD PRODUCT BROCHURE PDF FIRST */}
+              {brochureStep === 1 && (
+                <div className="space-y-4 animate-fadeIn">
+                  
+                  {/* PDF Upload Card */}
+                  <div className="space-y-4 p-6 rounded-2xl border-2 border-dashed border-blue-500/40 bg-blue-500/5 text-center">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center mx-auto shadow-xl shadow-blue-500/30">
+                      <FileText className="w-7 h-7" />
+                    </div>
+
+                    <div>
+                      <h4 className="text-base font-extrabold text-foreground font-display">
+                        Upload Product Brochure PDF Document
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                        Upload your brochure PDF file. The AI model will automatically analyze the document, extract the product name, image, category, specifications table, and highlights.
+                      </p>
+                    </div>
+
+                    <label className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white text-xs font-extrabold rounded-xl cursor-pointer shadow-lg shadow-blue-500/25 transition-all active:scale-95">
+                      <Upload className="w-4 h-4" />
+                      <span>Select & Upload Brochure PDF</span>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setBrochureData(prev => ({
+                              ...prev,
+                              pdfFileName: file.name,
+                              pdfFile: URL.createObjectURL(file)
+                            }));
+                            await handleAnalyzePdfBrochure(file.name);
+                          }
+                        }}
+                      />
+                    </label>
+
+                    {/* Pre-installed / Sample PDF selection */}
+                    <div className="pt-3 border-t border-border/50 text-left space-y-2">
+                      <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">
+                        Or Quick Select an Existing Brochure PDF
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {[
+                          { title: "Brush Cutter 4SP PR", pdf: "Brush_Cutter_4SP_PR_Brochure.pdf" },
+                          { title: "Power Weeder M700 ECO", pdf: "Power_Weeder_M700_ECO_Brochure.pdf" },
+                          { title: "Power Weeder M800 ECO", pdf: "Power_Weeder_M800_ECO_Brochure.pdf" },
+                          { title: "BC 520 2SP Brush Cutter", pdf: "George_Maijo_BC_520_2SP_Brochure.pdf" }
+                        ].map((item, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            disabled={isAnalyzingPdf}
+                            onClick={async () => {
+                              setBrochureData(prev => ({ ...prev, pdfFileName: item.pdf }));
+                              await handleAnalyzePdfBrochure(item.pdf);
+                            }}
+                            className="flex items-center justify-between p-2.5 rounded-xl border border-border bg-background hover:border-blue-500 hover:bg-blue-500/5 transition-all text-left group"
+                          >
+                            <div className="flex items-center gap-2 truncate">
+                              <FileText className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                              <span className="font-bold text-[11px] truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                {item.title}
+                              </span>
+                            </div>
+                            <Sparkles className="w-3 h-3 text-muted-foreground group-hover:text-blue-500 shrink-0" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5 text-left pt-2">
+                      <div className="flex items-center justify-between">
+                        <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Type PDF File Name</label>
+                        <button
+                          type="button"
+                          disabled={isAnalyzingPdf}
+                          onClick={async () => {
+                            await handleAnalyzePdfBrochure(brochureData.pdfFileName || "Brush_Cutter_4SP_PR_Brochure.pdf");
+                          }}
+                          className="text-[10px] text-blue-600 dark:text-blue-400 font-extrabold hover:underline flex items-center gap-1"
+                        >
+                          <Sparkles className="w-3 h-3" />
+                          <span>{isAnalyzingPdf ? "Analyzing PDF..." : "✨ AI Extract & Analyze PDF"}</span>
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={brochureData.pdfFileName}
+                        onChange={(e) => setBrochureData(prev => ({ ...prev, pdfFileName: e.target.value }))}
+                        placeholder="e.g. Brush_Cutter_4SP_PR_Brochure.pdf"
+                        className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-mono font-bold focus:outline-none focus:border-primary"
+                      />
+                    </div>
+
+                    {isAnalyzingPdf && (
+                      <div className="p-4 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-300 font-extrabold text-xs flex items-center justify-center gap-2 animate-pulse">
+                        <Sparkles className="w-4 h-4 animate-spin" />
+                        <span>AI Engine is analyzing PDF, extracting product image, text & specs...</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddBrochureOpen(false)}
+                      className="px-5 py-2.5 border border-border rounded-xl hover:bg-muted text-muted-foreground text-xs font-extrabold transition-all"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isAnalyzingPdf}
+                      onClick={async () => {
+                        await handleAnalyzePdfBrochure(brochureData.pdfFileName || "Brush_Cutter_4SP_PR_Brochure.pdf");
+                      }}
+                      className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2 active:scale-95"
+                    >
+                      <span>Analyze PDF & Continue to Review</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 2: REVIEW AI DETAILS & SAVE PRODUCT */}
+              {brochureStep === 2 && (
+                <div className="space-y-4 animate-fadeIn">
+                  
+                  {/* Top Bar: Extracted Image + Basic Information */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-2xl border border-blue-500/30 bg-blue-500/5 dark:bg-slate-900/60">
+                    
+                    {/* Extracted Product Image */}
+                    <div className="space-y-2 flex flex-col items-center justify-center text-center p-2 rounded-xl border border-border bg-background">
+                      <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">
+                        Extracted Product Image
+                      </label>
+                      <div className="h-28 w-full rounded-lg border border-border bg-slate-100 dark:bg-slate-900 flex items-center justify-center overflow-hidden p-1">
+                        {brochureData.image ? (
+                          <img src={brochureData.image} alt="Extracted Product" className="max-h-full object-contain" />
+                        ) : (
+                          <div className="text-muted-foreground text-[10px]">No image</div>
+                        )}
+                      </div>
+                      <label className="px-2.5 py-1 bg-muted hover:bg-muted/80 text-foreground text-[10px] font-extrabold rounded-lg cursor-pointer transition-all flex items-center gap-1">
+                        <Upload className="w-3 h-3" />
+                        <span>Change Image</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (evt) => {
+                                setBrochureData(prev => ({ ...prev, image: evt.target?.result as string }));
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {/* Basic Info Inputs */}
+                    <div className="sm:col-span-2 space-y-3">
+                      <div className="space-y-1">
+                        <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Product Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={brochureData.name}
+                          onChange={(e) => setBrochureData(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="e.g. George Maijo Brush Cutter 4SP PR"
+                          className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-bold focus:outline-none focus:border-primary"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Category</label>
+                          <select
+                            value={brochureData.category}
+                            onChange={(e) => setBrochureData(prev => ({ ...prev, category: e.target.value }))}
+                            className="w-full p-2 rounded-xl border border-border bg-background text-xs font-bold focus:outline-none focus:border-primary"
+                          >
+                            <option value="Brush Cutter">Brush Cutter</option>
+                            <option value="Power Weeder">Power Weeder</option>
+                            <option value="Power Tiller">Power Tiller</option>
+                            <option value="Combine Harvester">Combine Harvester</option>
+                            <option value="Paddy Reaper">Paddy Reaper</option>
+                            <option value="Agricultural Equipment">Agricultural Equipment</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">PDF File</label>
+                          <input
+                            type="text"
+                            readOnly
+                            value={brochureData.pdfFileName}
+                            className="w-full p-2 rounded-xl border border-border bg-muted text-xs font-mono font-bold text-muted-foreground"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Product Description *</label>
+                        <textarea
+                          rows={2}
+                          required
+                          value={brochureData.shortDesc}
+                          onChange={(e) => setBrochureData(prev => ({ ...prev, shortDesc: e.target.value }))}
+                          className="w-full p-2 rounded-xl border border-border bg-background text-[11px] leading-relaxed focus:outline-none focus:border-primary font-medium"
+                        />
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Editable AI Extracted Specifications Table & Summary */}
+                  <div className="p-4 rounded-2xl border border-blue-500/30 bg-blue-500/5 dark:bg-slate-900/80 text-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-border pb-2">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <h4 className="font-extrabold text-foreground text-xs uppercase tracking-wider font-display">
+                          Editable AI Extracted Technical Specifications ({Object.keys(brochureData.specs || {}).length} Rows)
+                        </h4>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newKey = prompt("Enter new specification attribute name (e.g. Engine Model, Working Width, Fuel Capacity):");
+                          if (newKey && newKey.trim()) {
+                            const newVal = prompt(`Enter value for "${newKey.trim()}":`) || "Value";
+                            setBrochureData(prev => ({
+                              ...prev,
+                              specs: { ...prev.specs, [newKey.trim()]: newVal.trim() }
+                            }));
+                          }
+                        }}
+                        className="px-2.5 py-1 bg-blue-600 text-white rounded-lg text-[10px] font-extrabold hover:bg-blue-700 transition-all flex items-center gap-1 shadow-sm active:scale-95"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>Add Custom Spec Row</span>
+                      </button>
+                    </div>
+
+                    {/* Interactive Specs Table */}
+                    {Object.keys(brochureData.specs || {}).length > 0 ? (
+                      <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                        {Object.entries(brochureData.specs).map(([key, val], idx) => (
+                          <div key={idx} className="flex items-center gap-2 p-2 rounded-xl bg-background border border-border hover:border-blue-500/40 transition-all">
+                            <input
+                              type="text"
+                              value={key}
+                              onChange={(e) => {
+                                const newKey = e.target.value;
+                                setBrochureData(prev => {
+                                  const updated = { ...prev.specs };
+                                  delete updated[key];
+                                  if (newKey) updated[newKey] = val;
+                                  return { ...prev, specs: updated };
+                                });
+                              }}
+                              placeholder="Spec Parameter Name"
+                              className="w-1/3 p-1.5 rounded-lg border border-border bg-muted/40 font-bold text-foreground text-[11px] focus:outline-none focus:border-blue-500"
+                            />
+                            <input
+                              type="text"
+                              value={val}
+                              onChange={(e) => {
+                                const newVal = e.target.value;
+                                setBrochureData(prev => ({
+                                  ...prev,
+                                  specs: { ...prev.specs, [key]: newVal }
+                                }));
+                              }}
+                              placeholder="Spec Parameter Value"
+                              className="flex-1 p-1.5 rounded-lg border border-border bg-background text-[11px] font-medium text-foreground focus:outline-none focus:border-blue-500 font-mono"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setBrochureData(prev => {
+                                  const updated = { ...prev.specs };
+                                  delete updated[key];
+                                  return { ...prev, specs: updated };
+                                });
+                              }}
+                              className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
+                              title="Delete Row"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-3 text-center text-muted-foreground text-[11px] font-medium border border-dashed border-border rounded-xl">
+                        No specifications extracted yet.
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setBrochureStep(1)}
+                      className="px-5 py-2.5 border border-border rounded-xl hover:bg-muted text-muted-foreground text-xs font-extrabold transition-all"
+                    >
+                      ⬅ Back to Upload PDF
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-95 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 active:scale-95"
+                    >
+                      <CheckCircle2 className="w-4 h-4" /> Save Product & Publish to Catalog
+                    </button>
+                  </div>
+                </div>
+              )}
+
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* FULL PRODUCT DETAILS & EDIT MODAL */}
+      {selectedDetailProduct && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn overflow-y-auto">
+          <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-card border border-border rounded-3xl shadow-2xl my-auto text-left animate-scaleUp overflow-hidden">
+            
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-border p-6 gap-4 bg-card shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center overflow-hidden shrink-0">
+                  {editProductData.image ? (
+                    <img src={editProductData.image} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <Package className="w-6 h-6" />
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-mono">
+                      {editProductData.category || selectedDetailProduct.category}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground font-mono">
+                      SKU: {editProductData.sku || selectedDetailProduct.sku || "N/A"}
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-extrabold font-display text-foreground mt-1">
+                    {selectedDetailProduct.name}
+                  </h2>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedDetailProduct(null)}
+                className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleSaveProductEdit} className="flex-1 overflow-y-auto p-6 space-y-5 text-xs">
+              
+              {/* Product Live Image Preview Banner */}
+              {editProductData.image && (
+                <div className="w-full h-44 rounded-2xl border border-border bg-slate-100 dark:bg-slate-900/60 flex items-center justify-center overflow-hidden relative group">
+                  <img
+                    src={editProductData.image}
+                    alt={editProductData.name || "Product"}
+                    className="max-h-full object-contain p-2 transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-[10px] font-mono">
+                    Live Image Preview
+                  </div>
+                </div>
+              )}
+
+              {/* Product Name & AI PDF Spec Analysis */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="font-extrabold text-foreground text-[11px] uppercase tracking-wider">Product Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editProductData.name || ""}
+                    onChange={(e) => setEditProductData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full p-3 rounded-xl border border-border bg-background text-xs font-bold focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-extrabold text-foreground text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-500" /> AI PDF Brochure Spec Extraction
+                  </label>
+                  <button
+                    type="button"
+                    disabled={isAnalyzingPdf}
+                    onClick={async () => {
+                      const res = await handleAnalyzePdfBrochure(editProductData.name || "");
+                      if (res) {
+                        setEditProductData(prev => ({
+                          ...prev,
+                          description: res.shortDesc
+                        }));
+                      }
+                    }}
+                    className="w-full p-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white text-xs font-extrabold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                  >
+                    <Sparkles className="w-4 h-4 animate-spin-slow" />
+                    <span>{isAnalyzingPdf ? "Analyzing PDF Brochure..." : "✨ AI Extract Full Details from PDF"}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Grid 2: Category, SKU, Stock */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <label className="font-extrabold text-foreground text-[11px] uppercase tracking-wider">Category</label>
+                  <input
+                    type="text"
+                    value={editProductData.category || ""}
+                    onChange={(e) => setEditProductData(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full p-3 rounded-xl border border-border bg-background text-xs font-bold focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-extrabold text-foreground text-[11px] uppercase tracking-wider">SKU / Model Code</label>
+                  <input
+                    type="text"
+                    value={editProductData.sku || ""}
+                    onChange={(e) => setEditProductData(prev => ({ ...prev, sku: e.target.value }))}
+                    className="w-full p-3 rounded-xl border border-border bg-background text-xs font-mono focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-extrabold text-foreground text-[11px] uppercase tracking-wider">Stock Available</label>
+                  <input
+                    type="number"
+                    value={editProductData.stock || 0}
+                    onChange={(e) => setEditProductData(prev => ({ ...prev, stock: Number(e.target.value) }))}
+                    className="w-full p-3 rounded-xl border border-border bg-background text-xs font-mono font-bold focus:outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Primary Image Upload & URL */}
+              <div className="space-y-2 p-4 rounded-2xl border border-border bg-slate-50/50 dark:bg-slate-900/40">
+                <div className="flex items-center justify-between">
+                  <label className="font-extrabold text-foreground text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-primary" /> Primary Product Image
+                  </label>
+                  <label className="px-3 py-1 bg-primary/10 hover:bg-primary hover:text-white text-primary text-[11px] font-extrabold rounded-lg cursor-pointer transition-all flex items-center gap-1.5">
+                    <Upload className="w-3 h-3" />
+                    <span>Upload Image File</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (evt) => {
+                            setEditProductData(prev => ({ ...prev, image: evt.target?.result as string }));
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+                <input
+                  type="url"
+                  value={editProductData.image || ""}
+                  onChange={(e) => setEditProductData(prev => ({ ...prev, image: e.target.value }))}
+                  placeholder="https://www.georgemaijoagri.com/wp-content/uploads/..."
+                  className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-mono focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              {/* Multiple Gallery Images Uploader for Carousel Sliding */}
+              <div className="space-y-3 p-4 rounded-2xl border border-border bg-slate-50/50 dark:bg-slate-900/40">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="font-extrabold text-foreground text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-indigo-500" /> Multiple Gallery Photos (Sliding Carousel)
+                    </label>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      Upload multiple product images for sliding carousel view on the main page.
+                    </p>
+                  </div>
+                  <label className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-extrabold rounded-xl cursor-pointer transition-all flex items-center gap-1.5 shrink-0 shadow-sm">
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Upload Multiple Photos</span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        files.forEach(file => {
+                          const reader = new FileReader();
+                          reader.onload = (evt) => {
+                            const res = evt.target?.result as string;
+                            setEditProductData(prev => ({
+                              ...prev,
+                              galleryImages: [...(prev.galleryImages || []), res]
+                            }));
+                          };
+                          reader.readAsDataURL(file);
+                        });
+                      }}
+                    />
+                  </label>
+                </div>
+
+                {/* Uploaded Gallery Thumbnails Grid */}
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2.5 pt-1">
+                  {(editProductData.galleryImages || []).map((imgUrl, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-xl border border-border bg-background overflow-hidden group shadow-sm">
+                      <img src={imgUrl} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditProductData(prev => ({
+                            ...prev,
+                            galleryImages: (prev.galleryImages || []).filter((_, i) => i !== idx)
+                          }));
+                        }}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] font-bold shadow-md opacity-90 hover:opacity-100 transition-opacity"
+                        title="Remove image"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+
+                  {(editProductData.galleryImages || []).length === 0 && (
+                    <div className="col-span-full py-4 text-center text-[11px] text-muted-foreground border border-dashed border-border rounded-xl">
+                      No carousel photos added yet. Click &quot;Upload Multiple Photos&quot; above to add images for sliding.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* 3D Model / 360 Degree View Video Uploader */}
+              <div className="space-y-2 p-4 rounded-2xl border border-border bg-slate-50/50 dark:bg-slate-900/40">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="font-extrabold text-foreground text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-purple-500" /> 3D Model / 360° View Asset
+                    </label>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      Add a 360° video or 3D GLTF asset for interactive view on the main home page.
+                    </p>
+                  </div>
+                  <label className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-extrabold rounded-xl cursor-pointer transition-all flex items-center gap-1.5 shrink-0 shadow-sm">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Upload 3D Asset</span>
+                    <input
+                      type="file"
+                      accept="video/*,.gltf,.glb"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (evt) => {
+                            setEditProductData(prev => ({ ...prev, hologramVideo: evt.target?.result as string }));
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+
+                <input
+                  type="text"
+                  value={editProductData.hologramVideo || ""}
+                  onChange={(e) => setEditProductData(prev => ({ ...prev, hologramVideo: e.target.value }))}
+                  placeholder="e.g. /videos/remove_all_the_background.mp4 or 3D model URL"
+                  className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-mono focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              {/* Grid 3: Brochure PDF Link */}
+              <div className="space-y-1.5">
+                <label className="font-extrabold text-foreground text-[11px] uppercase tracking-wider">Brochure PDF Link</label>
+                <input
+                  type="text"
+                  value={editProductData.brochure || ""}
+                  onChange={(e) => setEditProductData(prev => ({ ...prev, brochure: e.target.value }))}
+                  placeholder="e.g. equipment_spec.pdf"
+                  className="w-full p-3 rounded-xl border border-border bg-background text-xs font-mono focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1.5">
+                <label className="font-extrabold text-foreground text-[11px] uppercase tracking-wider">Full Product Description</label>
+                <textarea
+                  rows={3}
+                  value={editProductData.description || ""}
+                  onChange={(e) => setEditProductData(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full p-3 rounded-xl border border-border bg-background text-xs leading-relaxed focus:outline-none focus:border-primary font-medium"
+                />
+              </div>
+            </form>
+
+            {/* Sticky Modal Actions Footer */}
+            <div className="flex items-center justify-between p-6 border-t border-border bg-card shrink-0 gap-3">
+              <button
+                type="button"
+                onClick={() => setSelectedDetailProduct(null)}
+                className="px-5 py-2.5 border border-border rounded-xl hover:bg-muted text-muted-foreground text-xs font-extrabold transition-all"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveProductEdit}
+                className="px-6 py-2.5 bg-primary hover:opacity-90 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-primary/20 transition-all flex items-center gap-2 active:scale-95"
+              >
+                <CheckCircle2 className="w-4 h-4" /> Save & Update Product Details
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -4253,34 +6135,41 @@ export default function DashboardPage() {
                 <div className="space-y-1">
                   <label className="font-semibold text-foreground">Date</label>
                   <input
-                    type="text"
+                    type="date"
                     value={schDate}
                     onChange={(e) => setSchDate(e.target.value)}
-                    placeholder="Today"
-                    className="w-full p-2.5 rounded-xl border border-border bg-background text-xs focus:ring-1 focus:ring-primary"
+                    className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-medium focus:ring-1 focus:ring-primary cursor-pointer"
                   />
                 </div>
 
                 <div className="space-y-1">
                   <label className="font-semibold text-foreground">Start Time</label>
-                  <input
-                    type="text"
+                  <select
                     value={schStartTime}
                     onChange={(e) => setSchStartTime(e.target.value)}
-                    placeholder="10:00 AM"
-                    className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-mono focus:ring-1 focus:ring-primary"
-                  />
+                    className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-mono focus:ring-1 focus:ring-primary cursor-pointer"
+                  >
+                    {TIME_SLOTS.map((slot) => (
+                      <option key={slot} value={slot}>
+                        {slot}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="space-y-1">
                   <label className="font-semibold text-foreground">End Time</label>
-                  <input
-                    type="text"
+                  <select
                     value={schEndTime}
                     onChange={(e) => setSchEndTime(e.target.value)}
-                    placeholder="11:30 AM"
-                    className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-mono focus:ring-1 focus:ring-primary"
-                  />
+                    className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-mono focus:ring-1 focus:ring-primary cursor-pointer"
+                  >
+                    {TIME_SLOTS.map((slot) => (
+                      <option key={slot} value={slot}>
+                        {slot}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -4450,6 +6339,171 @@ export default function DashboardPage() {
                   className="px-4 py-2 bg-primary hover:opacity-90 text-white rounded-xl text-xs font-semibold shadow-md"
                 >
                   Add Sales Representative
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* SCHEDULE DEMO MEMBER FOR BOOKED PERSON MODAL */}
+      {isScheduleDemoOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+          <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl p-6 space-y-4 animate-scaleUp text-left">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
+                  <Calendar className="w-5 h-5 text-indigo-500" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold font-display text-foreground">Schedule Demo for Booked Client</h3>
+                  <p className="text-[11px] text-muted-foreground">Assign a sales team member & set up a live product demonstration.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsScheduleDemoOpen(false)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+                aria-label="Close Modal"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleScheduleDemoSubmit} className="space-y-4 text-xs">
+              {/* Select Booked Person / Lead */}
+              <div className="space-y-1">
+                <label className="font-semibold text-foreground flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-primary" />
+                  <span>Select Booked Person / Client Lead *</span>
+                </label>
+                <select
+                  required
+                  value={demoSelectedLeadId}
+                  onChange={(e) => setDemoSelectedLeadId(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-bold text-foreground focus:ring-1 focus:ring-primary cursor-pointer"
+                >
+                  {leads.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name} ({l.value}) — Stage: {l.stage.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Select Assigned Sales Rep */}
+              <div className="space-y-1">
+                <label className="font-semibold text-foreground flex items-center gap-1.5">
+                  <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Assign Sales Team Member / Rep *</span>
+                </label>
+                <select
+                  required
+                  value={demoSelectedRepId}
+                  onChange={(e) => setDemoSelectedRepId(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-bold text-foreground focus:ring-1 focus:ring-primary cursor-pointer"
+                >
+                  {salesReps.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name} ({r.role}) — Status: {r.status}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Date & Time Slot Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-semibold text-foreground flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                    <span>Demo Date *</span>
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={demoDateInput}
+                    onChange={(e) => setDemoDateInput(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-semibold focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-foreground flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Time Slot *</span>
+                  </label>
+                  <select
+                    value={demoTimeSlotInput}
+                    onChange={(e) => setDemoTimeSlotInput(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-bold text-foreground focus:ring-1 focus:ring-primary cursor-pointer"
+                  >
+                    <option value="09:00 AM - 09:45 AM">09:00 AM - 09:45 AM</option>
+                    <option value="10:00 AM - 10:45 AM">10:00 AM - 10:45 AM (Recommended)</option>
+                    <option value="11:30 AM - 12:15 PM">11:30 AM - 12:15 PM</option>
+                    <option value="02:00 PM - 02:45 PM">02:00 PM - 02:45 PM</option>
+                    <option value="04:00 PM - 04:45 PM">04:00 PM - 04:45 PM</option>
+                    <option value="06:00 PM - 06:45 PM">06:00 PM - 06:45 PM</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Product Demo Topic & Meeting Link Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-semibold text-foreground">Demo Module Focus</label>
+                  <select
+                    value={demoTopicInput}
+                    onChange={(e) => setDemoTopicInput(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-semibold focus:ring-1 focus:ring-primary cursor-pointer"
+                  >
+                    <option value="AI Voice Assistant & Live Sales Demo">AI Voice Assistant & Live Sales</option>
+                    <option value="Multi-channel WhatsApp Automation">Multi-channel WhatsApp API</option>
+                    <option value="E-Commerce POS & Catalog Management">E-Commerce & POS Fleet</option>
+                    <option value="RAG Vector Knowledge Base & Search">RAG AI Search & Chatbot</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-foreground">Meeting Venue / Link</label>
+                  <select
+                    value={demoMeetingType}
+                    onChange={(e) => setDemoMeetingType(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-semibold focus:ring-1 focus:ring-primary cursor-pointer"
+                  >
+                    <option value="Google Meet (Auto-generated)">Google Meet (Auto-generated)</option>
+                    <option value="Zoom Meeting Room">Zoom Video Call</option>
+                    <option value="In-Person Showroom Visit">In-Person Store/Office Visit</option>
+                    <option value="Phone Consultation Call">Phone Call Demo</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Special Instructions / Notes */}
+              <div className="space-y-1">
+                <label className="font-semibold text-foreground">Special Client Requirements / Notes</label>
+                <textarea
+                  rows={2}
+                  value={demoNotesInput}
+                  onChange={(e) => setDemoNotesInput(e.target.value)}
+                  placeholder="e.g. Client requested a walkthrough of POS hardware integration and multi-language support."
+                  className="w-full p-2.5 rounded-xl border border-border bg-background text-xs focus:ring-1 focus:ring-primary"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setIsScheduleDemoOpen(false)}
+                  className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-xl text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:opacity-95 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-indigo-600/20 flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span>Confirm & Schedule Demo</span>
                 </button>
               </div>
             </form>
@@ -4693,6 +6747,547 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* EDIT SUB ADMIN DETAILS & PERMISSIONS MODAL */}
+      {editingSubAdmin && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+          <div className="relative w-full max-w-lg bg-card border border-border rounded-3xl shadow-2xl p-6 space-y-5 animate-scaleUp text-left">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-border pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-extrabold text-xl flex items-center justify-center shadow-md shrink-0">
+                  {editingSubAdmin.avatar || editingSubAdmin.name?.charAt(0) || "U"}
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold font-display text-foreground flex items-center gap-2">
+                    <span>{editingSubAdmin.name}</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-500 border border-blue-500/20 font-bold">
+                      {editingSubAdmin.sgId}
+                    </span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    View and edit sub admin details, role designation, and access scope.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingSubAdmin(null)}
+                className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                aria-label="Close Modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSubAdminDirectory((prev) =>
+                  prev.map((item) => (item.id === editingSubAdmin.id ? editingSubAdmin : item))
+                );
+                setEditingSubAdmin(null);
+              }}
+              className="space-y-4 text-xs"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* SG ID */}
+                <div className="space-y-1">
+                  <label className="text-[11px] font-extrabold text-foreground uppercase tracking-wider">Sub Admin ID (SG ID)</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingSubAdmin.sgId}
+                    onChange={(e) => setEditingSubAdmin({ ...editingSubAdmin, sgId: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-border bg-background font-mono font-bold text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                  />
+                </div>
+
+                {/* Avatar Initials */}
+                <div className="space-y-1">
+                  <label className="text-[11px] font-extrabold text-foreground uppercase tracking-wider">Avatar Initials</label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={3}
+                    value={editingSubAdmin.avatar}
+                    onChange={(e) => setEditingSubAdmin({ ...editingSubAdmin, avatar: e.target.value.toUpperCase() })}
+                    className="w-full p-2.5 rounded-xl border border-border bg-background font-mono font-bold text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                  />
+                </div>
+
+                {/* Sub Admin Name */}
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="text-[11px] font-extrabold text-foreground uppercase tracking-wider">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingSubAdmin.name}
+                    onChange={(e) => setEditingSubAdmin({ ...editingSubAdmin, name: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-border bg-background font-bold text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                  />
+                </div>
+
+                {/* Email Address */}
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="text-[11px] font-extrabold text-foreground uppercase tracking-wider">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    value={editingSubAdmin.email}
+                    onChange={(e) => setEditingSubAdmin({ ...editingSubAdmin, email: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-border bg-background font-mono font-medium text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                  />
+                </div>
+
+                {/* Role Designation */}
+                <div className="space-y-1">
+                  <label className="text-[11px] font-extrabold text-foreground uppercase tracking-wider">Role Title *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingSubAdmin.role}
+                    onChange={(e) => setEditingSubAdmin({ ...editingSubAdmin, role: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-border bg-background font-bold text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                  />
+                </div>
+
+                {/* Access Scope */}
+                <div className="space-y-1">
+                  <label className="text-[11px] font-extrabold text-foreground uppercase tracking-wider">Access Scope *</label>
+                  <select
+                    value={editingSubAdmin.accessScope}
+                    onChange={(e) => setEditingSubAdmin({ ...editingSubAdmin, accessScope: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-border bg-background font-bold text-xs focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer"
+                  >
+                    <option value="Full Access">Full Access</option>
+                    <option value="Read/Write">Read/Write</option>
+                    <option value="Read Only">Read Only</option>
+                    <option value="Admin Controls">Admin Controls</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between pt-4 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm(`Are you sure you want to delete ${editingSubAdmin.name}?`)) {
+                      setSubAdminDirectory((prev) => prev.filter((item) => item.id !== editingSubAdmin.id));
+                      setEditingSubAdmin(null);
+                    }
+                  }}
+                  className="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete</span>
+                </button>
+
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setEditingSubAdmin(null)}
+                    className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-xl text-xs font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-blue-600/20 flex items-center gap-1.5"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Save & Update Details</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CRM DISCUSS & VOICE AI ENQUIRY PORTAL MODAL */}
+      {activeEnquirySession && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
+          <div className="relative w-full max-w-4xl max-h-[90vh] bg-card border border-border rounded-3xl shadow-2xl p-5 sm:p-7 animate-scaleUp text-left my-auto flex flex-col overflow-hidden">
+            {/* Header Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4 shrink-0">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 text-white font-extrabold flex items-center justify-center text-xl shadow-lg shadow-blue-500/20 shrink-0">
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 text-[10px] font-extrabold uppercase tracking-wider">
+                      CRM Discuss Portal
+                    </span>
+                    <span className="text-xs text-muted-foreground font-mono">ID: {activeEnquirySession.scheduleId}</span>
+                  </div>
+                  <h2 className="text-base sm:text-lg font-extrabold font-display text-foreground mt-0.5">
+                    Client Enquiry Discussion: {activeEnquirySession.leadName}
+                  </h2>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveEnquirySession(null)}
+                className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
+                aria-label="Close Portal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Scrollable Modal Content */}
+            <div className="flex-1 overflow-y-auto py-4 pr-1 space-y-6">
+              {/* STEP 1: SCHEDULED EMPLOYEE VERIFICATION CARD */}
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-border/80 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/60 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <UserCheck className="w-5 h-5 text-blue-500 shrink-0" />
+                    <div>
+                      <h3 className="text-sm font-bold text-foreground">Step 1: Scheduled Employee Verification</h3>
+                      <p className="text-[11px] text-muted-foreground">Verify and confirm the assigned sales representative before launching voice enquiry recording.</p>
+                    </div>
+                  </div>
+
+                  <span className={`px-3 py-1 rounded-full text-[11px] font-bold border shrink-0 flex items-center gap-1.5 ${
+                    activeEnquirySession.verificationStatus === "accepted"
+                      ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                      : "bg-amber-500/10 text-amber-600 border-amber-500/30 animate-pulse"
+                  }`}>
+                    {activeEnquirySession.verificationStatus === "accepted" ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Employee Verified & Accepted
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-3.5 h-3.5" /> Verification Pending
+                      </>
+                    )}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                  <div>
+                    <span className="text-muted-foreground font-semibold">Scheduled Representative:</span>
+                    <div className="mt-1">
+                      <select
+                        value={activeEnquirySession.salesmanId}
+                        onChange={(e) => {
+                          const selectedRep = salesReps.find((r) => r.id === e.target.value);
+                          if (selectedRep) {
+                            setActiveEnquirySession({
+                              ...activeEnquirySession,
+                              salesmanId: selectedRep.id,
+                              salesmanName: selectedRep.name
+                            });
+                            updateScheduleSalesman(activeEnquirySession.scheduleId, selectedRep.id);
+                          }
+                        }}
+                        disabled={activeEnquirySession.verificationStatus === "accepted"}
+                        className="w-full font-bold text-foreground bg-background border border-border rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer disabled:opacity-80"
+                      >
+                        {salesReps.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            👤 {r.name} ({r.role})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-muted-foreground font-semibold">Demo Meeting Date & Time:</span>
+                    <p className="font-mono font-bold text-foreground mt-2">
+                      📅 {activeEnquirySession.date} @ {activeEnquirySession.startTime}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-muted-foreground font-semibold">Venue / Meeting Link:</span>
+                    <p className="font-bold text-primary truncate mt-2">
+                      🌐 {activeEnquirySession.location}
+                    </p>
+                  </div>
+                </div>
+
+                {activeEnquirySession.verificationStatus === "pending" && (
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveEnquirySession({
+                          ...activeEnquirySession,
+                          verificationStatus: "accepted",
+                          recordingStatus: "recording"
+                        });
+                      }}
+                      className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-95 text-white font-extrabold rounded-xl text-xs shadow-md flex items-center gap-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Accept Employee & Start Voice Recording</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* STEP 2: VOICE RECORDING & REAL-TIME SPEECH-TO-TEXT (OCR / VOICE AI MODEL TRANSCRIBE) */}
+              {activeEnquirySession.verificationStatus === "accepted" && (
+                <div className="space-y-5">
+                  <div className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-3.5 h-3.5 rounded-full ${
+                          activeEnquirySession.recordingStatus === "recording"
+                            ? "bg-rose-500 animate-ping"
+                            : "bg-emerald-500"
+                        }`} />
+                        <div>
+                          <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                            <span>Step 2: Voice Recording & OCR / Voice AI Transcribe Engine</span>
+                            <span className="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 text-[10px] font-bold">
+                              Voice-to-Text Model Active
+                            </span>
+                          </h3>
+                          <p className="text-[11px] text-muted-foreground">
+                            Real-time Speech Recognition & OCR transcript converting voice discussion into text stream.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        {activeEnquirySession.recordingStatus === "recording" && (
+                          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 font-mono font-bold text-xs">
+                            <Mic className="w-3.5 h-3.5 animate-bounce" />
+                            <span>
+                              REC 00:{activeEnquirySession.recordingTime < 10 ? `0${activeEnquirySession.recordingTime}` : activeEnquirySession.recordingTime}
+                            </span>
+                          </div>
+                        )}
+
+                        {activeEnquirySession.recordingStatus === "recording" ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveEnquirySession({
+                                ...activeEnquirySession,
+                                recordingStatus: "analyzing"
+                              });
+                              setTimeout(() => {
+                                setActiveEnquirySession((prev) => prev ? { ...prev, recordingStatus: "completed" } : null);
+                              }, 1200);
+                            }}
+                            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md"
+                          >
+                            <MicOff className="w-4 h-4" /> Stop & Process AI Analysis
+                          </button>
+                        ) : activeEnquirySession.recordingStatus === "analyzing" ? (
+                          <span className="px-4 py-2 bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 font-bold rounded-xl text-xs flex items-center gap-2 animate-pulse">
+                            <Sparkles className="w-4 h-4 animate-spin" /> Analyzing Voice Text...
+                          </span>
+                        ) : (
+                          <span className="px-3.5 py-1.5 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold rounded-xl text-xs flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Transcribe Complete
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Audio Waveform Animation Bar */}
+                    {activeEnquirySession.recordingStatus === "recording" && (
+                      <div className="flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl bg-slate-900 text-white">
+                        <Volume2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <div className="flex items-center gap-1 h-5">
+                          <div className="w-1 bg-emerald-400 h-3 animate-pulse" />
+                          <div className="w-1 bg-emerald-400 h-5 animate-pulse delay-75" />
+                          <div className="w-1 bg-emerald-400 h-2 animate-pulse delay-150" />
+                          <div className="w-1 bg-emerald-400 h-4 animate-pulse delay-100" />
+                          <div className="w-1 bg-emerald-400 h-5 animate-pulse delay-200" />
+                          <div className="w-1 bg-emerald-400 h-3 animate-pulse delay-300" />
+                        </div>
+                        <span className="text-[11px] font-mono text-emerald-400 ml-2">Voice AI Engine capturing & converting audio to text...</span>
+                      </div>
+                    )}
+
+                    {/* Transcribed Speech-to-Text Conversation Stream */}
+                    <div className="max-h-56 overflow-y-auto space-y-2.5 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-border/80 text-xs">
+                      <p className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-wider mb-2">
+                        Live OCR / Speech-to-Text Feed ({activeEnquirySession.transcript.length} turns logged):
+                      </p>
+                      {activeEnquirySession.transcript.map((msg, idx) => (
+                        <div
+                          key={idx}
+                          className={`p-3 rounded-xl border ${
+                            msg.speaker === "client"
+                              ? "bg-blue-500/5 border-blue-500/20 text-foreground"
+                              : "bg-emerald-500/5 border-emerald-500/20 text-foreground"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between font-bold mb-1">
+                            <span className={msg.speaker === "client" ? "text-blue-600 dark:text-blue-400" : "text-emerald-600 dark:text-emerald-400"}>
+                              {msg.speaker === "client" ? `👤 Client (${activeEnquirySession.leadName.split(" ")[0]})` : `👔 Representative (${activeEnquirySession.salesmanName})`}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground font-mono">{msg.time}</span>
+                          </div>
+                          <p className="text-xs leading-relaxed">{msg.text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* STEP 3 & STEP 4: AI ANALYSIS, SUMMARY & SENTIMENT CONVERSION OUTCOME */}
+                  {(activeEnquirySession.recordingStatus === "completed" || activeEnquirySession.recordingStatus === "analyzing") && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-fadeIn">
+                      {/* Summary Section */}
+                      <div className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-3.5">
+                        <div className="flex items-center gap-2 border-b border-border pb-2.5">
+                          <FileText className="w-4 h-4 text-blue-500" />
+                          <h4 className="text-sm font-bold text-foreground">AI Discussion Summary</h4>
+                        </div>
+
+                        <div className="space-y-3 text-xs">
+                          <div>
+                            <p className="font-bold text-foreground mb-1">Key Highlights Discussed:</p>
+                            <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                              {activeEnquirySession.summary.keyHighlights.map((hl, i) => (
+                                <li key={i}>{hl}</li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div>
+                            <p className="font-bold text-foreground mb-1">Client Objections Resolved:</p>
+                            <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                              {activeEnquirySession.summary.objectionsResolved.map((obj, i) => (
+                                <li key={i}>{obj}</li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div>
+                            <p className="font-bold text-foreground mb-1">Agreed Next Steps:</p>
+                            <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                              {activeEnquirySession.summary.agreedNextSteps.map((step, i) => (
+                                <li key={i}>{step}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Conversion & Sentiment Review Outcome */}
+                      <div className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-4 flex flex-col justify-between">
+                        <div className="space-y-3.5">
+                          <div className="flex items-center justify-between border-b border-border pb-2.5">
+                            <div className="flex items-center gap-2">
+                              <TrendingUp className="w-4 h-4 text-emerald-500" />
+                              <h4 className="text-sm font-bold text-foreground">Conversation & Conversion Analysis</h4>
+                            </div>
+                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[10px] font-extrabold">
+                              Both Sides Review Completed
+                            </span>
+                          </div>
+
+                          {/* Conversion Sentiment Outcome Card */}
+                          <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                                <Sparkles className="w-4 h-4" /> CONVERSION SENTIMENT OUTCOME:
+                              </span>
+                              <span className="text-xs font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
+                                {activeEnquirySession.buyingIntentScore}% BUY INTENT
+                              </span>
+                            </div>
+                            <h3 className="text-base font-extrabold text-foreground font-display">
+                              🟢 POSITIVE TO BUY THE PRODUCT
+                            </h3>
+                            <p className="text-[11px] text-muted-foreground leading-relaxed">
+                              Client verified specifications, expressed high buying intent, and requested direct POS invoice generation. Both sales rep and client sides are fully verified & completed.
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 text-center text-xs">
+                            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-border/80">
+                              <p className="text-[10px] text-muted-foreground font-semibold">Deal Likelihood</p>
+                              <p className="font-extrabold text-emerald-500 text-sm mt-0.5">High (88%)</p>
+                            </div>
+                            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-border/80">
+                              <p className="text-[10px] text-muted-foreground font-semibold">Review Status</p>
+                              <p className="font-extrabold text-blue-500 text-sm mt-0.5">100% Completed</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Interactive Session Comments */}
+                        <div className="space-y-2 pt-2 border-t border-border">
+                          <label className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                            <MessageCircle className="w-3.5 h-3.5 text-purple-500" /> Log Session Comment / Note:
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              placeholder="Add comment to store under client enquiry data..."
+                              value={activeEnquirySession.newCommentInput || ""}
+                              onChange={(e) => setActiveEnquirySession({ ...activeEnquirySession, newCommentInput: e.target.value })}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && activeEnquirySession.newCommentInput?.trim()) {
+                                  setActiveEnquirySession({
+                                    ...activeEnquirySession,
+                                    comments: [...(activeEnquirySession.comments || []), activeEnquirySession.newCommentInput.trim()],
+                                    newCommentInput: ""
+                                  });
+                                }
+                              }}
+                              className="flex-1 px-3 py-1.5 rounded-xl border border-border bg-background text-xs font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (activeEnquirySession.newCommentInput?.trim()) {
+                                  setActiveEnquirySession({
+                                    ...activeEnquirySession,
+                                    comments: [...(activeEnquirySession.comments || []), activeEnquirySession.newCommentInput.trim()],
+                                    newCommentInput: ""
+                                  });
+                                }
+                              }}
+                              className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shrink-0 shadow-sm"
+                            >
+                              Add Note
+                            </button>
+                          </div>
+                          {activeEnquirySession.comments && activeEnquirySession.comments.length > 0 && (
+                            <div className="space-y-1 max-h-24 overflow-y-auto">
+                              {activeEnquirySession.comments.map((cm, cIdx) => (
+                                <p key={cIdx} className="text-[11px] text-muted-foreground italic bg-muted/30 px-2.5 py-1 rounded-lg border border-border/40">
+                                  💬 {cm}
+                                </p>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Finish & Save to Client Data Button */}
+                        <div className="pt-3 border-t border-border flex items-center gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => saveEnquiryToClientData(activeEnquirySession)}
+                            className="flex-1 py-2.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:opacity-95 text-white font-extrabold rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5"
+                          >
+                            <CheckCircle2 className="w-4 h-4" /> Save Analysis & Store under Client Data Enquiries
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

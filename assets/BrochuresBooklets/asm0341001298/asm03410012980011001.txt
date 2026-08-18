@@ -1,0 +1,29 @@
+﻿Boeing Intercontinental
+Cruising Speed .........575 miles per hour
+Passenger Capacity .....first-class 120
+tourist-class 153 Economy-class 179
+Engines ................4 Pratt & Whitney J-75
+15,000-pound thrust class
+Overall Length .........145 feet, 6 inches
+Wing Span ..............142 feet, 6 inches
+Maximum Gross Weight
+(takeoff) ...........295,000 pounds
+Fuel Capacity ..........21,200 U.S. gallons
+Payload ................25,000 pounds 40,000 pounds
+at	at
+Range .................. 5,000 miles	4,000 miles
+Douglas DC-8
+Cruising Speed .........575 miles per hour
+Passenger Capacity .....first-class 109
+tourist class 141 Economy-class 168
+Engines ................4 Pratt & Whitney J-75
+15,000-pound thrust class
+Overall Length .........148 feet, 10 inches
+Wing Span ..............137 feet, 9 inches
+Maximum Gross Weight
+(takeoff) ...........287,500 pounds
+Fuel Capacity ..........21,615 U.S. gallons
+Payload ................24,000 pounds 40,000 pounds
+at	at
+Range .................. 5,000 miles	4,000 miles
+11

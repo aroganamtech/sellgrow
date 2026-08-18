@@ -1,0 +1,16 @@
+﻿How About YOU?
+1.	Are you: male □ female Q
+2.	What is your approximate age?
+21-30 □ 31-40 □ 41-50 □ over 50 O
+3.	Are you married? Q or single? O
+4.	How many children do you have?
+_____Under 2
+_____Between 2 and 12
+_____Between 12 and 25
+5.	What is the family’s approximate annual income?
+$3000-15000 □	$5000-17500 □	$7500-
+$12,000 □ over $12,000 □
+6.	In what industry, type of business or profession are you employed?
+Specifically, what position do you hold in it?
+7.	Where do you live? City State_________________
+2

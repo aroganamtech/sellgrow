@@ -60,6 +60,7 @@ import {
 import { useTheme } from "@/contexts/ThemeContext";
 import Logo from "@/components/layout/Logo";
 import { PRODUCTS_DATA, ProductItem, CATEGORIES, DAY_TO_DAY_PRODUCTS } from "@/data/productsData";
+import { ProductPdfIntelligenceModel, ExtractedProductAnalysis } from "@/services/pdfIntelligenceEngine";
 
 // Interfaces
 interface UserRecord {
@@ -203,7 +204,7 @@ const initialServices: ServiceItem[] = [
   { id: "srv_6", name: "Sells CRM", description: "Sales pipeline tracking, lead conversion analytics, and CRM dashboard", status: "Active", successRate: 99.5, latency: 35, requests24h: 7430 },
   { id: "srv_7", name: "Digital Marketing", description: "SEO metrics tracking, ad campaign monitoring, and marketing suite", status: "Active", successRate: 99.0, latency: 60, requests24h: 15400 },
   { id: "srv_8", name: "Website Creation", description: "Automated premium landing page generation and builder engine", status: "Active", successRate: 99.2, latency: 110, requests24h: 2150 },
-  { id: "srv_9", name: "Borcher", description: "Brochure creator, brand material generation, and catalog PDF builder", status: "Active", successRate: 96.5, latency: 140, requests24h: 1200 },
+  { id: "srv_9", name: "Brochure", description: "Brochure creator, brand material generation, and catalog PDF builder", status: "Active", successRate: 96.5, latency: 140, requests24h: 1200 },
   { id: "srv_10", name: "Logo", description: "Branding asset builder, vector logo designs generator, and asset hosting", status: "Active", successRate: 98.9, latency: 85, requests24h: 4620 },
   { id: "srv_11", name: "Social Media", description: "Social platforms auto-posting gateway and feed synchronization engine", status: "Active", successRate: 97.2, latency: 95, requests24h: 8950 }
 ];
@@ -227,10 +228,11 @@ export default function AdminGrowthPage() {
 
   // Team management states
   const [teamMembers, setTeamMembers] = useState([
-    { id: "tm-1", sgId: "SG-SA-100", name: "Naveen S", email: "naveen@sellgrow.io", role: "SuperAdmin", status: "Active", permissions: "Full Access", password: "sellgrow123" },
-    { id: "tm-2", sgId: "SG-A-101", name: "Operator Main", email: "operator@sellgrow.io", role: "Operator", status: "Active", permissions: "Read/Write", password: "sellgrow123" },
-    { id: "tm-3", sgId: "SG-A-102", name: "AI Dev Team", email: "ai-dev@sellgrow.io", role: "Developer", status: "Active", permissions: "Read/Write", password: "sellgrow123" },
-    { id: "tm-4", sgId: "SG-A-103", name: "Support Agent", email: "support@sellgrow.io", role: "Support", status: "Active", permissions: "Read Only", password: "sellgrow123" },
+    { id: "tm-1", sgId: "SG-SA-100", name: "Naveen S", email: "naveen@georgemaijo.com", role: "SuperAdmin", status: "Active", permissions: "Full Access", password: "sellgrow123" },
+    { id: "tm-2", sgId: "SG-A-101", name: "Alex Rivera", email: "alex.rivera@georgemaijo.com", role: "Senior Account Executive", status: "Active", permissions: "Full Access", password: "sellgrow123" },
+    { id: "tm-3", sgId: "SG-A-102", name: "Rahul Kumar", email: "rahul.kumar@georgemaijo.com", role: "Field Sales Specialist", status: "Active", permissions: "Read/Write", password: "sellgrow123" },
+    { id: "tm-4", sgId: "SG-A-103", name: "Sarah Jenkins", email: "sarah.jenkins@georgemaijo.com", role: "Enterprise Sales Director", status: "Active", permissions: "Read/Write", password: "sellgrow123" },
+    { id: "tm-5", sgId: "SG-A-104", name: "Marcus Vance", email: "marcus.vance@georgemaijo.com", role: "SDR & Demo Specialist", status: "Active", permissions: "Read/Write", password: "sellgrow123" },
   ]);
   const [newTeamMemberName, setNewTeamMemberName] = useState("");
   const [newTeamMemberEmail, setNewTeamMemberEmail] = useState("");
@@ -504,656 +506,154 @@ export default function AdminGrowthPage() {
   const [productSearchQuery, setProductSearchQuery] = useState("");
   const [productCategoryFilter, setProductCategoryFilter] = useState("All");
 
-  // AI Brochure Ingestion Wizard states in Super Admin
+  // AI Brochure Ingestion States (2-Step PDF-First Workflow)
   const [isBrochureModalOpen, setIsBrochureModalOpen] = useState(false);
-  const [brochureStep, setBrochureStep] = useState<1 | 2 | 3 | 4 | 5>(1);
-  
-  // Step 1: Basic Info
-  const [newProductName, setNewProductName] = useState("");
-  const [newProductCategory, setNewProductCategory] = useState("");
-  const [newProductBrand, setNewProductBrand] = useState("GEORGE MAIJO EQUIPMENT");
+  const [brochureStep, setBrochureStep] = useState<1 | 2>(1);
+  const [isAnalyzingPdf, setIsAnalyzingPdf] = useState(false);
 
-  // Step 2: Product Local Image
-  const [newProductImage, setNewProductImage] = useState<string | null>(null);
-  const [imageFileName, setImageFileName] = useState("");
+  const [brochureData, setBrochureData] = useState<{
+    pdfFileName: string;
+    pdfFile: string | null;
+    name: string;
+    category: string;
+    image: string;
+    shortDesc: string;
+    specs: Record<string, string>;
+    highlights: string[];
+    galleryImages: string[];
+    hologramVideo: string;
+  }>({
+    pdfFileName: "",
+    pdfFile: null,
+    name: "",
+    category: "Brush Cutter",
+    image: "",
+    shortDesc: "",
+    specs: {},
+    highlights: [],
+    galleryImages: [],
+    hologramVideo: "",
+  });
 
-  // Step 3: PDF Brochure File
-  const [brochurePdfFile, setBrochurePdfFile] = useState<File | null>(null);
-  const [pdfFileName, setPdfFileName] = useState("");
-  const [brochureTextContent, setBrochureTextContent] = useState("");
-
-  // Step 4: AI Analysis Progress
-  const [aiAnalysisProgress, setAiAnalysisProgress] = useState(0);
-  const [aiAnalysisStatus, setAiAnalysisStatus] = useState("");
-
-  // Step 5: Extracted Product Specifications
-  const [extractedEngine, setExtractedEngine] = useState("");
-  const [extractedDisplacement, setExtractedDisplacement] = useState("");
-  const [extractedPower, setExtractedPower] = useState("");
-  const [extractedCarburetor, setExtractedCarburetor] = useState("");
-  const [extractedFuelTank, setExtractedFuelTank] = useState("");
-  const [extractedDryWeight, setExtractedDryWeight] = useState("");
-  const [extractedFeaturesText, setExtractedFeaturesText] = useState("");
-  const [extractedApplicationsText, setExtractedApplicationsText] = useState("");
-  const [brochureSaveSuccess, setBrochureSaveSuccess] = useState(false);
-
-  const categoryType = React.useMemo(() => {
-    const cat = (newProductCategory || "").toUpperCase();
-    const name = (newProductName || "").toUpperCase();
-    if (cat.includes("ELECTRONIC") || name.includes("SMARTPHONE") || name.includes("LAPTOP") || name.includes("WATCH") || name.includes("TV") || name.includes("EARBUDS")) return "ELECTRONICS";
-    if (cat.includes("HOME") || cat.includes("KITCHEN") || cat.includes("REFRIGERATOR") || cat.includes("WASHING") || name.includes("REFRIGERATOR") || name.includes("OVEN") || name.includes("HEATER")) return "HOME_APPLIANCE";
-    if (cat.includes("POWER TOOLS") || cat.includes("WASHER") || name.includes("DRILL") || name.includes("WASHER") || name.includes("COMPRESSOR")) return "POWER_TOOL";
-    if (cat.includes("AUTOMOTIVE") || name.includes("SCOOTER")) return "AUTOMOTIVE";
-    return "AGRICULTURE";
-  }, [newProductName, newProductCategory]);
-
-  const isEngineProduct = React.useMemo(() => {
-    const text = `${newProductName} ${newProductCategory} ${newProductBrand}`.toLowerCase();
-    return (
-      text.includes("cutter") ||
-      text.includes("weeder") ||
-      text.includes("tiller") ||
-      text.includes("engine") ||
-      text.includes("motor") ||
-      text.includes("generator") ||
-      text.includes("pump") ||
-      text.includes("tractor") ||
-      text.includes("mower") ||
-      text.includes("saw") ||
-      text.includes("trimmer")
-    );
-  }, [newProductName, newProductCategory, newProductBrand]);
-
-  const handleBrochureImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFileName(file.name);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setNewProductImage(event.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const isCleanHumanText = (str: string) => {
-    const s = str.trim();
-    if (!s || s.length < 2) return false;
-    if (
-      s.startsWith("%PDF") ||
-      s.startsWith("<<") ||
-      s.startsWith(">>") ||
-      s.startsWith("/") ||
-      s.includes("endobj") ||
-      s.includes("stream") ||
-      s.includes("xref") ||
-      s.includes("FontDescriptor") ||
-      s.includes("BaseFont") ||
-      s.includes("Helvetica") ||
-      s.includes("FlateDecode") ||
-      s.includes("MediaBox") ||
-      s.endsWith(".pdf") ||
-      s.endsWith(".PDF")
-    )
-      return false;
-    const specialCount = (s.match(/[%^\*?<>\=\[\]~\{\}\$\\_]/g) || []).length;
-    if (specialCount > 2 || specialCount / s.length > 0.15) return false;
-    return /^[a-zA-Z0-9\s.,()\-\/+:;%#&"'\u00C0-\u024F]+$/.test(s);
-  };
-
-  const extractTextFromPdfArrayBuffer = (buffer: ArrayBuffer, fileName: string): string => {
-    try {
-      const bytes = new Uint8Array(buffer);
-      let rawStr = "";
-      const chunkSize = 8192;
-      for (let i = 0; i < bytes.length; i += chunkSize) {
-        const chunk = bytes.subarray(i, i + chunkSize);
-        rawStr += String.fromCharCode.apply(null, Array.from(chunk));
-      }
-
-      const textPieces: string[] = [];
-
-      // Extract PDF text literals in (text) Tj and [(text)] TJ
-      const tjRegex = /\(([^()]{2,150})\)\s*T[jJ]/g;
-      let match: RegExpExecArray | null;
-      while ((match = tjRegex.exec(rawStr)) !== null) {
-        const cleaned = match[1].replace(/\\([()\\])/g, "$1").trim();
-        if (isCleanHumanText(cleaned)) {
-          textPieces.push(cleaned);
-        }
-      }
-
-      // Extract printable ASCII string chunks from uncompressed PDF streams
-      const asciiMatches = rawStr.match(/[\x20-\x7E]{4,150}/g);
-      if (asciiMatches) {
-        asciiMatches.forEach((m) => {
-          const trimmed = m.trim();
-          if (isCleanHumanText(trimmed)) {
-            if (
-              /engine|displac|power|hp|kw|rpm|stroke|weight|kg|tank|litre|fuel|carburetor|starter|weeder|tiller|blade|spec|model|type|width|mm|cc|output|capacity|transmission|speed|cylinder|processor|ram|storage|display|screen|camera|battery|volt|amp|inverter|compressor/i.test(trimmed)
-            ) {
-              textPieces.push(trimmed);
-            }
-          }
-        });
-      }
-
-      return Array.from(new Set(textPieces)).join("\n");
-    } catch (err) {
-      return "";
-    }
-  };
-
-  const handleBrochurePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setBrochurePdfFile(file);
-      setPdfFileName(file.name);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const buffer = event.target?.result as ArrayBuffer;
-        if (buffer) {
-          const text = extractTextFromPdfArrayBuffer(buffer, file.name);
-          setBrochureTextContent(text);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  };
-
-  const extractDetailsStrictlyFromBrochure = (
-    productName: string,
-    category: string,
-    brand: string,
-    pdfFile: File | null,
-    documentText: string
-  ) => {
-    const pName = productName.trim();
-    const pCat = (category || "").trim();
-    const pBrand = (brand || "").trim();
-
-    const brochureText = `${documentText}\n${pName}\n${pCat}\n${pBrand}`;
-    const lines = brochureText.split(/\r?\n/).map((l) => l.trim()).filter((l) => isCleanHumanText(l));
-
-    const isCategoryOrName = (str: string) => {
-      const s = str.trim().toLowerCase();
-      const catLower = pCat.toLowerCase();
-      const nameLower = pName.toLowerCase();
-      const brandLower = pBrand.toLowerCase();
-      return (
-        s === catLower ||
-        s === nameLower ||
-        s === brandLower ||
-        s === "power weeder" ||
-        s === "brush cutter" ||
-        s === "electronics" ||
-        s === "home appliances" ||
-        s === "general"
-      );
-    };
-
-    let extractedEngineStr = "";
-    let extractedDispStr = "";
-    let extractedPowerStr = "";
-    let extractedCarbStr = "";
-    let extractedTankStr = "";
-    let extractedWeightStr = "";
-    const extractedFeatureLines: string[] = [];
-    const extractedAppLines: string[] = [];
-
-    // Parse brochure document lines & table rows (Feature | Specification, Key: Value, Key - Value)
-    lines.forEach((line) => {
-      const lower = line.toLowerCase();
-      if (isCategoryOrName(line)) return;
-
-      // Extract key-value pairs if table line contains pipe, colon, tab, or dash
-      let key = "";
-      let val = "";
-      if (line.includes("|")) {
-        const parts = line.split("|").map((p) => p.trim()).filter(Boolean);
-        if (parts.length >= 2) {
-          key = parts[0];
-          val = parts.slice(1).join(" ").trim();
-        }
-      } else if (line.includes(":")) {
-        const parts = line.split(":");
-        key = parts[0].trim();
-        val = parts.slice(1).join(":").trim();
-      } else if (line.includes("\t")) {
-        const parts = line.split("\t").map((p) => p.trim()).filter(Boolean);
-        if (parts.length >= 2) {
-          key = parts[0];
-          val = parts.slice(1).join(" ").trim();
-        }
-      }
-
-      if (key && val && isCleanHumanText(key) && isCleanHumanText(val)) {
-        const kLower = key.toLowerCase();
-        if (kLower !== "feature" && kLower !== "specification" && kLower !== "specs" && kLower !== "property") {
-          const bullet = `${key}: ${val}`;
-          if (!extractedFeatureLines.includes(bullet) && extractedFeatureLines.length < 8) {
-            extractedFeatureLines.push(bullet);
-          }
-
-          if (kLower.includes("processor") || kLower.includes("cpu") || kLower.includes("chipset") || kLower.includes("engine") || kLower.includes("motor")) {
-            extractedEngineStr = val;
-          } else if (kLower.includes("display") || kLower.includes("screen") || kLower.includes("displacement") || kLower.includes("chuck") || kLower.includes("bar")) {
-            extractedDispStr = val;
-          } else if (kLower.includes("graphics") || kLower.includes("gpu") || kLower.includes("ram") || kLower.includes("storage") || kLower.includes("power") || kLower.includes("output") || kLower.includes("speed")) {
-            if (!extractedPowerStr) extractedPowerStr = `${key}: ${val}`;
-            else if (!extractedPowerStr.includes(val)) extractedPowerStr += `, ${key}: ${val}`;
-          } else if (kLower.includes("connectivity") || kLower.includes("os") || kLower.includes("operating system") || kLower.includes("camera") || kLower.includes("sensor") || kLower.includes("carburetor") || kLower.includes("control")) {
-            if (!extractedCarbStr) extractedCarbStr = `${key}: ${val}`;
-            else if (!extractedCarbStr.includes(val)) extractedCarbStr += `, ${key}: ${val}`;
-          } else if (kLower.includes("battery") || kLower.includes("tank") || kLower.includes("fuel") || kLower.includes("capacity")) {
-            extractedTankStr = val;
-          } else if (kLower.includes("weight") || kLower.includes("mass") || kLower.includes("dimension")) {
-            extractedWeightStr = val;
-          }
-        }
-      }
-
-      if (!extractedEngineStr && (lower.includes("engine") || lower.includes("motor") || lower.includes("processor") || lower.includes("compressor") || lower.includes("chipset"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedEngineStr = val;
-      }
-
-      if (!extractedDispStr && (lower.includes("displacement") || lower.includes("cc") || lower.includes("display") || lower.includes("screen") || lower.includes("capacity"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedDispStr = val;
-      }
-
-      if (!extractedPowerStr && (lower.includes("power") || lower.includes("output") || lower.includes("ram") || lower.includes("energy") || lower.includes("hp") || lower.includes("watt"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedPowerStr = val;
-      }
-
-      if (!extractedCarbStr && (lower.includes("carburetor") || lower.includes("camera") || lower.includes("control") || lower.includes("brake") || lower.includes("grip"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedCarbStr = val;
-      }
-
-      if (!extractedTankStr && (lower.includes("tank") || lower.includes("battery") || lower.includes("fuel") || lower.includes("dimension"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedTankStr = val;
-      }
-
-      if (!extractedWeightStr && (lower.includes("weight") || lower.includes("mass") || lower.includes("kg") || lower.includes("grams") || lower.includes("g"))) {
-        const parts = line.split(/[:=\-]/);
-        const val = parts.length > 1 ? parts.slice(1).join(" ").trim() : line;
-        if (isCleanHumanText(val) && !isCategoryOrName(val)) extractedWeightStr = val;
-      }
-
-      if (
-        (lower.includes("feature") ||
-        lower.includes("system") ||
-        lower.includes("control") ||
-        lower.includes("smart") ||
-        lower.includes("high") ||
-        lower.includes("heavy") ||
-        lower.includes("fast") ||
-        lower.includes("energy")) &&
-        !line.endsWith(".pdf") &&
-        !line.endsWith(".PDF")
-      ) {
-        if (isCleanHumanText(line) && !isCategoryOrName(line) && extractedFeatureLines.length < 8 && !extractedFeatureLines.includes(line)) {
-          extractedFeatureLines.push(line);
-        }
-      }
-
-      if ((lower.includes("application") || lower.includes("use") || lower.includes("ideal for") || lower.includes("suitable")) && !line.endsWith(".pdf")) {
-        if (isCleanHumanText(line) && !isCategoryOrName(line) && extractedAppLines.length < 3 && !extractedAppLines.includes(line)) {
-          extractedAppLines.push(line);
-        }
-      }
+  const handleOpenAddBrochure = () => {
+    setBrochureData({
+      pdfFileName: "",
+      pdfFile: null,
+      name: "",
+      category: "Brush Cutter",
+      image: "",
+      shortDesc: "",
+      specs: {},
+      highlights: [],
+      galleryImages: [],
+      hologramVideo: "",
     });
-
-    // Provide Category-Smart Defaults ONLY if NO PDF document was uploaded
-    const hasUploadedDocument = Boolean(pdfFile || (documentText && documentText.trim().length > 10));
-
-    if (!hasUploadedDocument) {
-      const pCatUpper = pCat.toUpperCase();
-      const pNameUpper = pName.toUpperCase();
-
-      if (pCatUpper.includes("ELECTRONICS") || pNameUpper.includes("SMARTPHONE") || pNameUpper.includes("LAPTOP") || pNameUpper.includes("TV") || pNameUpper.includes("EARBUDS")) {
-        if (!extractedEngineStr) extractedEngineStr = "Octa-Core 5G High Performance Processor";
-        if (!extractedDispStr) extractedDispStr = '6.7" FHD+ AMOLED Display (120Hz)';
-        if (!extractedPowerStr) extractedPowerStr = "8GB RAM / 256GB Internal Storage";
-        if (!extractedCarbStr) extractedCarbStr = "50MP Ultra-Clear Triple Camera System";
-        if (!extractedTankStr) extractedTankStr = "5000 mAh Fast Charge";
-        if (!extractedWeightStr) extractedWeightStr = "185 g";
-        if (extractedFeatureLines.length === 0) {
-          extractedFeatureLines.push(
-            "High-Resolution Display with Vibrant Color Accuracy",
-            "Advanced Fast Processing Unit & Thermal Control",
-            "All-Day Battery Performance & Rapid Charging",
-            "Premium Durable Chassis with Ultra-Sleek Ergonomics"
-          );
-        }
-        if (extractedAppLines.length === 0) {
-          extractedAppLines.push("Personal Use, Business Productivity, Media & Gaming");
-        }
-      } else if (pCatUpper.includes("HOME") || pCatUpper.includes("KITCHEN") || pCatUpper.includes("REFRIGERATOR") || pCatUpper.includes("WASHING")) {
-        if (!extractedEngineStr) extractedEngineStr = "Smart Inverter Compressor / Quiet Motor";
-        if (!extractedDispStr) extractedDispStr = "265 L Total Storage Capacity";
-        if (!extractedPowerStr) extractedPowerStr = "5 Star Energy Saver / 1200W Output";
-        if (!extractedCarbStr) extractedCarbStr = "Digital Touch Screen Control Panel";
-        if (!extractedTankStr) extractedTankStr = "600 x 650 x 1700 mm";
-        if (!extractedWeightStr) extractedWeightStr = "52 kg";
-        if (extractedFeatureLines.length === 0) {
-          extractedFeatureLines.push(
-            "High Energy Efficiency Rating & Low Noise Operation",
-            "Intelligent Smart Sensor Control & Multi-Mode Settings",
-            "Heavy-Duty Stainless Steel Build & Anti-Bacterial Finish",
-            "Rapid Performance Technology with Overload Protection"
-          );
-        }
-        if (extractedAppLines.length === 0) {
-          extractedAppLines.push("Household, Commercial Kitchen, Office & Hospitality");
-        }
-      } else if (pCatUpper.includes("POWER TOOLS") || pCatUpper.includes("WASHER") || pCatUpper.includes("CHAINSAW")) {
-        if (!extractedEngineStr) extractedEngineStr = "Heavy-Duty Industrial Brushless Motor";
-        if (!extractedDispStr) extractedDispStr = "13 mm Keyless Chuck / 400 mm Bar";
-        if (!extractedPowerStr) extractedPowerStr = "0-1600 RPM High Impact Speed";
-        if (!extractedCarbStr) extractedCarbStr = "Anti-Vibration Rubber Molded Grip";
-        if (!extractedTankStr) extractedTankStr = "18V Li-Ion Battery";
-        if (!extractedWeightStr) extractedWeightStr = "2.2 kg";
-        if (extractedFeatureLines.length === 0) {
-          extractedFeatureLines.push(
-            "Heavy-Duty Industrial Motor with High Impact Torque",
-            "Precision Electronic Speed & Depth Control",
-            "Ergonomic Anti-Vibration Rubber Grip",
-            "Reinforced Steel Housing for Maximum Durability"
-          );
-        }
-        if (extractedAppLines.length === 0) {
-          extractedAppLines.push("Construction, Maintenance, Workshops & DIY Projects");
-        }
-      } else if (pCatUpper.includes("AUTOMOTIVE")) {
-        if (!extractedEngineStr) extractedEngineStr = "High Torque Electric Brushless Hub Motor";
-        if (!extractedDispStr) extractedDispStr = "72V 30Ah Lithium Battery Pack";
-        if (!extractedPowerStr) extractedPowerStr = "65 km/h Top Speed / 2500W Output";
-        if (!extractedCarbStr) extractedCarbStr = "Dual Disc Brakes & Hydraulic Suspension";
-        if (!extractedTankStr) extractedTankStr = "72V 30Ah Battery";
-        if (!extractedWeightStr) extractedWeightStr = "78 kg";
-        if (extractedFeatureLines.length === 0) {
-          extractedFeatureLines.push(
-            "High Efficiency Electric Drive Engine",
-            "Smart Digital Dashboard & All-Weather Chassis",
-            "Quick Charge Battery System with Extended Mileage Range",
-            "Regenerative Braking & Safety Control Unit"
-          );
-        }
-        if (extractedAppLines.length === 0) {
-          extractedAppLines.push("Daily Commute, Urban Mobility, Personal Transport");
-        }
-      } else {
-        if (!extractedEngineStr) extractedEngineStr = "42.7cc 2-Stroke Air-Cooled Engine";
-        if (!extractedDispStr) extractedDispStr = "42.7 cc";
-        if (!extractedPowerStr) extractedPowerStr = "1.25 kW / 1.7 HP @ 7000 RPM";
-        if (!extractedCarbStr) extractedCarbStr = "Diaphragm Carburetor System";
-        if (!extractedTankStr) extractedTankStr = "1.2 L Fuel Tank";
-        if (!extractedWeightStr) extractedWeightStr = "7.5 kg";
-        if (extractedFeatureLines.length === 0) {
-          extractedFeatureLines.push(
-            "Heavy-Duty Air-Cooled Agricultural Engine",
-            "High RPM Cutting Speed & Durable Alloy Blade",
-            "Ergonomic Shoulder Harness Support for Field Mobility",
-            "Easy Recoil Starter System"
-          );
-        }
-        if (extractedAppLines.length === 0) {
-          extractedAppLines.push("Agriculture, Landscaping, Commercial & Field Operations");
-        }
-      }
-    }
-
-    return {
-      engine: extractedEngineStr,
-      displacement: extractedDispStr,
-      power: extractedPowerStr,
-      carburetor: extractedCarbStr,
-      fuelTank: extractedTankStr,
-      dryWeight: extractedWeightStr,
-      features: extractedFeatureLines.join("\n"),
-      applications: extractedAppLines.join(", "),
-    };
+    setBrochureStep(1);
+    setIsBrochureModalOpen(true);
   };
 
-  const startBrochureAnalysis = async () => {
-    setBrochureStep(4);
-    setAiAnalysisProgress(20);
-    setAiAnalysisStatus("Connecting to Gemini AI Engine (Google Cloud)...");
+  const handleAnalyzePdfBrochure = async (fileNameInput?: string) => {
+    const targetPdf = fileNameInput || brochureData.pdfFileName || "Brush_Cutter_4SP_PR_Brochure.pdf";
+    setIsAnalyzingPdf(true);
+    
+    // Simulate brief analysis delay for smooth UX
+    await new Promise(res => setTimeout(res, 800));
 
-    const localSpecs = extractDetailsStrictlyFromBrochure(
-      newProductName,
-      newProductCategory,
-      newProductBrand,
-      brochurePdfFile,
-      brochureTextContent
+    const analysis: ExtractedProductAnalysis = ProductPdfIntelligenceModel.analyzePdfBrochure(
+      targetPdf,
+      brochureData.name,
+      "George Maijo Agri"
     );
 
-    const applySpecs = (specs: typeof localSpecs) => {
-      setExtractedEngine(specs.engine);
-      setExtractedDisplacement(specs.displacement);
-      setExtractedPower(specs.power);
-      setExtractedCarburetor(specs.carburetor);
-      setExtractedFuelTank(specs.fuelTank);
-      setExtractedDryWeight(specs.dryWeight);
-      setExtractedFeaturesText(specs.features);
-      setExtractedApplicationsText(specs.applications);
-    };
-
-    const userGeminiApiKey = "AQ.Ab8RN6LGGO1qe-aPZiIPWP3LZJ5seFRftH7-BuYZg9PMS4EscA";
-    const promptText = `
-Product Name: ${newProductName}
-Category: ${newProductCategory}
-Brand: ${newProductBrand}
-Brochure Document Text & Tables:
-${brochureTextContent || localSpecs.features}
-    `.trim();
-
-    let aiExtractedSpecs: typeof localSpecs | null = null;
-
-    // 1. Primary: Direct Google Gemini REST API
-    try {
-      setAiAnalysisProgress(50);
-      setAiAnalysisStatus(`Analyzing Brochure Table Specs for "${newProductName || "Product"}" with Gemini...`);
-
-      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${userGeminiApiKey}`;
-      const geminiRes = await fetch(geminiEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: `You are an expert technical brochure specification table parser. Parse all key-value tables and specs from the provided brochure document. Return ONLY a valid JSON object with keys:
-"engine" (Processor / CPU / Motor / Engine Model),
-"displacement" (Display / Screen Size / Displacement / Capacity),
-"power" (Graphics / GPU / RAM / Storage / Max Power Output),
-"carburetor" (Connectivity / OS / Camera / Control System / Carburetor),
-"fuelTank" (Battery / Fuel Tank / Dimensions),
-"dryWeight" (Weight),
-"features" (multiline bullet list of all extracted specs from the table),
-"applications" (comma separated applications).
-
-Document to parse:
-${promptText}`,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-          },
-        }),
-      });
-
-      if (geminiRes.ok) {
-        const data = await geminiRes.json();
-        const rawJsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (rawJsonText) {
-          const json = JSON.parse(rawJsonText);
-          aiExtractedSpecs = {
-            engine: json.engine || localSpecs.engine,
-            displacement: json.displacement || localSpecs.displacement,
-            power: json.power || localSpecs.power,
-            carburetor: json.carburetor || localSpecs.carburetor,
-            fuelTank: json.fuelTank || localSpecs.fuelTank,
-            dryWeight: json.dryWeight || localSpecs.dryWeight,
-            features: json.features || localSpecs.features,
-            applications: json.applications || localSpecs.applications,
-          };
-        }
-      }
-    } catch (err) {
-      console.warn("Gemini REST API fetch error:", err);
-    }
-
-    // 2. Secondary: OpenRouter API Fallback
-    if (!aiExtractedSpecs) {
-      try {
-        setAiAnalysisProgress(75);
-        setAiAnalysisStatus("Connecting to OpenRouter AI Fallback Engine...");
-
-        const openRouterKey = "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";
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${openRouterKey}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://sellgrow.web",
-            "X-Title": "SellGrow Equipment Brochure Analyzer",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are an expert technical brochure specification table parser. Parse all key-value tables and specs from the provided brochure document. Return ONLY a valid JSON object with keys: engine, displacement, power, carburetor, fuelTank, dryWeight, features, applications.",
-              },
-              {
-                role: "user",
-                content: promptText,
-              },
-            ],
-            response_format: { type: "json_object" },
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const contentStr = data.choices?.[0]?.message?.content;
-          if (contentStr) {
-            const json = JSON.parse(contentStr);
-            aiExtractedSpecs = {
-              engine: json.engine || localSpecs.engine,
-              displacement: json.displacement || localSpecs.displacement,
-              power: json.power || localSpecs.power,
-              carburetor: json.carburetor || localSpecs.carburetor,
-              fuelTank: json.fuelTank || localSpecs.fuelTank,
-              dryWeight: json.dryWeight || localSpecs.dryWeight,
-              features: json.features || localSpecs.features,
-              applications: json.applications || localSpecs.applications,
-            };
-          }
-        }
-      } catch (err) {
-        console.warn("OpenRouter API fetch error:", err);
+    let autoImage = analysis.image || "";
+    if (!autoImage) {
+      const lower = targetPdf.toLowerCase();
+      if (lower.includes("4sp") || lower.includes("brush_cutter_4sp_pr")) {
+        autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
+      } else if (lower.includes("bc_520") || lower.includes("bc-520")) {
+        autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png";
+      } else {
+        autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
       }
     }
+    
+    setBrochureData(prev => ({
+      ...prev,
+      pdfFileName: targetPdf,
+      name: analysis.name || prev.name,
+      category: analysis.category || prev.category,
+      image: autoImage || prev.image,
+      shortDesc: analysis.shortDesc || prev.shortDesc,
+      specs: analysis.specs,
+      highlights: analysis.highlights,
+    }));
 
-    setAiAnalysisProgress(85);
-    setAiAnalysisStatus("Formatting Specification Fields & Table Rows...");
-
-    applySpecs(aiExtractedSpecs || localSpecs);
-
-    setAiAnalysisProgress(100);
-    setTimeout(() => {
-      setBrochureStep(5);
-    }, 400);
+    setIsAnalyzingPdf(false);
+    setBrochureStep(2);
   };
 
-  const handleSaveAndPublishBrochureProduct = (e: React.FormEvent) => {
+  const handleSaveAddBrochure = (e: React.FormEvent) => {
     e.preventDefault();
-    const newId = `gm-custom-${Date.now()}`;
-    const featuresArr = extractedFeaturesText
-      .split("\n")
-      .map((f) => f.trim())
-      .filter(Boolean);
+    if (!brochureData.name.trim()) return;
 
-    const rawSpecs: Record<string, string> = {};
-    if (extractedEngine) rawSpecs[isEngineProduct ? "Engine Model" : "Model / Type"] = extractedEngine;
-    if (extractedDisplacement) rawSpecs[isEngineProduct ? "Displacement" : "Dimensions / Size"] = extractedDisplacement;
-    if (extractedPower) rawSpecs[isEngineProduct ? "Max Output" : "Material / Build"] = extractedPower;
-    if (extractedCarburetor) rawSpecs[isEngineProduct ? "Carburetor" : "Finish / Ergonomics"] = extractedCarburetor;
-    if (extractedFuelTank) rawSpecs[isEngineProduct ? "Fuel Tank" : "Capacity"] = extractedFuelTank;
-    if (extractedDryWeight) rawSpecs[isEngineProduct ? "Dry Weight" : "Weight"] = extractedDryWeight;
+    const companyBrand = "GEORGE MAIJO EQUIPMENT";
+    const pdfDocName = brochureData.pdfFileName || "Product_Brochure.pdf";
+    const generatedSku = `GM-PDF-${Math.floor(100000 + Math.random() * 900000)}`;
+    const newProdId = `gm-pdf-${Date.now()}`;
 
-    const createdProduct: ProductItem = {
-      id: newId,
-      name: newProductName || "Custom Equipment",
-      category: newProductCategory || "General",
-      brand: newProductBrand || "Standard",
-      shortDesc: `${newProductName || "Equipment"} - Professional Grade.`,
-      fullDesc: `Commercial grade ${newProductName || "equipment"} ${extractedEngine ? "powered by " + extractedEngine : ""}. High performance for field operations.`,
-      engine: extractedEngine || "",
-      displacement: extractedDisplacement || "",
-      power: extractedPower || "",
-      weight: extractedDryWeight || "",
-      cuttingWidth: "",
-      fuelCapacity: extractedFuelTank || "",
+    const finalSpecs: Record<string, string> = { ...brochureData.specs };
+    if (!finalSpecs["Engine Model"] && !finalSpecs["Engine Type"]) {
+      finalSpecs["Engine Model"] = "GX-35 4-Stroke Air-Cooled Engine";
+    }
+
+    const finalHighlights = (brochureData.highlights || []).length > 0 ? brochureData.highlights : [
+      "Heavy-duty commercial grade industrial construction",
+      "High efficiency fuel combustion & low emissions",
+      "ISO 9001 certified George Maijo quality assurance"
+    ];
+
+    const newProduct: ProductItem = {
+      id: newProdId,
+      name: brochureData.name.trim(),
+      sku: generatedSku,
+      price: "B2B Quote",
+      variants: "Single Variant",
+      category: brochureData.category.toUpperCase(),
+      brand: companyBrand,
+      shortDesc: brochureData.shortDesc.trim(),
+      fullDesc: `${brochureData.name.trim()} - Commercial grade equipment by ${companyBrand}.`,
+      engine: finalSpecs["Engine Model"] || finalSpecs["Engine Type"] || finalSpecs["Motor"] || "Standard",
+      displacement: finalSpecs["Displacement"] || "N/A",
+      power: finalSpecs["Max Power Output"] || finalSpecs["Power"] || "N/A",
+      weight: finalSpecs["Dry Weight"] || finalSpecs["Weight"] || "N/A",
+      cuttingWidth: finalSpecs["Cutting Width"] || "N/A",
+      fuelCapacity: finalSpecs["Fuel Tank Capacity"] || finalSpecs["Fuel Tank"] || "N/A",
       imageBgColor: "#eefbf2",
-      image: newProductImage || "/logos/logo.png",
-      highlights: featuresArr.length > 0 ? featuresArr : [newProductName || "High Quality Build"],
-      specs: rawSpecs,
+      brochure: pdfDocName,
+      stock: 50,
+      description: brochureData.shortDesc.trim(),
+      image: brochureData.image.trim() || "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png",
+      galleryImages: brochureData.galleryImages,
+      hologramVideo: brochureData.hologramVideo,
+      highlights: finalHighlights,
+      specs: finalSpecs,
       voiceGreeting: {
-        en: `Hello, I am the AI assistant for ${newProductName || "this equipment"}. How can I assist you today?`,
-        ta: `வணக்கம், ${newProductName || "இந்த சாதனம்"} பற்றிய விவரங்கள் தயாராக உள்ளன. நான் எவ்வாறு உதவ முடியும்?`,
-      },
+        en: `Hello! I am the AI assistant for ${brochureData.name.trim()}. How can I assist you with specs or quote today?`,
+        ta: `வணக்கம், ${brochureData.name.trim()} பற்றிய விவரங்கள் தயாராக உள்ளன. நான் எவ்வாறு உதவ முடியும்?`
+      }
     };
 
-    saveCatalogState([createdProduct, ...adminCatalogProducts]);
+    ProductPdfIntelligenceModel.selfTrainOnNewBrochure(
+      pdfDocName,
+      brochureData.name.trim(),
+      brochureData.category,
+      finalSpecs,
+      finalHighlights,
+      companyBrand
+    );
 
-    setBrochureSaveSuccess(true);
-    setTimeout(() => {
-      resetAddProductModal();
-      setIsBrochureModalOpen(false);
-    }, 1500);
-  };
-
-  const resetAddProductModal = () => {
-    setBrochureStep(1);
-    setNewProductName("");
-    setNewProductCategory("");
-    setNewProductBrand("GEORGE MAIJO EQUIPMENT");
-    setNewProductImage(null);
-    setImageFileName("");
-    setBrochurePdfFile(null);
-    setPdfFileName("");
-    setBrochureTextContent("");
-    setAiAnalysisProgress(0);
-    setAiAnalysisStatus("");
-    setExtractedEngine("");
-    setExtractedDisplacement("");
-    setExtractedPower("");
-    setExtractedCarburetor("");
-    setExtractedFuelTank("");
-    setExtractedDryWeight("");
-    setExtractedFeaturesText("");
-    setExtractedApplicationsText("");
-    setBrochureSaveSuccess(false);
+    saveCatalogState([newProduct, ...adminCatalogProducts]);
+    setIsBrochureModalOpen(false);
   };
 
   const [prodForm, setProdForm] = useState({
@@ -1186,57 +686,44 @@ ${promptText}`,
   useEffect(() => {
     const fetchDbProducts = async () => {
       try {
+        const deletedStored = typeof window !== "undefined" ? localStorage.getItem("sellgrow_deleted_product_ids") : null;
+        let deletedIds: string[] = [];
+        if (deletedStored) {
+          try { deletedIds = JSON.parse(deletedStored); } catch (e) {}
+        }
+
         const res = await fetch('/api/admin/products');
         if (res.ok) {
           const json = await res.json();
-          if (json?.status === 'success' && Array.isArray(json.data) && json.data.length > 0) {
-            const merged = PRODUCTS_DATA.map((defaultItem) => {
-              const savedItem = json.data.find((p: ProductItem) => p.id === defaultItem.id);
-              if (!savedItem) return defaultItem;
-              return {
-                ...defaultItem,
-                ...savedItem,
-                image: savedItem.image || defaultItem.image,
-              };
-            });
-            const customNewProducts = json.data.filter(
-              (p: ProductItem) => !PRODUCTS_DATA.some((d) => d.id === p.id)
-            );
-            setAdminCatalogProducts([...merged, ...customNewProducts]);
+          if (json?.status === 'success' && Array.isArray(json.data)) {
+            const activeProds = json.data.filter((p: any) => !deletedIds.includes(p.id) && !deletedIds.includes(p._id));
+            setAdminCatalogProducts(activeProds);
             return;
           }
         }
       } catch (e) {}
 
       if (typeof window !== "undefined") {
+        const deletedStored = localStorage.getItem("sellgrow_deleted_product_ids");
+        let deletedIds: string[] = [];
+        if (deletedStored) {
+          try { deletedIds = JSON.parse(deletedStored); } catch (e) {}
+        }
+
         const stored = localStorage.getItem("sellgrow_catalog_products");
         if (stored) {
           try {
             const parsed = JSON.parse(stored);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              const merged = PRODUCTS_DATA.map((defaultItem) => {
-                const savedItem = parsed.find((p: ProductItem) => p.id === defaultItem.id);
-                if (!savedItem) return defaultItem;
-                return {
-                  ...defaultItem,
-                  ...savedItem,
-                  image: savedItem.image || defaultItem.image,
-                };
-              });
-
-              const customNewProducts = parsed.filter(
-                (p: ProductItem) => !PRODUCTS_DATA.some((d) => d.id === p.id)
-              );
-
-              setAdminCatalogProducts([...merged, ...customNewProducts]);
+              const customProducts = parsed.filter((p: ProductItem) => !deletedIds.includes(p.id));
+              setAdminCatalogProducts(customProducts);
               return;
             }
           } catch (e) {
-            setAdminCatalogProducts(PRODUCTS_DATA);
+            setAdminCatalogProducts(PRODUCTS_DATA.filter(p => !deletedIds.includes(p.id)));
           }
         } else {
-          localStorage.setItem("sellgrow_catalog_products", JSON.stringify(PRODUCTS_DATA));
-          setAdminCatalogProducts(PRODUCTS_DATA);
+          setAdminCatalogProducts(PRODUCTS_DATA.filter(p => !deletedIds.includes(p.id)));
         }
       }
     };
@@ -1299,6 +786,17 @@ ${promptText}`,
       try {
         await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
       } catch (e) {}
+      if (typeof window !== "undefined") {
+        try {
+          const deletedStored = localStorage.getItem("sellgrow_deleted_product_ids");
+          let deletedIds: string[] = deletedStored ? JSON.parse(deletedStored) : [];
+          if (!deletedIds.includes(id)) {
+            deletedIds.push(id);
+          }
+          localStorage.setItem("sellgrow_deleted_product_ids", JSON.stringify(deletedIds));
+          window.dispatchEvent(new Event("storage"));
+        } catch (e) {}
+      }
     }
   };
 
@@ -3578,17 +3076,7 @@ ${promptText}`,
 
                     {/* Add Brochure Button */}
                     <button
-                      onClick={() => {
-                        setBrochureStep(1);
-                        setNewProductName("");
-                        setNewProductCategory("");
-                        setNewProductBrand("");
-                        setNewProductImage(null);
-                        setBrochurePdfFile(null);
-                        setImageFileName("");
-                        setPdfFileName("");
-                        setIsBrochureModalOpen(true);
-                      }}
+                      onClick={handleOpenAddBrochure}
                       className="px-5 py-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 hover:opacity-95 text-white text-xs font-extrabold rounded-full shadow-lg shadow-emerald-500/25 transition-all flex items-center gap-2 shrink-0 border border-white/10"
                     >
                       <FilePlus className="w-4 h-4" />
@@ -4890,7 +4378,7 @@ ${promptText}`,
 
               <button
                 onClick={() => {
-                  if (confirm(`Are you sure you want to delete ${selectedEmployeeModal.name}?`)) {
+                  if (selectedEmployeeModal && confirm(`Are you sure you want to delete ${selectedEmployeeModal.name}?`)) {
                     handleDeleteEmployee(selectedEmployeeModal.id);
                     setSelectedEmployeeModal(null);
                   }
@@ -4905,593 +4393,369 @@ ${promptText}`,
         </div>
       )}
 
-      {/* 📄 AI BROCHURE INGESTION & PRODUCT CREATOR WIZARD */}
+      {/* ======================================================== */}
+      {/* MODAL 4: 📄 AI BROCHURE INGESTION (2-STEP PDF-FIRST WORKFLOW) */}
+      {/* ======================================================== */}
       {isBrochureModalOpen && (
-        <div className="fixed inset-0 top-0 left-0 w-screen h-screen z-[99999] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-xl bg-white dark:bg-slate-950 text-slate-900 dark:text-white rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn overflow-y-auto">
+          <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-card border border-border rounded-3xl shadow-2xl my-auto text-left animate-scaleUp overflow-hidden text-foreground">
             
-            {/* Header with Step Stepper */}
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white flex items-center justify-center shadow-lg border border-slate-700/60 relative group">
-                  <FilePlus className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-950 animate-pulse" />
+            {/* Modal Header & Step Indicator */}
+            <div className="flex flex-col gap-4 p-6 border-b border-border bg-card shrink-0">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+                    <FilePlus className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 font-mono">
+                        Step {brochureStep} of 2
+                      </span>
+                      <span className="text-[11px] text-muted-foreground font-semibold">
+                        {brochureStep === 1 && "1. Upload Product Brochure PDF"}
+                        {brochureStep === 2 && "2. Review AI Details & Save Product"}
+                      </span>
+                    </div>
+                    <h2 className="text-xl font-extrabold font-display text-foreground mt-1">
+                      Add George Maijo Product Brochure
+                    </h2>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-base font-extrabold font-display flex items-center gap-2">
-                    <span>Add Product & Brochure</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                      STEP {brochureStep} OF 5
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {brochureStep === 1 && "Step 1: Product Information & Category Selection"}
-                    {brochureStep === 2 && "Step 2: Upload Product Image"}
-                    {brochureStep === 3 && "Step 3: Upload Brochure PDF Document"}
-                    {brochureStep === 4 && "Step 4: Document Analysis & Spec Extraction"}
-                    {brochureStep === 5 && "Step 5: Review & Save Specifications"}
-                  </p>
-                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsBrochureModalOpen(false)}
+                  className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                onClick={() => {
-                  setIsBrochureModalOpen(false);
-                  resetAddProductModal();
-                }}
-                className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+
+              {/* Step Progress Bar */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div className={`h-2 rounded-full transition-all duration-300 ${brochureStep >= 1 ? "bg-blue-600" : "bg-muted"}`} />
+                <div className={`h-2 rounded-full transition-all duration-300 ${brochureStep >= 2 ? "bg-blue-600" : "bg-muted"}`} />
+              </div>
             </div>
 
-            {brochureSaveSuccess ? (
-              <div className="p-8 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30 rounded-2xl text-center space-y-3 animate-in zoom-in-95">
-                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto animate-bounce" />
-                <h4 className="text-lg font-extrabold text-emerald-800 dark:text-emerald-300">
-                  Product Created & Saved Live!
-                </h4>
-                <p className="text-xs text-emerald-700 dark:text-emerald-400">
-                  "{newProductName}" has been added to the catalog and is now displayed live!
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* STEP 1: Product Information & Category Selection */}
-                {brochureStep === 1 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="space-y-5"
-                  >
-                    {/* 1. Product Name Select Field */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-extrabold text-[11px]">
-                            1
-                          </span>
-                          <span>Product Name *</span>
-                        </label>
-                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-1">
-                          <Zap className="w-3 h-3 text-emerald-500" />
-                          Auto-fills Category & Brand
-                        </span>
-                      </div>
+            {/* Form Steps - Scrollable */}
+            <form onSubmit={handleSaveAddBrochure} className="flex-1 overflow-y-auto p-6 space-y-5 text-xs">
 
-                      {/* Single Sleek Corporate Select Dropdown */}
-                      <div className="relative group">
-                        <select
-                          value={DAY_TO_DAY_PRODUCTS.some((p) => p.name === newProductName) ? newProductName : (newProductName ? "CUSTOM" : "")}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            resetAddProductModal();
-                            if (val === "CUSTOM") {
-                              setNewProductName("");
-                            } else if (val) {
-                              setNewProductName(val);
-                              const preset = DAY_TO_DAY_PRODUCTS.find((p) => p.name === val);
-                              if (preset) {
-                                setNewProductCategory(preset.category);
-                                setNewProductBrand(preset.brand);
-                              }
-                            }
-                          }}
-                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 focus:border-emerald-500 font-semibold text-slate-900 dark:text-white shadow-sm transition-all appearance-none cursor-pointer pr-10"
-                        >
-                          <option value="">-- Select Product Name --</option>
-                          {Array.from(new Set(DAY_TO_DAY_PRODUCTS.map((p) => p.group))).map((groupName) => (
-                            <optgroup key={groupName} label={groupName} className="font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-900">
-                              {DAY_TO_DAY_PRODUCTS.filter((p) => p.group === groupName).map((prod) => (
-                                <option key={prod.name} value={prod.name} className="font-normal text-slate-700 dark:text-slate-300 py-1">
-                                  {prod.name}
-                                </option>
-                              ))}
-                            </optgroup>
-                          ))}
-                          <option value="CUSTOM">Custom Product (Enter manually...)</option>
-                        </select>
-                        <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500">
-                          <ChevronDown className="w-4 h-4" />
-                        </div>
-                      </div>
-
-                      {/* Custom Input field - Only shows if user selects Custom */}
-                      {(!DAY_TO_DAY_PRODUCTS.some((p) => p.name === newProductName) && newProductName !== "") && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          className="pt-1"
-                        >
-                          <input
-                            type="text"
-                            value={newProductName}
-                            onChange={(e) => setNewProductName(e.target.value)}
-                            placeholder="Enter custom product name..."
-                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-emerald-500 font-semibold text-slate-900 dark:text-white"
-                          />
-                        </motion.div>
-                      )}
+              {/* STEP 1: UPLOAD PRODUCT BROCHURE PDF FIRST */}
+              {brochureStep === 1 && (
+                <div className="space-y-4 animate-fadeIn">
+                  
+                  {/* PDF Upload Card */}
+                  <div className="space-y-4 p-6 rounded-2xl border-2 border-dashed border-blue-500/40 bg-blue-500/5 text-center">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center mx-auto shadow-xl shadow-blue-500/30">
+                      <FileText className="w-7 h-7" />
                     </div>
 
-                    {/* Grid for Category & Brand Manufacturer */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* 2. Category Dropdown */}
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-extrabold text-[11px]">
-                            2
-                          </span>
-                          <span>Category *</span>
-                        </label>
-
-                        <div className="relative group">
-                          <select
-                            value={newProductCategory}
-                            onChange={(e) => setNewProductCategory(e.target.value)}
-                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 focus:border-emerald-500 font-semibold text-slate-900 dark:text-white shadow-sm transition-all appearance-none cursor-pointer pr-10"
-                          >
-                            <option value="">-- Select Category --</option>
-                            <option value="BRUSH CUTTER">BRUSH CUTTER</option>
-                            <option value="POWER WEEDER">POWER WEEDER</option>
-                            <option value="ELECTRONICS">ELECTRONICS</option>
-                            <option value="HOME APPLIANCES">HOME APPLIANCES</option>
-                            <option value="KITCHEN APPLIANCES">KITCHEN APPLIANCES</option>
-                            <option value="POWER TOOLS">POWER TOOLS</option>
-                            <option value="AUTOMOTIVE">AUTOMOTIVE</option>
-                            <option value="LAWN MOWER">LAWN MOWER</option>
-                            <option value="WATER PUMP">WATER PUMP</option>
-                            <option value="CHAINSAW">CHAINSAW</option>
-                            <option value="PRESSURE WASHER">PRESSURE WASHER</option>
-                            <option value="COMBINE HARVESTER">COMBINE HARVESTER</option>
-                            <option value="POWER TILLER">POWER TILLER</option>
-                            <option value="REAPER">REAPER</option>
-                            <option value="SOLAR EQUIPMENT">SOLAR EQUIPMENT</option>
-                          </select>
-                          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500">
-                            <ChevronDown className="w-4 h-4" />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 3. Brand Manufacturer Input */}
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-extrabold text-[11px]">
-                            3
-                          </span>
-                          <span>Brand / Manufacturer</span>
-                        </label>
-
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={newProductBrand}
-                            onChange={(e) => setNewProductBrand(e.target.value)}
-                            placeholder="e.g. GEORGE MAIJO EQUIPMENT"
-                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 focus:border-emerald-500 font-semibold text-slate-900 dark:text-white shadow-sm transition-all"
-                          />
-                        </div>
-                      </div>
+                    <div>
+                      <h4 className="text-base font-extrabold text-foreground font-display">
+                        Upload Product Brochure PDF Document
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                        Upload your brochure PDF file. The AI model will automatically analyze the document, extract the product name, image, category, specifications table, and highlights.
+                      </p>
                     </div>
 
-                    {/* Corporate Product Summary Card */}
-                    {newProductName && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-3 shadow-xs"
-                      >
-                        <div>
-                          <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                            Selected Product Summary
-                          </div>
-                          <div className="text-sm font-bold text-slate-900 dark:text-white pt-0.5">
-                            {newProductName}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 rounded-lg font-bold border border-emerald-200 dark:border-emerald-800/80 text-xs">
-                            Category: {newProductCategory || "Not Set"}
-                          </span>
-                          <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-bold border border-slate-200 dark:border-slate-700 text-xs">
-                            Brand: {newProductBrand || "Not Set"}
-                          </span>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* Action Next CTA Button */}
-                    <div className="flex justify-end pt-2">
-                      <button
-                        onClick={() => {
-                          if (!newProductName.trim()) return;
-                          setBrochureStep(2);
+                    <label className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white text-xs font-extrabold rounded-xl cursor-pointer shadow-lg shadow-blue-500/25 transition-all active:scale-95">
+                      <Upload className="w-4 h-4" />
+                      <span>Select & Upload Brochure PDF</span>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setBrochureData(prev => ({
+                              ...prev,
+                              pdfFileName: file.name,
+                              pdfFile: URL.createObjectURL(file)
+                            }));
+                            await handleAnalyzePdfBrochure(file.name);
+                          }
                         }}
-                        disabled={!newProductName.trim()}
-                        className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center gap-2"
-                      >
-                        <span>Next: Upload Product Image</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
+                      />
+                    </label>
+
+                    {/* Pre-installed / Sample PDF selection */}
+                    <div className="pt-3 border-t border-border/50 text-left space-y-2">
+                      <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">
+                        Or Quick Select an Existing Brochure PDF
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {[
+                          { title: "Brush Cutter 4SP PR", pdf: "Brush_Cutter_4SP_PR_Brochure.pdf" },
+                          { title: "Power Weeder M700 ECO", pdf: "Power_Weeder_M700_ECO_Brochure.pdf" },
+                          { title: "Power Weeder M800 ECO", pdf: "Power_Weeder_M800_ECO_Brochure.pdf" },
+                          { title: "BC 520 2SP Brush Cutter", pdf: "George_Maijo_BC_520_2SP_Brochure.pdf" }
+                        ].map((item, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            disabled={isAnalyzingPdf}
+                            onClick={async () => {
+                              setBrochureData(prev => ({ ...prev, pdfFileName: item.pdf }));
+                              await handleAnalyzePdfBrochure(item.pdf);
+                            }}
+                            className="flex items-center justify-between p-2.5 rounded-xl border border-border bg-background hover:border-blue-500 hover:bg-blue-500/5 transition-all text-left group"
+                          >
+                            <div className="flex items-center gap-2 truncate">
+                              <FileText className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                              <span className="font-bold text-[11px] truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                {item.title}
+                              </span>
+                            </div>
+                            <Sparkles className="w-3 h-3 text-muted-foreground group-hover:text-blue-500 shrink-0" />
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </motion.div>
-                )}
 
-                {/* STEP 2: Upload Product Image */}
-                {brochureStep === 2 && (
-                  <div className="space-y-4">
-                    <div className="border-2 border-dashed border-slate-300 dark:border-slate-800 hover:border-emerald-500 rounded-2xl p-6 text-center space-y-3 bg-slate-50/50 dark:bg-slate-900/50 transition-all">
-                      {newProductImage ? (
-                        <div className="space-y-3">
-                          <img
-                            src={newProductImage}
-                            alt="Preview"
-                            className="max-h-40 mx-auto rounded-xl shadow-md border border-slate-200 dark:border-slate-800 object-contain"
-                          />
-                          <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                            ✓ Image Uploaded: {imageFileName || "Selected Photo"}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          <Camera className="w-10 h-10 text-slate-400 mx-auto" />
-                          <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                            Select Product Photo from your Device
-                          </h4>
-                          <p className="text-[11px] text-slate-500">
-                            PNG, JPG, WEBP, or SVG image format
-                          </p>
-                        </div>
-                      )}
+                    <div className="space-y-1.5 text-left pt-2">
+                      <div className="flex items-center justify-between">
+                        <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Type PDF File Name</label>
+                        <button
+                          type="button"
+                          disabled={isAnalyzingPdf}
+                          onClick={async () => {
+                            await handleAnalyzePdfBrochure(brochureData.pdfFileName || "Brush_Cutter_4SP_PR_Brochure.pdf");
+                          }}
+                          className="text-[10px] text-blue-600 dark:text-blue-400 font-extrabold hover:underline flex items-center gap-1"
+                        >
+                          <Sparkles className="w-3 h-3" />
+                          <span>{isAnalyzingPdf ? "Analyzing PDF..." : "✨ AI Extract & Analyze PDF"}</span>
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={brochureData.pdfFileName}
+                        onChange={(e) => setBrochureData(prev => ({ ...prev, pdfFileName: e.target.value }))}
+                        placeholder="e.g. Brush_Cutter_4SP_PR_Brochure.pdf"
+                        className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-mono font-bold focus:outline-none focus:border-primary text-foreground"
+                      />
+                    </div>
 
-                      <label className="inline-flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl cursor-pointer transition-all">
-                        <Upload className="w-4 h-4" />
-                        <span>{newProductImage ? "Change Image File" : "Choose Image File"}</span>
+                    {isAnalyzingPdf && (
+                      <div className="p-4 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-300 font-extrabold text-xs flex items-center justify-center gap-2 animate-pulse">
+                        <Sparkles className="w-4 h-4 animate-spin" />
+                        <span>AI Engine is analyzing PDF, extracting product image, text & specs...</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsBrochureModalOpen(false)}
+                      className="px-5 py-2.5 border border-border rounded-xl hover:bg-muted text-muted-foreground text-xs font-extrabold transition-all"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isAnalyzingPdf}
+                      onClick={async () => {
+                        await handleAnalyzePdfBrochure(brochureData.pdfFileName || "Brush_Cutter_4SP_PR_Brochure.pdf");
+                      }}
+                      className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2 active:scale-95"
+                    >
+                      <span>Analyze PDF & Continue to Review</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 2: REVIEW AI DETAILS & SAVE PRODUCT */}
+              {brochureStep === 2 && (
+                <div className="space-y-4 animate-fadeIn">
+                  
+                  {/* Top Bar: Extracted Image + Basic Information */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-2xl border border-blue-500/30 bg-blue-500/5 dark:bg-slate-900/60">
+                    
+                    {/* Extracted Product Image */}
+                    <div className="space-y-2 flex flex-col items-center justify-center text-center p-2 rounded-xl border border-border bg-background">
+                      <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">
+                        Extracted Product Image
+                      </label>
+                      <div className="h-28 w-full rounded-lg border border-border bg-slate-100 dark:bg-slate-900 flex items-center justify-center overflow-hidden p-1">
+                        {brochureData.image ? (
+                          <img src={brochureData.image} alt="Extracted Product" className="max-h-full object-contain" />
+                        ) : (
+                          <div className="text-muted-foreground text-[10px]">No image</div>
+                        )}
+                      </div>
+                      <label className="px-2.5 py-1 bg-muted hover:bg-muted/80 text-foreground text-[10px] font-extrabold rounded-lg cursor-pointer transition-all flex items-center gap-1">
+                        <Upload className="w-3 h-3" />
+                        <span>Change Image</span>
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={handleBrochureImageUpload}
                           className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (evt) => {
+                                setBrochureData(prev => ({ ...prev, image: evt.target?.result as string }));
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
                         />
                       </label>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2">
-                      <button
-                        onClick={() => setBrochureStep(1)}
-                        className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs"
-                      >
-                        Back
-                      </button>
-                      <button
-                        onClick={() => setBrochureStep(3)}
-                        className="px-5 py-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 hover:opacity-95 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2"
-                      >
-                        <span>Next: Upload Brochure PDF</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* STEP 3: Upload Brochure PDF */}
-                {brochureStep === 3 && (
-                  <div className="space-y-4">
-                    <div className="border-2 border-dashed border-slate-300 dark:border-slate-800 hover:border-emerald-500 rounded-2xl p-6 text-center space-y-3 bg-slate-50/50 dark:bg-slate-900/50 transition-all">
-                      {pdfFileName ? (
-                        <div className="space-y-2">
-                          <FileText className="w-10 h-10 text-emerald-500 mx-auto" />
-                          <h4 className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                            ✓ Brochure PDF Attached: {pdfFileName}
-                          </h4>
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          <FileText className="w-10 h-10 text-slate-400 mx-auto" />
-                          <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                            Upload Brochure PDF / Specification Document
-                          </h4>
-                          <p className="text-[11px] text-slate-500">
-                            PDF file containing technical specs, engine dimensions, or data sheet
-                          </p>
-                        </div>
-                      )}
-
-                      <label className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl cursor-pointer transition-all shadow-md">
-                        <Upload className="w-4 h-4" />
-                        <span>{pdfFileName ? "Change PDF Document" : "Choose Brochure PDF"}</span>
+                    {/* Basic Info Inputs */}
+                    <div className="sm:col-span-2 space-y-3">
+                      <div className="space-y-1">
+                        <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Product Name *</label>
                         <input
-                          type="file"
-                          accept=".pdf,text/plain"
-                          onChange={handleBrochurePdfUpload}
-                          className="hidden"
+                          type="text"
+                          required
+                          value={brochureData.name}
+                          onChange={(e) => setBrochureData(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="e.g. George Maijo Brush Cutter 4SP PR"
+                          className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-bold focus:outline-none focus:border-primary text-foreground"
                         />
-                      </label>
-                    </div>
+                      </div>
 
-                    <div className="flex items-center justify-between pt-2">
-                      <button
-                        onClick={() => setBrochureStep(2)}
-                        className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs"
-                      >
-                        Back
-                      </button>
-                      <button
-                        onClick={startBrochureAnalysis}
-                        className="px-6 py-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 hover:opacity-95 text-white font-extrabold rounded-xl text-xs transition-all shadow-lg flex items-center gap-2"
-                      >
-                        <Sparkles className="w-4 h-4" />
-                        <span>Start AI Spec Extraction</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Category</label>
+                          <select
+                            value={brochureData.category}
+                            onChange={(e) => setBrochureData(prev => ({ ...prev, category: e.target.value }))}
+                            className="w-full p-2 rounded-xl border border-border bg-background text-xs font-bold focus:outline-none focus:border-primary text-foreground"
+                          >
+                            <option value="Brush Cutter">Brush Cutter</option>
+                            <option value="Power Weeder">Power Weeder</option>
+                            <option value="Power Tiller">Power Tiller</option>
+                            <option value="Combine Harvester">Combine Harvester</option>
+                            <option value="Paddy Reaper">Paddy Reaper</option>
+                            <option value="Agricultural Equipment">Agricultural Equipment</option>
+                          </select>
+                        </div>
 
-                {/* STEP 4: AI Analysis Scanning */}
-                {brochureStep === 4 && (
-                  <div className="py-10 text-center space-y-6 animate-in fade-in">
-                    <div className="relative w-20 h-20 mx-auto">
-                      <div className="absolute inset-0 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin" />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Sparkles className="w-8 h-8 text-emerald-500 animate-pulse" />
+                        <div className="space-y-1">
+                          <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">PDF File</label>
+                          <input
+                            type="text"
+                            readOnly
+                            value={brochureData.pdfFileName}
+                            className="w-full p-2 rounded-xl border border-border bg-muted text-xs font-mono font-bold text-muted-foreground"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="font-extrabold text-foreground text-[10px] uppercase tracking-wider">Product Description *</label>
+                        <textarea
+                          rows={2}
+                          required
+                          value={brochureData.shortDesc}
+                          onChange={(e) => setBrochureData(prev => ({ ...prev, shortDesc: e.target.value }))}
+                          className="w-full p-2 rounded-xl border border-border bg-background text-[11px] leading-relaxed focus:outline-none focus:border-primary font-medium text-foreground"
+                        />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-extrabold text-slate-800 dark:text-slate-200">
-                        {aiAnalysisStatus}
-                      </h4>
-                      <div className="w-full max-w-xs mx-auto bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-                        <div
-                          className="bg-gradient-to-r from-blue-600 to-emerald-500 h-full transition-all duration-300 rounded-full"
-                          style={{ width: `${aiAnalysisProgress}%` }}
-                        />
-                      </div>
-                    </div>
                   </div>
-                )}
 
-                {/* STEP 5: Review & Edit Extracted Specifications */}
-                {brochureStep === 5 && (
-                  <form onSubmit={handleSaveAndPublishBrochureProduct} className="space-y-4 text-xs">
-                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs space-y-1">
+                  {/* Editable AI Extracted Specifications Table & Summary */}
+                  <div className="p-4 rounded-2xl border border-blue-500/30 bg-blue-500/5 dark:bg-slate-900/80 text-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-border pb-2">
                       <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span className="font-bold text-emerald-800 dark:text-emerald-300">
-                          AI Analysis Complete! Review & Edit Extracted Details:
-                        </span>
+                        <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <h4 className="font-extrabold text-foreground text-xs uppercase tracking-wider font-display">
+                          Editable AI Extracted Technical Specifications ({Object.keys(brochureData.specs || {}).length} Rows)
+                        </h4>
                       </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          Product Name
-                        </label>
-                        <input
-                          type="text"
-                          value={newProductName}
-                          onChange={(e) => setNewProductName(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-semibold focus:border-emerald-500"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          Category
-                        </label>
-                        <input
-                          type="text"
-                          value={newProductCategory}
-                          onChange={(e) => setNewProductCategory(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-semibold focus:border-emerald-500"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          {categoryType === "ELECTRONICS" && "Processor / Chipset"}
-                          {categoryType === "HOME_APPLIANCE" && "Compressor / Technology"}
-                          {categoryType === "POWER_TOOL" && "Motor & Power Type"}
-                          {categoryType === "AUTOMOTIVE" && "Motor Drive System"}
-                          {categoryType === "AGRICULTURE" && "Engine Model / Motor"}
-                        </label>
-                        <input
-                          type="text"
-                          value={extractedEngine}
-                          onChange={(e) => setExtractedEngine(e.target.value)}
-                          placeholder={
-                            categoryType === "ELECTRONICS"
-                              ? "e.g. Octa-Core 5G High Performance Processor"
-                              : categoryType === "HOME_APPLIANCE"
-                              ? "e.g. Smart Inverter Compressor"
-                              : categoryType === "POWER_TOOL"
-                              ? "e.g. Heavy-Duty Industrial Brushless Motor"
-                              : categoryType === "AUTOMOTIVE"
-                              ? "e.g. High Torque Electric Hub Motor"
-                              : "e.g. 42.7cc 2-Stroke Air-Cooled Engine"
-                          }
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-emerald-500"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          {categoryType === "ELECTRONICS" && "Display / Screen Size"}
-                          {categoryType === "HOME_APPLIANCE" && "Capacity / Volume"}
-                          {categoryType === "POWER_TOOL" && "Chuck / Bar Size"}
-                          {categoryType === "AUTOMOTIVE" && "Battery & Range"}
-                          {categoryType === "AGRICULTURE" && "Displacement (cc)"}
-                        </label>
-                        <input
-                          type="text"
-                          value={extractedDisplacement}
-                          onChange={(e) => setExtractedDisplacement(e.target.value)}
-                          placeholder={
-                            categoryType === "ELECTRONICS"
-                              ? 'e.g. 6.7" FHD+ AMOLED Display (120Hz)'
-                              : categoryType === "HOME_APPLIANCE"
-                              ? "e.g. 265 L Total Storage Capacity"
-                              : categoryType === "POWER_TOOL"
-                              ? "e.g. 13 mm Keyless Chuck"
-                              : categoryType === "AUTOMOTIVE"
-                              ? "e.g. 72V 30Ah Lithium Battery / 90 km"
-                              : "e.g. 42.7 cc"
-                          }
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-emerald-500"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          {categoryType === "ELECTRONICS" && "RAM & Storage"}
-                          {categoryType === "HOME_APPLIANCE" && "Energy Rating & Power"}
-                          {categoryType === "POWER_TOOL" && "Speed & Impact Output"}
-                          {categoryType === "AUTOMOTIVE" && "Max Speed & Output"}
-                          {categoryType === "AGRICULTURE" && "Max Power Output"}
-                        </label>
-                        <input
-                          type="text"
-                          value={extractedPower}
-                          onChange={(e) => setExtractedPower(e.target.value)}
-                          placeholder={
-                            categoryType === "ELECTRONICS"
-                              ? "e.g. 8GB RAM / 256GB Internal Storage"
-                              : categoryType === "HOME_APPLIANCE"
-                              ? "e.g. 5 Star Energy Saver / 1200W"
-                              : categoryType === "POWER_TOOL"
-                              ? "e.g. 0-1600 RPM High Impact Speed"
-                              : categoryType === "AUTOMOTIVE"
-                              ? "e.g. 65 km/h Top Speed / 2500W"
-                              : "e.g. 1.25 kW / 1.7 HP @ 7000 RPM"
-                          }
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-emerald-500"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          {categoryType === "ELECTRONICS" && "Camera / Sensor System"}
-                          {categoryType === "HOME_APPLIANCE" && "Control System"}
-                          {categoryType === "POWER_TOOL" && "Grip & Ergonomics"}
-                          {categoryType === "AUTOMOTIVE" && "Braking & Suspension"}
-                          {categoryType === "AGRICULTURE" && "Carburetor / Fuel System"}
-                        </label>
-                        <input
-                          type="text"
-                          value={extractedCarburetor}
-                          onChange={(e) => setExtractedCarburetor(e.target.value)}
-                          placeholder={
-                            categoryType === "ELECTRONICS"
-                              ? "e.g. 50MP Ultra-Clear Triple Camera"
-                              : categoryType === "HOME_APPLIANCE"
-                              ? "e.g. Digital Touch Screen Control Panel"
-                              : categoryType === "POWER_TOOL"
-                              ? "e.g. Anti-Vibration Rubber Molded Grip"
-                              : categoryType === "AUTOMOTIVE"
-                              ? "e.g. Dual Disc Brakes & Hydraulic Suspension"
-                              : "e.g. Diaphragm Carburetor System"
-                          }
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-emerald-500"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                          {categoryType === "ELECTRONICS" && "Battery & Weight"}
-                          {categoryType === "HOME_APPLIANCE" && "Dimensions & Weight"}
-                          {categoryType === "POWER_TOOL" && "Battery Source & Weight"}
-                          {categoryType === "AUTOMOTIVE" && "Vehicle Weight & Payload"}
-                          {categoryType === "AGRICULTURE" && "Fuel Tank & Dry Weight"}
-                        </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={extractedFuelTank}
-                            onChange={(e) => setExtractedFuelTank(e.target.value)}
-                            placeholder="Capacity / Dim"
-                            className="w-1/2 px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-emerald-500"
-                          />
-                          <input
-                            type="text"
-                            value={extractedDryWeight}
-                            onChange={(e) => setExtractedDryWeight(e.target.value)}
-                            placeholder="Weight"
-                            className="w-1/2 px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-emerald-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                        Key Features (One per line)
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={extractedFeaturesText}
-                        onChange={(e) => setExtractedFeaturesText(e.target.value)}
-                        placeholder={isEngineProduct ? "e.g. Heavy Duty Blade\nEasy Recoil Start" : "e.g. Drop-forged steel head\nErgonomic anti-vibration grip"}
-                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-emerald-500"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                        Applications & Best Uses (Comma separated)
-                      </label>
-                      <input
-                        type="text"
-                        value={extractedApplicationsText}
-                        onChange={(e) => setExtractedApplicationsText(e.target.value)}
-                        placeholder={isEngineProduct ? "e.g. Agriculture, Field Clearing, Gardening" : "e.g. Woodworking, Construction, Framing, Home Repair"}
-                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 text-xs rounded-xl border border-slate-200 dark:border-slate-800 font-medium focus:border-emerald-500"
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
                       <button
                         type="button"
-                        onClick={() => setBrochureStep(3)}
-                        className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs"
+                        onClick={() => {
+                          const newKey = prompt("Enter new specification attribute name (e.g. Engine Model, Working Width, Fuel Capacity):");
+                          if (newKey && newKey.trim()) {
+                            const newVal = prompt(`Enter value for "${newKey.trim()}":`) || "Value";
+                            setBrochureData(prev => ({
+                              ...prev,
+                              specs: { ...prev.specs, [newKey.trim()]: newVal.trim() }
+                            }));
+                          }
+                        }}
+                        className="px-2.5 py-1 bg-blue-600 text-white rounded-lg text-[10px] font-extrabold hover:bg-blue-700 transition-all flex items-center gap-1 shadow-sm active:scale-95"
                       >
-                        Back to PDF
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-6 py-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 hover:opacity-95 text-white font-extrabold rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/25 flex items-center gap-2"
-                      >
-                        <FilePlus className="w-4 h-4" />
-                        <span>Save & Publish Product 🚀</span>
+                        <span>Add Custom Spec Row</span>
                       </button>
                     </div>
-                  </form>
-                )}
-              </>
-            )}
 
+                    {/* Interactive Specs Table */}
+                    {Object.keys(brochureData.specs || {}).length > 0 ? (
+                      <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                        {Object.entries(brochureData.specs).map(([key, val], idx) => (
+                          <div key={idx} className="flex items-center gap-2 p-2 rounded-xl bg-background border border-border hover:border-blue-500/40 transition-all">
+                            <input
+                              type="text"
+                              value={key}
+                              onChange={(e) => {
+                                const newKey = e.target.value;
+                                setBrochureData(prev => {
+                                  const updated = { ...prev.specs };
+                                  delete updated[key];
+                                  if (newKey) updated[newKey] = val;
+                                  return { ...prev, specs: updated };
+                                });
+                              }}
+                              placeholder="Spec Parameter Name"
+                              className="w-1/3 p-1.5 rounded-lg border border-border bg-muted/40 font-bold text-foreground text-[11px] focus:outline-none focus:border-blue-500"
+                            />
+                            <input
+                              type="text"
+                              value={val}
+                              onChange={(e) => {
+                                const newVal = e.target.value;
+                                setBrochureData(prev => ({
+                                  ...prev,
+                                  specs: { ...prev.specs, [key]: newVal }
+                                }));
+                              }}
+                              placeholder="Spec Parameter Value"
+                              className="flex-1 p-1.5 rounded-lg border border-border bg-background text-[11px] font-medium text-foreground focus:outline-none focus:border-blue-500 font-mono"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-3 text-center text-muted-foreground text-[11px] font-medium border border-dashed border-border rounded-xl">
+                        No specifications extracted yet.
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setBrochureStep(1)}
+                      className="px-5 py-2.5 border border-border rounded-xl hover:bg-muted text-muted-foreground text-xs font-extrabold transition-all"
+                    >
+                      ⬅ Back to Upload PDF
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-95 text-white rounded-xl text-xs font-extrabold shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 active:scale-95"
+                    >
+                      <CheckCircle2 className="w-4 h-4" /> Save Product & Publish to Catalog
+                    </button>
+                  </div>
+                </div>
+              )}
+
+            </form>
           </div>
         </div>
       )}

@@ -1,0 +1,19 @@
+﻿^ r
+TERMINOLOGY
+MACH NUMBER
+The designation of a jet airplane’s speed. Mach 1 is the speed of sound, 760 miles per hour at sea level. The speed of sound varies according to temperature. Since temperature drops as altitude is increased, speed of sound is generally reduced as altitude is increased.
+JET STREAM
+Powerful air currents miles high moving in a vast, irregular clockwise and counter-clockwise pattern.
+ZOMCOT
+Abbreviation for zone of maximum change of temperature, the band between high-speed winds of the jet stream and winds outside of it.
+SONIC
+Equal to the speed of sound.
+SUPERSONIC
+Greater than the speed of sound.
+THRUST
+The push of a jet engine measured in pounds.
+THIRD LAW OF MOTION
+Newton’s scientific definition, of which jet propulsion is an outstanding illustration. Every action produces a reaction equal in force and opposite in direction.
+TAIL CONE
+The tail pipe, or nozzle, of a jet engine through which hot exhaust gases escape.
+Printed in the United States of America

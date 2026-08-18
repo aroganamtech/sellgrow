@@ -1,0 +1,11 @@
+﻿English—Ingles	Spanish—Español	Phonetical Pronunciation—Spanish	Pronunciación fonética—Ingle's
+Porter.	El portero.	Ell pohr-tay'-roh.	Por'-ter.
+Suitcase.	La maleta.	Lah mah-let'-ah.	Siút'-queis.
+Trunk.	El baúl.	Ell bah-ool'.	Trunk.
+Ticket.	El boleto (el billete).	Ell boh-let'-oh (ell bee-yay' tay).	Ti'-quet.
+On time. Punctually.	A tiempo. Puntualmente.	Ah tee-em'-poh. Poon-too-ahl-men'-tav.	An taim. Punc'-tiu-eli.
+Late.	Tarde.	Tahr'-day.	Leit.
+Where do we leave from?	¿De dónde partiremos?	Day dohn'-day pahr-tee-ray'-mohss?	Juér du ul liv frum?
+May I have your passport?	Tenga la bondad de darme (mostrarme) su pasaporte	Tayn'-gah lah bohn-dah' day dahr'-may (mohss-trahr'-may) soo pah-sah-por'-tay	Mei ai jav iúr pas'-port?
+Has your passport been visaed?	¿Tiene ustea visado su pasaporte?	Tee-ay'-nay oo-stg' vee-sah'-doh soo Dah-sah-nor'-tav?	Jas iúr pas'-port bin vi-seid?	.
+3

@@ -63,6 +63,9 @@
       ],
       "@/styles/*": [
         "./styles/*"
+      ],
+      "@/brochure_ai_model/*": [
+        "./brochure_ai_model/*"
       ]
     }
   },

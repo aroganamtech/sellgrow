@@ -1,0 +1,131 @@
+﻿Phoenix, AZ
+Reservations: 258-0132
+	Freq.	Leave	Arrive	Flight No.	Stops or Connecting City Aircraftf Meals		
+To Accra	Su	915a	535p +1	409/24/188	Houston/NewYork	747	«BDS
+From Accra	Consult your Travel Agent or Pan Am						
+Res. 21151							
+To Bahrain*	Mo	915a	755p +1	409/98/2	Miami/London	747	«BLD
+From Bahrain	We	515a	930p	1/61/723	Frankft/Miami	747	«BLD
+Res. 258-850							
+To Berlin*	FrSa	915a	IOOp+1	409/24/66	Houston/NewYork	1011 «BDS	
+	TuThSa	915a	100P+1	409/60/638	Miami/Frankft	DC10 « BLD	
+	Daily	915a	225p +1	409/98/104	Miami/London	747	«BLD
+From Berlin	Daily	745a	930p	101/99/723	London/Miami	747	«SLD
+Res. 88-10-11	WeFrSu	815a	930p	67/61/723	Frankft/Miami	DC10 « LSD	
+To Bombay*	WeSu	915a	105a +2	409/98/2	Miami/London	747	«BLD
+From Bombay	Consult your Travel Agent or Pan Am						
+Res. 244020							
+To Buenos Aires*	ThSa	915a	920a +1	409/453	Miami	747	«BLD
+Ezeiza Airport	TuWeFrSu	915a	155p +1	409/441/201	Miami/Rio	SP	BLD
+	Mo	915a	155p +1	409/441	Miami	747	«•BLD
+	ThSa	145p	920a +1	728/12/453	Houston/Miami	747	«SDD
+	Mo	145p	155p +1	728/12/441	Houston/Miami	747	«DBL
+From Buenos Aires	Tu	630p	1224p +1	440/11/729	Miami/Houston	747	«■DBS
+Res. 45-0111	FrSu	1150p	1224p +1	454/11/729	Miami/Houslon	747	«DSB
+To Caracas*	MoWeFrSu	915a	1205a +1	409/498/455	Miami/SJuan	DC10	BLD
+From Caracas	MoWeFrSu	700a	930p	456/499/723	S.Juan/Miami	DC10	SDD
+Res. 284-9911							
+To Dakar	Su	915a	1100a +1	409/24/188	Houston/NewYork	747	«BDD
+From Dakar	Consult your Travel Agent or Pan Am						
+Res. 265-86							
+To Delhi*	FrSa	915a	120a +2	409/98/2	Miami/London	747	«■BLD
+	MoTuTh	915a	320a +2	409/98/2	Miami/London	747	«■BLD
+From Delhi	We	240a	930p	1/61/723	Frankft/Miami	747	«■BLD
+Res. 322273	FrSu	420a	930p	1/61/723	Frankft/Miami	747	«•BLD
+To Dhahran	ExSaSu	915a	630p +1	409/24	Houston	sp «BDD	
+From Dhahran	Consult your Travel Agent or Pan Am						
+Res. 8642977							
+To Ft. Lauderdale/	Daily	915a	445p	409/716	Houston	727	BS
+Hollywood, FL	Daily	145p	1000p	728/958	Houston	727	SD
+From Ft.	Daily	800a	1224p	705/729	Houston	727	BS
+Lauderdale/	Daily	535p	930p	953/723	Houston	727	DD
+Hollywood, FL							
+Res. 462-6600							
+To Fort Myers, FL	Daily	915a	426p	409/762	Houston	727	BL
+From Fort Myers,	Daily	500p	930p	797/723	Houston	727	DD
+FL							
+Res. 334-2141							
+A plus (+) or minus (-) sign after the arrival	MEAL CODES:
+time indicates arrival the day(s) following departure	S-Snack L-Lunch
+or the day previous to departure.	B-Breakfast D-Dinner
+Flight numbers In Bold are operated by Wide Cabin aircraft. All times shown are locally observed
+Standard or Daylight Saving Time.
+Phoenix, AZ
+Reservations: 258-0132
+	Freq.	Leave	Arrive	Flight No.	Stops or Connecting City	Aircraft Meals	
+To Frankfurt*^	TuThSa	915a	920a +1	409/60	Miami	DC10 «- BLD	
+	Daily	915a	1110a +1	409/98/2	Miami/London	747	«■BLD
+From Frankfurt	WeFrSu	1125a	930p	61/723	Miami	DC10 «-LSD	
+Res. 23-05-91							
+To Guatemala City	Daily	145p	1010p	728/415	Houston	727	SD
+From Guatemala	Daily	350p	930p	416/723	Houston	727	DD
+City							
+Res. 22144							
+To Hamburg*	Daily	915a	110p +1	409/98/104	Miami/London	747	«■BLD
+From Hamburg	Daily	905a	930p	101/99/723	London/Miami	747	«SLD
+Res. 500-9281							
+To Houston, TX	Daily	915a	1230p	409	NON-STOP	727	B
+Intercontinental Airport	Daily	145p	500p	728	NON-STOP	727	S
+From Houston, TX	Daily	1045a	1224p	729	NON-STOP	727	S
+Res. 447-0088	Daily	755p	930p	723	NON-STOP	727	D
+To Karachi*	TuTh	915a	1145p +1	409/98/2	Miami/London	747	«■BLD
+From Karachi	Consult your Travel Agent or Pan Am						
+Res. 510121/24							
+To London*	Daily	915a	H 750a +1	409/98	Miami	747	«•BLD
+Airports: H-Heathrow	ExTuSu	145p G 1025a+1		728/90	Houston	1011 «- SDS	
+fi-Gatwick							
+From London	Daily	H1115a	930p	99/723	Miami	747	«■LSD
+Res. 409-0688	ExMoWe G1230p		930p	91/723	Houston	1011 «-LSD	
+To Maracaibo*	ExTu	915a	930p	409	Two-Stop	727	BLD
+From Maracaibo	ExWe	935a	930p	410/723	Miami	727	BDD
+Res. 513199							
+To Miami, FL	Daily	915a	446p	409	One-Stop	727	BL
+	Daily	145p	946p	728/12	Houston	DC10	SD
+From Miami, FL	Daily	800a	1224p	11/729	Houston	DC10	BS
+Res. 874-5000	Daily	520p	930p	723	One-Stop	727	DD
+To Monrovia*	Su	915a	220p +1	409/24/188	Houston/New York	747	«■BDD
+Roberts International							
+Airport							
+From Monrovia	Consult your Travel Agent or Pan Am						
+Res. 72-1000							
+To Montevideo	Mo	915a	155p +1 409/441/201		Miami/Rio	sp « BLD	
+	Fr	915a	155p +1	409/441	Miami	747	«■BLD
+	Fr	145p	155p +1	728/12/441	Houston/Miami	747	«■ DBL
+From Montevideo	Sa	645p	1224p +1	440/11/729	Miami/Houston	747	» CZJ OD CO
+Res. 980-613							
+To New Orleans, LA Daily		915a	252p	409/992	Houston	727	B
+	Daily	145p	730p	728/920	Houston	727	S
+From New Orleans,	Daily	830a	1224p	921/729	Houston	727	S
+LA	Dally	550p	930p	991/723	Houston	727	D
+Res. 529-5192							
+Ä^-Operates with long-range Special Performance 747	f-Enrouteplanechangefromortoanother
+A-Throughaircraftwithenroutechangeofflightnumber aircrafttypeonsomeflights «-Theatre-in-the-Air®movieflight	«Vinter» Continental Hotel
+*-Airporttransferrequired	fp-Forum Hotel
+Phoenix, AZ
+Reservations: 258-0132
+	Freq.	Leave	Arrive	Flight No.	Stops or Connecting City Aircraft t Meals		
+To New York, NY* Airports: K-JFK Inti L-LaGuardia	Daily	915a	K 843p	409/24	Houston	727	BD
+From New York, NY Consult your Travel Agent or Pan Am Res. 973-4000							
+To Orlando, FL	Daily	915a	457p	409/926	Houston	727	BS
+From Orlando, FL Res. 422-0701	Daily	550p	930p	719/723	Houston	727	DD
+To Panama City, Panama	Daily	915a	810p	409/427	Miami	DC10	BLD
+From Panama City, Daily Panama Res. 25-6500		840a	930p	426/723	Miami	DC10	BDD
+To Paris* Orly Airport	WeFrSu	915a	855a +1	409/80	Miami	DC10 « BLD	
+From Paris Res. 266-4545	MoThSa	1200n	930p	81/723	Miami	DC10 « LSD	
+To Rio de Janeiro* International Airport	Daily Daily	915a 145p	855a +1 855a +1	409/441 728/12/441	Miami Houston/Miami	747 747	«BLD «SDB
+From Rio de Janeiro Res. 398-3353	WeFrSu Daily	1230a 1130p	930p 1224P+1	456/499/723 440/11/729	S.Juan/Miami Miami/Houston	DC10 747	SDD «DBS
+To Riyadh*	Flight from Dhahran to Riyadh Operated by SAUDIA (SV) MoTuWeTh 915a 935p +1 409/24/SV24 Houston/Dhahran					SP	«BDD
+From Riyadh Res. 465-0779	Flight from Riyadh to Dhahran Operated by SAUDIA (SV) Consult your Travel Agent or Pan Am						
+To San Juan International Airport	Daily	915a	926p	409/498	Miami	DC10	BLD
+From San Juan Res. 754-7470	Daily	145p	930p	499/723	Miami	DC10	SDD
+To Santiago, Chile	Times at Santiago 1 Hour Later thru March 13 WeFrSu 915a 755a+1 409/459 WeFrSu 145p 755a+1 728/12/459				Miami Houston/Miami	1011 «- BLD 1011 «•SDD	
+From Santiago, Chile Res. 724-367	Times at Santiago 1 Hour Later thru March 13 MoThSa 1100p 1224p +1 460/11/729				Miami/Houston	1011 «DSB	
+To Sao Paulo Airports: C-Congonhas V-Viracopos	Portion of Flights between Rio and Congonhas Operated for Pan Am by Transbrasil or VASP Daily 915a C 1045a +1 409/451 Miami 747 «-BLD Daily 145p C 1045a +1 728/12/451 Houston/Miami 747 «-SDB						
+From Sao Paulo Res. 257-6655	Portion of Flights between Rio and Congonhas Operated for Pan Am by Transbrasil or VASP Daily C 930p 1224p+1 450/11/729 Miami/Houston 747 «- DBS						
+To Sarasota/ Bradenton,FL	Daily	915a	530p	409/762	Houston	727	BL
+From Sarasota/ Bradenton, FL Res. 365-2121	Daily	600p	930p	797/723	Houston	727	DD
+A plus (+) or minus (-) sign after the arrival	MEAL CODES:
+time indicates arrival the day(s) following departure	S-Snack L-Lunch
+or the day previous to departure.	B-Breakfast D-Dinner
+Flight numbers in Bold are operated by Wide Cabin aircraft. All times shown are locally observed
+Standard or Daylight Saving Time.

@@ -1,0 +1,26 @@
+﻿EQUIPMENT 29 Boeing 747-121 - passenger 4 Boeing 747-100F - cargo 2 Boeing 747-200F - cargo
+10	Boeing 747SP - passenger
+27 Boeing 707-321B - passenger 30 Boeing 727-121 - passenger 26 Boeing 727-200 - passenger 2 Boeing 727QC - passenger-cargo
+11	Douglas DC-10-10 - passenger 4 Douglas DC-10-30 - passenger
+6 Lockheed L-1011-500 - passenger
+On Order: 8 Boeing 727-200
+6 Lockheed L-1011-500
+PERSONNEL	36,132
+Total captains	1,060
+co-pilots	1,054
+flight engineers	1,082
+flight attendants (pursers,	6,800
+stewards, stewardesses)
+OTHER OPERATIONS
+Intercontinental Hotels Corporation
+Pan Am Building
+New York, New York 10166
+Pan Am World Services, Inc.
+666 Steamboat Road Greenwich, Connecticut 06830
+Engineering and Design Department Cocoa Beach, Florida 32931
+General Aviation Services Division
+Teterboro Airport, Teterboro, New Jersey 07608 and
+Westchester County Airport, White Plains, N.Y. 10601
+International Services Division Pan Am Building, New York, N.Y. 10166
+Technical and Base Support Services Division Patrick AFB, Florida 32925
+-11-

@@ -42,10 +42,8 @@ function ensureHtmlAliases(dir) {
           const baseName = file.replace(/\.html$/, '');
           const subFolder = path.join(dir, baseName);
           const subIndex = path.join(subFolder, 'index.html');
-          if (!fs.existsSync(subIndex)) {
-            fs.mkdirSync(subFolder, { recursive: true });
-            fs.copyFileSync(filePath, subIndex);
-          }
+          fs.mkdirSync(subFolder, { recursive: true });
+          fs.copyFileSync(filePath, subIndex);
         }
       } catch (e) {}
     }

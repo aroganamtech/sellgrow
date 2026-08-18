@@ -1,0 +1,8 @@
+﻿Instant recording and checkin of oassenger
+reservation:
+... Pan American’s New Electronics System for faster, more efficient
+service tells in less than 4 seconds what
+space is available to any of 111 different destinations around the world. It can handle 36,000 inquiries an hour. It’s the first coast-to-coast electronic reservations system in the transportation industry.
+Needless to add, service to the public is vastly improved, telephone waiting time greatly reduced and “lost” calls virtually eliminated. PAT is an example of alert airline management which keeps pace on the ground with advances in the air.
+How It Works. Reservations clerk simply inserts a destination plate into the keyset (below). . . pushes buttons for the requested month and day . . . pulls a lever.
+An electrical impulse races to the master reservations board (above). . .“searches” the slot for the requested date and destination . . .“bounces” back to the ticket office to tell whether or not the flight is open.

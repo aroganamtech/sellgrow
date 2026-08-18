@@ -1,0 +1,5 @@
+﻿ENGINE WORKS
+To transform this apparatus into a self-contained jet engine, replace the hand-pump with a series of fans, called a compressor. If the compressor is turned at high speed, huge quantities of air are passed through the balloon while holding a high pressure inside.
+For energy, place a burner in the airstream. Burning the fuel raises the air temperature rapidly and the volume of each air particle is greatly increased. Since the compressor pressure blocks forward flow of the air, the air can only move rearward on the less restricted path leading to the exit.
+By placing a windmill (turbine) in the path of the heated air, some of this energy is used to spin the turbine which in turn spins the compressor by means of a connecting shaft. The remaining energy is expended in expelling the hot gases through the exhaust nozzle.
+Now the transformation is complete and the balloon “jet engine” can operate as long as there is fuel to burn.

@@ -1,0 +1,72 @@
+﻿INDEX
+On this page and the last column of the previous page we list restaurants by type of cuisine. The letters and figures following the names give the London area, ie Wl, NW2, etc.
+London Steak House, SW1 London Steak House, SW3 London Steak House, SW16 London Steak House, SW19 London Steak House, SW7 London Steak House, SE3 London Steak House, SE21 London Steak House, WC2 London Steak House, N21 London Steak House, N6 Massey's, W1
+Massey's Chop House, SW3 Paramount Grill, WC2 Princes Room, E1 Provans, SW10 Presidential Club 21, W1 Royal Festival Hall, SE1 Rules, WC2 Samuel Pepys, EC4 Shirreffs, W1 Side Saddle, N10 St. Stephens, SW1 Stars, Wl Tate Gallery, SW1 Tiddy Dol's Eating House, W1 French
+Adam Room, SW7 Angela, Da, SW3 Anti-Opera, L', WC2 Ark, W8
+Artiste Addamé, SW5
+Athenaeum, W1
+An Bon Accueil, SW3
+Au Jardin des Gourmets, W1
+Barque and Bite, NW1
+Bistingo, Le, W1
+Boulestin, WC2
+Bressan, Le, W2
+Brompton Grill, SW3
+Carriage Room, WC2
+Carrosse, Le, SW3
+Celebrity, W1
+Cherry Tree, N14
+Chez Ciccio, W8
+Chez Moi, W11
+Chez Solange, WC2
+Chelsea Room, SW1
+Clarendon, W6
+Coq d'Or, Le, W1
+Coq Hardi, W8
+Cotillion, EC4
+Cordon Bleu, Wl
+Didier, W9
+Ecu de France, A, L', W1 Escargot Bienvenu, L', W1 Essex, EC3 Fanny's Bistro, W1 Fontaine, La, W1 Français, Le, SW3 Fringale, La, SW10 Gaffe, La, NW3
+Gargouille de Notre Dame, A La NW1
+Genevieve, W1
+Gore, SW7
+Grumbles, SW1
+Humphrey's, SW6
+Ici Paris, W1
+Jacaranda, SW3
+Jardin des Gourmets, Au, Wl
+Keats, NW3
+Kettners, W1
+Kings Head, SW3
+Lacy's, W1
+Lafayette, SW1
+Land's, SW3
+Leith's, W1
+Lock, Stock and Barrel, NW1 Lucullus, EC3 Napoule, La, W1 Paprika, W8
+Petit Montmartre, Le, W1 Poissonnerie, SW3 Pomme D'amour, La, W11 Princes Room, E1 Provans, SW10 Quaglino's, W1 Recoite, La, W1 Reíais du Café Royal, Le, W1 Renaissance, La, SW1 Roof, W1
+Royal Festival Hall, SE1 Side Saddle, N10 Snooty Fox, W1 Spot III, SW10 St. Stephens, SW1 Stable, SW7 Summit, W1 Tate Gallery, SW1 Terrasse Tio Pepe, La, Wl Throgmorton, EC2 Toque Blanche, La, W8
+German
+Berlin Room, SW1 Greek
+Aphrodite's Tavern, NW11 Beotys, WC2 Chanticleer, SW1 Grecian Palace, W1 Mykonos, SW5 Williamsons Tavern, EC4 Hungarian Gay Hussar, W1 Mignon, W2 Indian
+Agra de Luxe, Wl Ashoka, WC2 Gaylord, W1 Jamshid, SW7 Mumtaz, NW1 Naraine, SW5 Shafi, Wl Shezan, SW7 Tandoori Ashoka, SW3 Tandoori, W1 Tandoori, SW3 Veeraswamy's, W1 Italian
+Bellavista, SW7 Biagi's, Wl Bistingo, W8 Bizzarro, W2
+Borgo Santa Croce, SW10 Bussola, La, WC2 Campana, W1 Canaletto, W2 Cantina Marchig SW3 Casa Parelli, W8 Chez Ciccio, W'
+Colosseo, Wr Concordio, \
+Corvino, EC*.
+Dolce Vita, L,^
+Fanny's Bistre Frank's, SW1 Gatamelata, L Gennaro's, W Giovanni's, W Hostaria Rom Imperia, WC2
+Laguma, WC2 Leoni's Quo Vadis, W1 Loggia, La, W2 .
+Meridiana, SW3 Mulino, II, W2 Osteria di Londra, W1 Osteria 430, SW10 Pavilion, W1 Peter Mario, W1 Piazza, W1
+Piccola Venezia, SW7 Rossetti Pub-Trattoria, NW8 Rugantino, W1 San Carlo, N6 San Fredliano, SW3 Scala, La, WC2 Siciliano, II, W1 Stable, SW7 Toninois, W1 Toscanella, La, NW3 Venezia, W1 Verbanella, SW3
+Japanese
+Japanese, W1 Hokkai, W1
+Jewish
+Blooms, E1
+Mexican
+Cucaracha, La, Wl Norwegian
+Norway Food Centre, SW3
+Russian
+Nikita's, SW10
+Scottish
+Caledonian Suite, WC2 Seafood Alcove, W8 Antoine, W1 Bentleys, W1 Braganza, W1 Carafe, SW1 China Garden, W1 Cunninghams, W1 Fisherman's Wharf, W1 Fisherman's Wharf, SW13 Fisherman's Wharf, SW3 Golden Carp, W1 Old Caledonia, WC2 Overtons, SW1 Poissonnerie, SW3 Sheekey, WC2 Soveriegn, W1 Vendome, W1 Wheeler's, SW1 Wheeler's, W1 Wheeler's, FC2 ;p .ish
+I

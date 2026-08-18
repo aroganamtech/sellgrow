@@ -3,11 +3,11 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Mail, Github, Twitter, Linkedin, Instagram, Facebook, Youtube, Send } from "lucide-react";
+import { Mail, Github, Twitter, Linkedin, Instagram, Facebook, Youtube, Send, Globe } from "lucide-react";
 import Logo from "@/components/layout/Logo";
 
 export default function Footer() {
-  const { t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 

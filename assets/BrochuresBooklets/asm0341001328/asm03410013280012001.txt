@@ -1,0 +1,7 @@
+﻿HOW DOES I JET ENGINE OPEHATE?
+4 DIRECTION OF FLIGHT
+Fig. 1 — CONVENTIONAL JET
+K -Cold Air	B- Burner	F-Fan J - Jet
+C- Compressor	T - Turbine	KJ - Cold Air Jet
+CONVENTIONAL JET —Cold air (K) enters at left and goes into the compressor section (C) where the rotating blades increase the air pressure and force it into the combustion chamber (B). Here it is mixed with fuel and burned. The burning gases expand and flow through the turbines (T). Some of the energy is used by the turbines to drive the front compressor. The remainder (J) jets out the rear at tremendous velocity to provide thrust.
+FORWARD FAN —Propulsion comes from two sources: (1) some of the vast quantity of air gulped in by the fan (F) passes through the compressor, burners and turbine (C, B, T) and emerges as in the conventional jet (J) . . . while (2) additional air is being taken in at the outer edge of the fan, by-passing the turbojet, and emerging as a cold air jet (KJj. The fan blades replace a portion of the compressor of the conventional engine and are driven by another turbine stage added at the rear.

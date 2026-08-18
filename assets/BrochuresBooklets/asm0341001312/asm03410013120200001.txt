@@ -1,0 +1,445 @@
+﻿INDEX OF CITIES AND PLACES
+Lapland, Finland	50
+Lapland, Sweden	44
+Laren, Netherlands	32
+Las Pinas, Philippine Islands	152
+Lausanne, Switzerland	22
+LEBANON	60
+Le Brevent, France	19
+Leenane, Ireland	8
+Les Avants, Switzerland	22
+Levera Beach, Grenada	95
+Lido Beach, Switzerland	23
+The Lido, Hong Kong	156
+Liege, Belgium	29
+Lihue, T. H.	144
+Lillehammer, Norway	41
+Lima, Peru	127
+Limbe, Haiti	82
+Linz, Austria	39
+Lisbon, Portugal	51
+Viti Levu, Fiji Islands	166
+Llandudno, Wales	12
+Llanfarfechan, Wales	12
+Llangollen, Wales	12
+Loch Lomond, Scotland	15
+Lohaina, T. H.	144
+London, England	9
+Lopburi, Siam	159
+Los Santos, Panama	110
+Lough Corrib, Ireland	8
+Lowlands, Scotland	15
+Lourdes, France	19
+Lucerne, Switzerland	23
+Luchon, France	19
+Lujan, Argentina	120
+Luquillo Beach, Puerto Rico	74
+Lund, Sweden	44
+Luzon Island, P. I.	152
+LUXEMBOURG	30
+Luxembourg, Luxembourg	30
+Lyngenfjord, Norway	41
+Macao, Hong Kong	156
+Mt. McKinley, Alaska	140
+Machu Picchu, Peru	128
+Madeira Island, Portugal	53
+Madrid, Spain	54
+Malaga, Spain	56
+Mallorca, Spain	56
+Malmo, Sweden	44
+Manila, P. I.	151
+Manly, Australia	172
+Mar del Plato, Argentina	120
+Maracaibo, Venezuela	136
+Maracay, Venezuela	136
+Maracus Bay, Trinidad	97
+Margarita Islands, Venezuela	136
+Mariel, Cuba	72
+Marina Grande, Capri	26
+Marken Island, Netherlands	32
+Marmara, Turkey	59
+Marseilles, France	19
+Marstrand, Sweden	44
+MARTINIQUE	88
+Matanzas, Cuba	71
+Maui Island, T. H.	144
+Mauna Loa, T. H.	144
+Maya ruins, Mexico	104
+Mayaguez, Puerto Rico	74
+County Mayo, Ireland	8
+Medellin, Colombia	133
+Meg&ve, France	19
+Megiddo, Israel	64
+Melbourne, Australia	173
+Mendenhall Glacier, Alaska	140
+Mendoza, Argentina	120
+Menton, France	19
+Mer de Glace Glacier, Switzerland 22 Merida (Yucatan) Mexico	104
+MEXICO	102
+Mexico (City) D. F. Mexico	102
+Milan, Italy	26
+Milford Track, New Zealand	169
+Milot, Haiti	82
+Minas, Uruguay	117
+Miyajima Resort, Japan	150
+Molokai, T. H.	145
+MONACO	19
+Mondorf des Bains, Luxembourg 30 Mont Blanc, France	22
+Mont St. Michel, France	20
+Monte Carlo, Monaco	19
+Montego Bay, Jamaica	79
+Montevideo, Uruguay	116
+Montreux, Switzerland	22
+Morgins, Switzerland	23
+Mull Island, Scotland	15
+Munich, Germany	34
+Naceden, Australia	174
+Nagoya, Japan	150
+Nahuel Huapi, Argentina	20
+Nairn, Scotland	16
+Naples, Italy	26
+Nara, Japan	149
+Nassau, Bahamas	68
+Necochea, Argentina	120
+Loch Ness, Scotland	16
+NETHERLANDS (Holland)	31
+NETHERLANDS WEST INDIES 98 New Forest, England	11
+New Providence Island, Bahamas 68 NEW ZEALAND	167
+Newcastle, Jamaica	79
+Nice, France	19
+Nikko, Japan	149
+Nimes, France	19
+Niteroi, Brazil	114
+Nordalsfjord, Norway	41
+Normandy, France	20
+North Berwick, Scotland	15
+North Island, New Zealand	168
+NORTHERN IRELAND	8
+NORWAY	40
+Nottingham, England	12
+Oahu, T. H.	143
+Oaxaca, Mexico	104
+Oban, Scotland	15
+Oberammergau, Germany	34
+Obergurgl, Austria	39
+Ocho Rios, Jamaica	79
+Odense, Denmark	48
+Ojo, Argentina	120
+Old Sarum, England	11
+Oporto, Portugal	53
+Oranjestad, N. W. I.	99
+Orkney Island, Scotland	16
+Osaka, Japan	149
+Oslo, Norway	40
+Osorno, Chile	123
+Ostend, Belgium	29
+Otavalo, Ecuador	131
+Otehei Bay, New Zealand	170
+Ouro Preto, Brazil	115
+Oxford, England	11
+Pachacamac ruins, Peru	128
+Padua, Italy	26
+Paget, Bermuda	1
+PAKISTAN	160
+Palermo, Sicily	26
+Palin, Guatemala	107
+Palm Beach, Australia	172
+PANAMA	108
+Panama City, Panama	108
+Paqueta, Brazil	114
+Paradise Beach, Bahamas	69
+PARAGUAY	121
+Paricutin, Mexico	104
+Paris, France	17
+Parker Ranch, T. H.	144
+Passau, Austria	39
+Pau, France	19
+Pearl Harbor, T. H.	144
+Pearl Islands, Panama	109
+Peebles, Scotland	15
+Pembroke, Bermuda	1
+Pembrokeshire, Wales	12
+Penmaenwar, Wales	12
+Perth, Scotland	16
+PERU	127
+Perugia, Italy	25
+Peten-Itza, Guatemala	107
+Petionville, Haiti	82
+Petropolis, Brazil	114
+PHILIPPINE ISLANDS	151
+Phillips Island, Australia	174
+Phosphorescent Bay, Puerto Rico 74 Piccolo Marina, Capri	26
+Pigeon Point Beach, Tobago	97
+Pinar del Rio, Cuba	72
+Piriapolis, Uruguay	117
+Pisa, Italy	26
+Piscadera Bay, N. W. I.	99
+Playas Beach Resort, Ecuador 131 Plymouth, England	12
+Pocitos, Uruguay	117
+Pointe-a-Pitre, Guadeloupe	89
+Pompeii, Italy	26
+Ponce, Puerto Rico	74
+Popocatapetl, Mexico	104
+Port-au-Prince, Haiti	81
+Port Maria, Jamaica	79
+Port of Spain, Trinidad	96
+Portillo, Chile	123
+Portobello, Panama	109
+Portofino, Italy	26
+Portsea, Australia	174
+Portsmouth, England	13
+PORTUGAL	51
+Positano, Italy	26
+Prestwick, Scotland	15
+Pretoria, U. S. Africa	182
+Prince George Wharf, Bahamas 69 Princess Islands, Turkey	59
+Prinkipo Island, Turkey	59
+Pucon, Chile	123
+Pucusana, Peru	128
+Puebla, Mexico	104
+Puellao, Chile	123
+Puerto Allegre, Argentina	120
+Puerto Barrios, Guatemala	107
+Puerto Blest, Argentina	120
+Puerto Cabello, Venezuela	136
+PUERTO RICO	73
+Mount Puilboreau, Haiti	82
+Puno, Peru	129
+Punta del Este, Uruguay	117
+Puyehue, Chile	123
+Pyrenees, France	19
+Queenstown, New Zealand	169
+Quetzaltenango, Guatemala	107
+Quimper, France	20
+Quito, Ecuador	130
+Ramleh, Israel	64
+Rattvik, Sweden	44
+Recess, Ireland	8
+Remich, Luxembourg	30
+Repulse Bay, Hong Kong	156
+Rhineland, Germany	34
+Richmond Hill, Grenada	95
+Rigi, Switzerland	23
+Riksgransen, Sweden	44
+Rio de Janeiro, Brazil	113
+Rio Dulce, Guatemala	107
+Riobamba, Ecuador	131
+Riviera, France	19
+Rochers de Naye, Switzerland	22
+Rock Sound, Bahamas	69
+Rockley Bay, Tobago	97
+Rome, Italy	24
+Romerias, Spain	56
+Romsdalfjord, Norway	41
+Rothenburg o/Tauber, Germany 35 Rotorua, New Zealand	168
+Rotterdam, Netherlands	32
+Rouen, France	20
+Rovaniemi, Finland	50
+Royal Natal National Park,
+U. S. Africa	180
+Ruedesheim, Germany	34
+Rush, Ireland	7
+Russell, New Zealand	169
+St. Ann’s Bay, Jamaica	79
+St. Anton-am-Arlberg, Austria 39 St. Cloud, France	20
+St. Croix Island, Virgin Islands 77 St. Davids, Grenada	94
+St. George’s Grenada	94
+St. George’s, Bermuda	1
+St. Germain-en-Laye, France	19
+St. Goar, Germany	34
+St. Johns, Antigua	86
+St. Johns Island, Virgin Islands 77 St. Kilda, Australia	174
+ST. LUCIA, B. W. I.	90
+St. Malo, France	20
+St. Michael, Barbados	93
+St. Moritz, Switzerland	23
+St. Raphael, France	19
+St. Thomas Island, Virgin Islands 76 St. Tropez, France	19
+Salamanca, Spain	56
+Salisbury, England	11
+Saltee Islands, Ireland	7
+Salto Grande, Uruguay	117
+Salzburg, Austria	38
+San Bernardino, Paraguay	121
+San Bias, Panama	109
+San Cristobal, Dominican Republic 85 San Diego de los Banos, Cuba	72
+San Fernando, Trinidad	97
+San German, Puerto Rico	74
+San Jose, Guatemala	107
+San Juan, Puerto Rico	73
+San Juan, Dominican Republic 85 San Juan Teotchuacan, Mexico 104 San Remo, Italy	26
+San Sebastian, Spain	56
+San Souci, Haiti	82
+Santa Clara, Cuba	71
+Santa Margherita Liguire, Italy 26 Santa Teresa Nat’l. Park, Uruguay 117 Santeurs, Grenada	95
+Santiago, Chile	122
+Santiago de Cuba, Cuba	71
+Santos, Brazil	115
+Säo Paulo, Brazil	114
+Salvador, Brazil	115
+Sassafras, Australia	174
+Sauteurs, Grenada	95
+Savona, Italy	26
+SCOTLAND	14
+Sea of Galilee, Israel	64
+Sea Gardens, Bahamas	69
+Segesta, Sicily	26
+Segovia, Spain	56
+Setubal, Portugal	52
+Seville, Spain	56
+Seven Oaks, England	11
+Shannon, Ireland	6
+Sheko-O, Hong Kong	156
+Sherbrook, Australia	174
+Shetland Island, Scotland	16
+SIAM	157
+SICILY	26
+Siena, Italy	25
+Silimunte, Sicily	26
+Silkeborg, Denmark	48
+SINGAPORE	153
+Sintra, Portugal	52
+Sitka, Alaska	140
+Skagway, Alaska	140
+Skane Province, Sweden	44
+Skerries, Ireland	7
+Isle of Skye, Scotland	15
+Sognefjord, Norway	41
+Solis, Uruguay	117
+Somerset, Bermuda	1
+Somerset, England	12
+Sorrento, Australia	174
+Sorrento, Italy	26
+Souk el Gharb. Lebanon	61
+SOUTH AFRICA	176
+South Island, New Zealand	169
+Southampton, Bermuda	1
+Southern Alps, New Zealand	169
+SPAIN	54
+Spey River, Scotland	16
+Speyside, Tobago	97
+Spiez, Switzerland	23
+Stiges, Spain	56
+Stirling, Scotland	15
+Stockholm, Sweden	43
+Stonehenge, England	11
+Stratford-on-Avon, England	11
+Stresa, Italy	26
+Stronachlachar, Scotland	15
+Stuttgart, Germany	34
+Styria, Austria	39
+Sucre, Bolivia	126
+Surrey, England	11
+Sussex, England	11
+Suva, Fiji Islands	166
+Svendborg, Denmark	48
+SWEDEN	43
+SWITZERLAND	21
+Sydney, Australia	171
+Syit Island, Germany	34
+Syracuse, Sicily	26
+Tabago Island, Panama	109
+Tagaytay City, Philippine Islands 152 Tampere, Finland	50
+Tandil, Argentina	120
+Tasman National Park, N. Z. 169 Lake Taupo, New Zealand	169
+Taormina, Sicily	26
+Tasmania Island, Australia	174
+Taxco, Mexico	104
+Tel Aviv, Israel	62
+Terezopolis, Brazil	114
+THAILAND (Siam)	157
+The Hague, Netherlands	32
+Thornhill, Scotland	15
+Tiahuanaco, Bolivia	126
+Tiberias, Israel	64
+Timaru, New Zealand	170
+Tintagel, England	12
+Tipperary Country, Ireland	7
+Lake Titicaca, Bolivia	126
+Tobago, B. W. I.	97
+Tocopilla, Chile	123
+Toledo, Spain	55
+Tokyo, Japan	148
+Tongariro National Park, N. Z. 168 Torquay, Australia	174
+Torquay, England	12
+Tours, France	19
+Tower Isle, Jamaica	79
+Tower Village Heights, Bahamas 69 Loch Tay, Scotland	15
+Tracey Arm Fjord, Alaska	140
+Lake Traful, Argentina	120
+Trahuanaco, Bolivia	126
+Tramore, Ireland	7
+TRINIDAD	96
+Trinidad, Cuba	71
+Tripoli, Lebanon	61
+Trondheim, Norway	41
+Trossachs, Scotland	15
+Trujillo, Peru	129
+Tucker’s Town, Bermuda	1
+TURKEY	58
+Turner Lake, Alaska	140
+Tweed River, Scotland	15
+Twin Glacier Camp, Alaska	140
+Uppsala, Sweden	44
+Urfohr, Austria	39
+URUGUAY	116
+Uxmal, Mexico	104
+Valencia, Spain	56
+Valencia, Venezuela	136
+Valparaiso, Chile	123
+Varadero Beach, Cuba	71
+Varmland Province, Sweden	44
+Vatican City, Italy	25
+Vehoniemi, Finland	50
+VENEZUELA	135
+Venice, Italy	26
+Ventimiglia, Italy	26
+Veraguas, Panama	110
+Verbier, Switzerland	23
+Verona, Italy	26
+Versailles, France	19
+Victoria, Grenada	95
+Victoria, Hong Kong	156
+Victoria Falls, U. S. Africa	182
+Vienna, Austria	36
+Vienne, France	20
+Vierex Fort, St. Lucia	91
+Villandry, France	19
+Villarica, Chile	123
+Villefranche, France	20
+Viña del Mar, Chile	123
+VIRGIN ISLANDS	76
+Visby, Sweden	45
+Volendam Island, Netherlands	32
+Waiheke Island, New Zealand 168 Waikiki, T. H.	144
+Waitemata, New Zealand	168
+Waitomo, New Zealand	168
+WALES	12
+Wallong, Belgium	29
+Warwick, Bermuda	1
+Wassenaar, Netherlands	32
+County Waterford, Ireland	7
+Wellington, New Zealand	169
+Mt. Wellington, Australia	174
+Wembley, England	12
+Wentworth Falls, Australia	172
+Westport, Ireland	7
+County Wexford, Ireland	7
+Whakarewarewa, New Zealand 168 Whitsunday Island, Australia	172
+Wiener Neustadt, Austria	38
+Wiesbaden, Germany	34
+Willemstad, Netherlands, W. I. 98 Wimbledon, England	12
+Winchester, England	11
+Wuerzburg, Germany	35
+Xochimilco, Mexico	104
+Yalova, Turkey	59
+Yodo, Japan	149
+York, England	12
+YUCATAN	104
+Yungas, Bolivia	126
+Yurukali Beach, Turkey	59
+Zamboanga, P. I.	152
+Zell-am-See, Austria	38
+Zermatt, Switzerland	23
+Mt. Zion, Israel	64
+Zurich, Switzerland	23

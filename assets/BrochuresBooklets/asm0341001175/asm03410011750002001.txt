@@ -1,0 +1,10 @@
+﻿Temp.	JAN.	FEB.	MAR.	APR.	MAY	JUNE JULY		AUG.	SEPT.	OCT.	NOV.	DEC.
+/ Low	35°	35°	36°	40°	45°	51°	54°	54°	49°	44°	39°	36°
+< High	43°	45°	49°	55°	62°	68°	71°	70°	65°	56°	49°	45°
+\ Average	39°	40°	43°	48°	54°	60°	63°	62°	57°	50°	44°	41°
+LOCATION . . . England and Wales occupy the southern part of the British Isles. Northern Ireland comprises the six northeastern counties of the island to the west of Great Britain.
+CHARACTERISTICS . . . England, with all its differences, is the closest thing to home you’ll find abroad. This is mainly because of the language. The English, though reserved, are friendly, unfailingly courteous, and their country is filled with history. It is one of the few remaining countries in which royalty is respected and that in itself breeds a tradition and dignity not found elsewhere. London has magnificence and the English countryside is utterly charming. There are places of historic and cultural interest from one end of the “tight little isle” to the other.
+POPULATION. .. The population of England and Wales is 43,757,880, a couple of million more than that of France. Northern Ireland has a population of 1,380,000.
+SIZE . . . The area of England is 50,327 square miles, about the size of Alabama. Wales, with 8,006 square miles, is the size of New lersey. Northern Ireland, with 5,238 square miles is a little larger than Connecticut.
+CAPITAL ... London has a population of 8,346,137, about the population of New York plus Cincinnati. Belfast (population 448,000) is the capital of Northern Ireland.
+GOVERNMENT. . . The United Kingdom of Great Britain and

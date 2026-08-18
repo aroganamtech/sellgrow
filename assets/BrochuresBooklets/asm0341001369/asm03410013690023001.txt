@@ -1,0 +1,12 @@
+﻿English-Ingles	Spanish — Español	Phonetical Pronunciation Spanish	Pronunciación fonética—Inglés
+Please.	Sírvase Ud.—Hágame el favor.	Seer'-vah-say oos-te'. Ah'-gah-may ell fah-vohr'.	Plis.
+No, many thanks.	No, muchas gracias.	No, moo'-chahss grah'-see-ahss	No, me'-ni dañes.
+Don’t mention it.	No hay de que.	No I day kay.	Dont men'-schen it.
+Does the smoke bother you?	¿Le molesta el humo?	Lay moh-less'-tah ell oo'-moh?	Des di smok bá-der iú?
+Do you smoke?	¿Fuma (Usted)?	Foo'-mah (oos-te')?	Du iú smok?
+Do you have a match?	¿Tiene Usted un fósforo?	Tee-ay'-nay oos-te' oon fohss'-foh-roh?	Du iú jav ei match?
+Have you a match?			Jav iú ei match?
+Can you tell me?—	¿Puede Ud. decirme?—	Pway'-day oos-te' day-seer'-may?	Can iú tel mi?
+I think so.	Creo que si.	Cray'-oh kay see.	Ai' d/nc so.
+I don’t think so.	Creo que no.	Cray'-oh kay noh.	Ai dont d/nc so.
+21

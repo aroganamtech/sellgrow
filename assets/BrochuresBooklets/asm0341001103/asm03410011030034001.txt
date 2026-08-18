@@ -1,0 +1,43 @@
+﻿COUNTRY	CONSULATE	CHANCELLE!! Y
+Bolivia	Corrientes 485	Corrientes 545
+Brazil	San Martin 195	Arroyo 1142
+Canada	Biné. Mitre 478	Bmé. Mitre 478
+Chile	Rivadavia 1396	Esmeralda 851
+Colombia	Esmeralda 83	Esmeralda 83
+Costa Rica	Av. R. Sáenz Peña 868	Av. R. Sáenz Peña 868
+Cuba	Santa Fe 2861	Santa Fe 2861
+France	Reconquista 165	Cerrito 1373
+Great Britain	Sarmiento 443	Reconquista 314
+Italy	Charcas 1149	Billinghurst 2577
+Mexico	Biné. Mitre 430	Arroyo 820
+Panama	Santa Fe 4010	Maipú 429
+Paraguay	Av. R. Sáenz Peña 917	Viamonte 1851
+Peru	Corrientes 330	Av. Alvear 2620
+Portugal	Rivadavia 814	Av. Quintana 956
+Spain	Guido 1760	Corrientes 330
+The Netherlands	Lavalle 1430	Lavalle 1430
+United States	Av. R. Sáenz Peña 567	Av. R. Sáenz Peña 567
+Uruguay	Corrientes 545	Las Heras 1907
+Venezuela	Ruines 1845	Esmeralda 909
+iJicipa
+ô
+IN BUENOS AIRE
+S
+Banco Central de la República Argentina - Reconquista 266 Banco Holandés Unido - 25 de Mayo 81 Banco Popular Argentino - Florida 201
+Bank of London & South America Ltd. - Bartolomé Mitre 399
+Bank of the Nation - Reconquista 25
+De Galicia y Buenos Aires - Cangallo 415
+De Italia y Río de la -Plata - Bartolomé Mitre 448
+De la Provincia de Buenos Aires - San Martín 135
+Di Napoli - Av. Roque Sáenz Peña 660
+Español del Río de la Plata - Cangallo 402
+Francés del Río de la Plata - Cangallo 400
+Francés e Italiano - Cangallo 500
+Nuevo Banco Italiano ■ Reconquista & Rivadavia
+Polaco Polska! Kasa Opieki - Tucumán 462
+Sirio Libanés del Río de la Plata - Bartolomé Mitre 343
+Societe Generale ■ Reconquista 330
+The First National Bank of Boston - Florida 99
+The National City Bank of New York - Bartolomé Mitre 502
+The Roval Bank of Cañada - San Martín 85
+32

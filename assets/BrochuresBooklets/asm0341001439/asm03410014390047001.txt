@@ -1,0 +1,18 @@
+﻿- 22 -
+La flotte de la Pan American au 1er Janvier^1962
+DOUGLAS	DC-8	Jet Clipper .  .............. 17
+BOEING 707 - 321	........... 17
+BOEING	707 - 331	 .....	6
+BOEING	707 - 121	.... ff....	6
+BOEING	377	............. 15
+DOUGLAS DC- 7C	........... -	15
+DOUGLAS	DC-	7B	    7
+DOUGLAS	DC-	6B	    40
+DOUGLAS	DC- 4	 .....	M
+DOUGLAS	DC- 3	............	2
+DOUGLAS	DC-	# cargo	  10
+DOUGLAS	DC-	6Acargo	   1
+DOUGLAS	DC-	4 cargo	  13
+Appareils en commande :
+BOEING	707	- 321 B	    5
+BOEING	707	- 321 C (fret et passagers) ....	2

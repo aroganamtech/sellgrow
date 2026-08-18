@@ -1,0 +1,52 @@
+﻿New York, NY
+Reservations: 973-4000 Airports K-JFKInt'l L-LaGuardia
+	Freq.	Leave Arrive	Flight No.	Stops or Connecting City	Aircraftt Meals	
+To Dakar	Th	K 530p 530a +1	184	NON-STOP	747	&D
+	Su	K110Op 1100a+1	188	NON-STOP	747	»D
+From Dakar	Fr	145a K 500a	191	NON-STOP	747	B
+Res. 265-86	Tu	215a K 530a	185	NON-STOP	747	B
+To Dallas/	Daily	K 615p 905p	1	NON-STOP	727	D
+Ft. Worth, TX						
+From Dallas/	Daily	1OOp K 509p	2	NON-STOP	727	L
+Ft. Worth, TX						
+Res. 988-0456						
+To Delhi*:*	FrSa	K 7 OOp 120a+2	2	Two-Stop	747	S-DSL
+	MoTuThK 7 OOp 320a+2		2	Three-Stop	747	^•DSL
+	FrSa	K 950p 120a+2	66/2	Frankfurt	747	5-DSL
+From Delhi	TuWeSa 240a K 125p		1/67	Frankfurt	747	S-SBL
+Res. 322273	TuWeSa 240a K 405p		1	Three-Stop	747	S-SBL
+	FrSu	420a K 125p	1/67	Frankfurt	747	^•SBL
+	FrSu	420a K 405p	1	Two-Stop	747	S-SBL
+To Detroit, Ml	Daily	K 4OOp 552p	101	NON-STOP	727	S
+From Detroit, Ml	Daily	650p K 835p	104	NON-STOP	727	S
+Res. 354-0500						
+To Dhahran	ExSaSu K 1030p 630p+1		24	NON-STOP	sf g-DB	
+From Dhahran	ExMoSu 1159p K 550a+1		25	NON-STOP	sp «. DSB	
+Res. 8642977						
+To Ft. Lauderdale/	Daily	L 900a 1202p	351	NON-STOP	DC10 £ B	
+Hollywood, FL	Daily	K 900a 155p	237/323	West Palm Beach	727	B
+	Daily	L 1215p 307p	353	NON-STOP	DC10 5H	
+	Daily	K 4 OOp 1005p	111/327	Washington	727	D
+	Daily	L 500p 757p	357	NON-STOP	DC10 S-D	
+From Ft.	Daily	830a L 1059a	358	NON-STOP	DC10 &B	
+Lauderdale/	Daily	105p L 347p	352	NON-STOP	DC10 £L	
+Hollywood, FL Daily		415p L 659p	354	NON-STOP	DC10 £D	
+Res. 462-6600						
+To Fort Myers, FL	Daily	K 800a 1042a	523	NON-STOP	727	B
+	Daily	K 415p 801p	525	One-Stop	727	D
+From Fort Myers,	Daily	1030a K 102p	524	NON-STOP	727	L
+FL	Daily	1110a K 259p	523/522	Sarasota	727	L
+Res. 334-2141						
+To Frankfurtofv	Daily	K 615p 735a+1	72	NON-STOP	747	iS-DS
+	Daily	K 7OOp 1110a +1	2	One-Stop	747	^•DSS
+	FrSa	K 950p 1110a +1	66	NON-STOP	1011 S-DS	
+From Frankfurt	Daily	1055a K 405p	1	One-Stop	747	5-SLS
+Res. 23-05-91	Daily	1100a K 125p	67	NON-STOP	747	SUS
+	SaSu	120p K 345p	73	NON-STOP	1011 S-LS	
+To Guam	ExMoTu K 4 OOp 555a+2		811/841	Honolulu	747	&DS8
+From Guam	Consult your Travel Agent or Pan Am					
+Res. 477-8841						
+•«^-Operates with long-range Special Performance 747	f-Enrouteplanechangefromortoanother
+A-Through aircraft with enroutechangeofflight number	aircrafttypeonsomeflights
+&-Theatre-in-the-Air®movieflight	O-Inter • Continental Hotel
+*-Airporttransfer required	fp-Forum Hotel

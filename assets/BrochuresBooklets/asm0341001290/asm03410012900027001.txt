@@ -1,0 +1,4 @@
+﻿JET ENGINE
+The first Jet Clippers were powered with Pratt & Whitney J-3 engines. Air is pulled in at the front (left in picture) compressed, mixed with fuel, burned, passed through turbines and exhausted aft. An improved version of this same engine used in the Intercontinental Jet Clipper, bears the number J-4.
+TURBOFAN ENGINE
+In the Turbofan—this one is the Pratt& Whitney JT3D (TF33) —a set of fans pulls in and pushes back additional air which flows around the engine, in addition to that which passes through the turbines. The fans here are forward; left in the photo. Moving more air at lower speed and lower temperature, the Turbofan gets more thrust with less fuel, thus increasing both speed and range, plus a dividend of quieter operation.

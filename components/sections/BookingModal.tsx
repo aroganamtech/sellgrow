@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   X, 
   Calendar as CalendarIcon, 
@@ -15,7 +17,8 @@ import {
   Check, 
   ChevronLeft, 
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Lock
 } from "lucide-react";
 
 interface BookingModalProps {
@@ -60,6 +63,7 @@ const SERVICE_PEOPLE: Record<string, { name: string; role: string; avatar: strin
 
 export default function BookingModal({ isOpen, onClose, solutionId, solutionTitle }: BookingModalProps) {
   const router = useRouter();
+  const { user, isAuthenticated } = useAuth();
   
   // Step navigation (1: Contact, 2: Schedule)
   const [step, setStep] = useState(1);
@@ -81,15 +85,15 @@ export default function BookingModal({ isOpen, onClose, solutionId, solutionTitl
   useEffect(() => {
     if (isOpen) {
       setStep(1);
-      setName("");
-      setEmail("");
-      setWhatsapp("");
+      setName(user?.name || user?.firstName || "");
+      setEmail(user?.email || "");
+      setWhatsapp(user?.phone || "");
       setSelectedDate(null);
       setSelectedTime(null);
       setErrors({});
       setCurrentDate(new Date());
     }
-  }, [isOpen]);
+  }, [isOpen, user]);
 
   if (!isOpen) return null;
 
@@ -252,253 +256,285 @@ export default function BookingModal({ isOpen, onClose, solutionId, solutionTitl
             </button>
           </div>
 
-          {/* Progress Indicator */}
-          <div className="px-6 py-3 bg-slate-100/40 dark:bg-black/5 border-b border-border flex items-center gap-3 justify-center text-xs font-semibold shrink-0">
-            <span className={`flex items-center gap-1 ${step >= 1 ? "text-primary dark:text-sky-400" : "text-muted-foreground"}`}>
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center border text-[10px] ${
-                step > 1 ? "bg-primary border-primary text-white" : "border-primary dark:border-sky-400"
-              }`}>
-                {step > 1 ? <Check className="w-3 h-3" /> : "1"}
-              </span>
-              Contact Info
-            </span>
-            <span className="w-8 h-px bg-border" />
-            <span className={`flex items-center gap-1 ${step >= 2 ? "text-primary dark:text-sky-400" : "text-muted-foreground"}`}>
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center border text-[10px] ${
-                step >= 2 ? "border-primary dark:border-sky-400" : "border-border"
-              }`}>
-                2
-              </span>
-              Select Schedule
-            </span>
-          </div>
+          {!isAuthenticated ? (
+            <div className="p-8 space-y-6 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto border border-primary/20 shadow-md">
+                <Lock className="w-7 h-7 text-primary" />
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-xl font-bold text-foreground font-display">Login or Register Required</h4>
+                <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                  To book a personalized demo session or schedule a time slot for <strong className="text-foreground">{solutionTitle}</strong>, please login to your SellGrow account or register a new account.
+                </p>
+              </div>
 
-          {/* Body Content */}
-          <div className="p-6 overflow-y-auto flex-grow space-y-4">
-            {step === 1 ? (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-                className="space-y-4 text-left"
-              >
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider" htmlFor="booking-name">Full Name</label>
-                  <div className="relative">
-                    <input
-                      id="booking-name"
-                      type="text"
-                      placeholder="e.g. John Doe"
-                      value={name}
-                      onChange={(e) => {
-                        setName(e.target.value);
-                        if (errors.name) setErrors(prev => ({ ...prev, name: "" }));
-                      }}
-                      className={`w-full pl-9 pr-3 py-2 text-sm rounded-xl border bg-white dark:bg-black/20 focus:outline-none transition-all ${
-                        errors.name ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-border focus:border-primary"
-                      }`}
-                    />
-                    <User className="w-4 h-4 text-muted absolute left-3 top-3" />
-                  </div>
-                  {errors.name && <p className="text-[10px] text-red-500 font-semibold">{errors.name}</p>}
-                </div>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-xs mx-auto">
+                <Link
+                  href="/login"
+                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-bold text-xs shadow-md shadow-primary/20 hover:opacity-90 transition-all flex items-center justify-center gap-1.5"
+                >
+                  <span>Login</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/register"
+                  className="w-full py-2.5 px-4 rounded-xl border border-border bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 text-foreground font-bold text-xs transition-all flex items-center justify-center"
+                >
+                  <span>Register</span>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Progress Indicator */}
+              <div className="px-6 py-3 bg-slate-100/40 dark:bg-black/5 border-b border-border flex items-center gap-3 justify-center text-xs font-semibold shrink-0">
+                <span className={`flex items-center gap-1 ${step >= 1 ? "text-primary dark:text-sky-400" : "text-muted-foreground"}`}>
+                  <span className={`w-5 h-5 rounded-full flex items-center justify-center border text-[10px] ${
+                    step > 1 ? "bg-primary border-primary text-white" : "border-primary dark:border-sky-400"
+                  }`}>
+                    {step > 1 ? <Check className="w-3 h-3" /> : "1"}
+                  </span>
+                  Contact Info
+                </span>
+                <span className="w-8 h-px bg-border" />
+                <span className={`flex items-center gap-1 ${step >= 2 ? "text-primary dark:text-sky-400" : "text-muted-foreground"}`}>
+                  <span className={`w-5 h-5 rounded-full flex items-center justify-center border text-[10px] ${
+                    step >= 2 ? "border-primary dark:border-sky-400" : "border-border"
+                  }`}>
+                    2
+                  </span>
+                  Select Schedule
+                </span>
+              </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider" htmlFor="booking-email">Email Address</label>
-                  <div className="relative">
-                    <input
-                      id="booking-email"
-                      type="email"
-                      placeholder="e.g. john@company.com"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        if (errors.email) setErrors(prev => ({ ...prev, email: "" }));
-                      }}
-                      className={`w-full pl-9 pr-3 py-2 text-sm rounded-xl border bg-white dark:bg-black/20 focus:outline-none transition-all ${
-                        errors.email ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-border focus:border-primary"
-                      }`}
-                    />
-                    <Mail className="w-4 h-4 text-muted absolute left-3 top-3" />
-                  </div>
-                  {errors.email && <p className="text-[10px] text-red-500 font-semibold">{errors.email}</p>}
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider" htmlFor="booking-phone">WhatsApp Number</label>
-                  <div className="relative">
-                    <input
-                      id="booking-phone"
-                      type="tel"
-                      placeholder="e.g. +91 98765 43210"
-                      value={whatsapp}
-                      onChange={(e) => {
-                        setWhatsapp(e.target.value);
-                        if (errors.whatsapp) setErrors(prev => ({ ...prev, whatsapp: "" }));
-                      }}
-                      className={`w-full pl-9 pr-3 py-2 text-sm rounded-xl border bg-white dark:bg-black/20 focus:outline-none transition-all ${
-                        errors.whatsapp ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-border focus:border-primary"
-                      }`}
-                    />
-                    <Phone className="w-4 h-4 text-muted absolute left-3 top-3" />
-                  </div>
-                  {errors.whatsapp && <p className="text-[10px] text-red-500 font-semibold">{errors.whatsapp}</p>}
-                </div>
-
-                <div className="bg-slate-50 dark:bg-black/10 p-3.5 rounded-xl border border-border border-dashed text-xs text-muted-foreground leading-normal flex items-start gap-2.5">
-                  <Clock className="w-4 h-4 text-primary dark:text-sky-400 shrink-0 mt-0.5" />
-                  <p>In the next step, you will select an active slot on our interactive schedule. This demo will connect you live with our dedicated systems expert.</p>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left"
-              >
-                {/* Custom Calendar Column */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Select Date</span>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => changeMonth("prev")}
-                        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-white/5 border text-muted-foreground hover:text-foreground transition-all disabled:opacity-30"
-                        disabled={
-                          currentDate.getFullYear() === new Date().getFullYear() &&
-                          currentDate.getMonth() === new Date().getMonth()
-                        }
-                      >
-                        <ChevronLeft className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => changeMonth("next")}
-                        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-white/5 border text-muted-foreground hover:text-foreground transition-all"
-                      >
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
+              {/* Body Content */}
+              <div className="p-6 overflow-y-auto flex-grow space-y-4">
+                {step === 1 ? (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    className="space-y-4 text-left"
+                  >
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider" htmlFor="booking-name">Full Name</label>
+                      <div className="relative">
+                        <input
+                          id="booking-name"
+                          type="text"
+                          placeholder="e.g. John Doe"
+                          value={name}
+                          onChange={(e) => {
+                            setName(e.target.value);
+                            if (errors.name) setErrors(prev => ({ ...prev, name: "" }));
+                          }}
+                          className={`w-full pl-9 pr-3 py-2 text-sm rounded-xl border bg-white dark:bg-black/20 focus:outline-none transition-all ${
+                            errors.name ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-border focus:border-primary"
+                          }`}
+                        />
+                        <User className="w-4 h-4 text-muted absolute left-3 top-3" />
+                      </div>
+                      {errors.name && <p className="text-[10px] text-red-500 font-semibold">{errors.name}</p>}
                     </div>
-                  </div>
 
-                  <div className="p-3.5 border border-border rounded-xl bg-slate-50/50 dark:bg-[#080d1a] shadow-inner text-center">
-                    <p className="text-xs font-bold text-foreground mb-3">
-                      {monthNames[month]} {year}
-                    </p>
-                    <div className="grid grid-cols-7 gap-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider" htmlFor="booking-email">Email Address</label>
+                      <div className="relative">
+                        <input
+                          id="booking-email"
+                          type="email"
+                          placeholder="e.g. john@company.com"
+                          value={email}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                            if (errors.email) setErrors(prev => ({ ...prev, email: "" }));
+                          }}
+                          className={`w-full pl-9 pr-3 py-2 text-sm rounded-xl border bg-white dark:bg-black/20 focus:outline-none transition-all ${
+                            errors.email ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-border focus:border-primary"
+                          }`}
+                        />
+                        <Mail className="w-4 h-4 text-muted absolute left-3 top-3" />
+                      </div>
+                      {errors.email && <p className="text-[10px] text-red-500 font-semibold">{errors.email}</p>}
                     </div>
-                    <div className="grid grid-cols-7 gap-1">
-                      {/* empty grids before 1st of month */}
-                      {emptyDaysArray.map((idx) => (
-                        <span key={`empty-${idx}`} />
-                      ))}
-                      {/* real calendar days */}
-                      {daysArray.map((day) => {
-                        const past = isPastDay(day);
-                        const selected = isSelectedDay(day);
-                        return (
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider" htmlFor="booking-phone">WhatsApp Number</label>
+                      <div className="relative">
+                        <input
+                          id="booking-phone"
+                          type="tel"
+                          placeholder="e.g. +91 98765 43210"
+                          value={whatsapp}
+                          onChange={(e) => {
+                            setWhatsapp(e.target.value);
+                            if (errors.whatsapp) setErrors(prev => ({ ...prev, whatsapp: "" }));
+                          }}
+                          className={`w-full pl-9 pr-3 py-2 text-sm rounded-xl border bg-white dark:bg-black/20 focus:outline-none transition-all ${
+                            errors.whatsapp ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-border focus:border-primary"
+                          }`}
+                        />
+                        <Phone className="w-4 h-4 text-muted absolute left-3 top-3" />
+                      </div>
+                      {errors.whatsapp && <p className="text-[10px] text-red-500 font-semibold">{errors.whatsapp}</p>}
+                    </div>
+
+                    <div className="bg-slate-50 dark:bg-black/10 p-3.5 rounded-xl border border-border border-dashed text-xs text-muted-foreground leading-normal flex items-start gap-2.5">
+                      <Clock className="w-4 h-4 text-primary dark:text-sky-400 shrink-0 mt-0.5" />
+                      <p>In the next step, you will select an active slot on our interactive schedule. This demo will connect you live with our dedicated systems expert.</p>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left"
+                  >
+                    {/* Custom Calendar Column */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Select Date</span>
+                        <div className="flex gap-1">
                           <button
-                            key={`day-${day}`}
-                            disabled={past}
-                            onClick={() => handleDaySelect(day)}
-                            className={`w-7 h-7 mx-auto rounded-full text-xs font-semibold flex items-center justify-center transition-all ${
-                              selected
-                                ? "bg-primary text-white font-bold"
-                                : past
-                                ? "text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-40"
-                                : "text-foreground hover:bg-slate-200 dark:hover:bg-white/10"
-                            }`}
+                            onClick={() => changeMonth("prev")}
+                            className="p-1 rounded hover:bg-slate-100 dark:hover:bg-white/5 border text-muted-foreground hover:text-foreground transition-all disabled:opacity-30"
+                            disabled={
+                              currentDate.getFullYear() === new Date().getFullYear() &&
+                              currentDate.getMonth() === new Date().getMonth()
+                            }
                           >
-                            {day}
+                            <ChevronLeft className="w-3.5 h-3.5" />
                           </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Time Slots Column */}
-                <div className="space-y-3">
-                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Select Time</span>
-                  {selectedDate ? (
-                    <div className="grid grid-cols-2 gap-2">
-                      {TIME_SLOTS.map((timeSlot) => {
-                        const isSelected = selectedTime === timeSlot;
-                        return (
                           <button
-                            key={timeSlot}
-                            onClick={() => setSelectedTime(timeSlot)}
-                            className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-center ${
-                              isSelected
-                                ? "border-primary bg-primary/10 text-primary shadow-sm shadow-primary/15"
-                                : "border-border bg-white dark:bg-black/10 hover:border-primary/50 text-foreground"
-                            }`}
+                            onClick={() => changeMonth("next")}
+                            className="p-1 rounded hover:bg-slate-100 dark:hover:bg-white/5 border text-muted-foreground hover:text-foreground transition-all"
                           >
-                            {timeSlot}
+                            <ChevronRight className="w-3.5 h-3.5" />
                           </button>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="h-[148px] border border-dashed border-border rounded-xl flex items-center justify-center p-4 bg-slate-50/20 text-center">
-                      <p className="text-xs text-muted-foreground">Select a date on the calendar first to view available time slots.</p>
-                    </div>
-                  )}
-
-                  {selectedDate && selectedTime && (
-                    <div className="mt-4 p-3 bg-primary/5 dark:bg-primary/10 border border-primary/20 rounded-xl space-y-1.5 text-xs text-left">
-                      <p className="font-bold text-primary dark:text-sky-400">Assigned Consultant:</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className="w-7 h-7 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center shrink-0">
-                          {SERVICE_PEOPLE[solutionId]?.avatar || "AS"}
                         </div>
-                        <div>
-                          <p className="font-semibold text-foreground text-[11px] leading-none">
-                            {SERVICE_PEOPLE[solutionId]?.name || "Alex Smith"}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5 leading-none">
-                            {SERVICE_PEOPLE[solutionId]?.role || "Expert Consultant"}
-                          </p>
+                      </div>
+
+                      <div className="p-3.5 border border-border rounded-xl bg-slate-50/50 dark:bg-[#080d1a] shadow-inner text-center">
+                        <p className="text-xs font-bold text-foreground mb-3">
+                          {monthNames[month]} {year}
+                        </p>
+                        <div className="grid grid-cols-7 gap-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                        </div>
+                        <div className="grid grid-cols-7 gap-1">
+                          {/* empty grids before 1st of month */}
+                          {emptyDaysArray.map((idx) => (
+                            <span key={`empty-${idx}`} />
+                          ))}
+                          {/* real calendar days */}
+                          {daysArray.map((day) => {
+                            const past = isPastDay(day);
+                            const selected = isSelectedDay(day);
+                            return (
+                              <button
+                                key={`day-${day}`}
+                                disabled={past}
+                                onClick={() => handleDaySelect(day)}
+                                className={`w-7 h-7 mx-auto rounded-full text-xs font-semibold flex items-center justify-center transition-all ${
+                                  selected
+                                    ? "bg-primary text-white font-bold"
+                                    : past
+                                    ? "text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-40"
+                                    : "text-foreground hover:bg-slate-200 dark:hover:bg-white/10"
+                                }`}
+                              >
+                                {day}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </div>
 
-          {/* Footer Actions */}
-          <div className="p-6 border-t border-border bg-slate-50/50 dark:bg-black/10 flex justify-between items-center shrink-0">
-            {step === 1 ? (
-              <>
-                <div />
-                <button
-                  onClick={handleNextStep}
-                  className="px-5 py-2.5 bg-primary hover:opacity-90 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-primary/10"
-                >
-                  Next: Schedule <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => setStep(1)}
-                  className="px-4 py-2.5 border border-border bg-white dark:bg-[#0c1220] hover:bg-slate-100 dark:hover:bg-white/5 text-foreground rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" /> Back
-                </button>
-                <button
-                  onClick={handleConfirmBooking}
-                  disabled={!selectedDate || !selectedTime}
-                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-emerald-600/10"
-                >
-                  Confirm Booking <Check className="w-3.5 h-3.5" />
-                </button>
-              </>
-            )}
-          </div>
+                    {/* Time Slots Column */}
+                    <div className="space-y-3">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Select Time</span>
+                      {selectedDate ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          {TIME_SLOTS.map((timeSlot) => {
+                            const isSelected = selectedTime === timeSlot;
+                            return (
+                              <button
+                                key={timeSlot}
+                                onClick={() => setSelectedTime(timeSlot)}
+                                className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-center ${
+                                  isSelected
+                                    ? "border-primary bg-primary/10 text-primary shadow-sm shadow-primary/15"
+                                    : "border-border bg-white dark:bg-black/10 hover:border-primary/50 text-foreground"
+                                }`}
+                              >
+                                {timeSlot}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="h-[148px] border border-dashed border-border rounded-xl flex items-center justify-center p-4 bg-slate-50/20 text-center">
+                          <p className="text-xs text-muted-foreground">Select a date on the calendar first to view available time slots.</p>
+                        </div>
+                      )}
+
+                      {selectedDate && selectedTime && (
+                        <div className="mt-4 p-3 bg-primary/5 dark:bg-primary/10 border border-primary/20 rounded-xl space-y-1.5 text-xs text-left">
+                          <p className="font-bold text-primary dark:text-sky-400">Assigned Consultant:</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="w-7 h-7 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                              {SERVICE_PEOPLE[solutionId]?.avatar || "AS"}
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground text-[11px] leading-none">
+                                {SERVICE_PEOPLE[solutionId]?.name || "Alex Smith"}
+                              </p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5 leading-none">
+                                {SERVICE_PEOPLE[solutionId]?.role || "Expert Consultant"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Footer Actions */}
+              <div className="p-6 border-t border-border bg-slate-50/50 dark:bg-black/10 flex justify-between items-center shrink-0">
+                {step === 1 ? (
+                  <>
+                    <div />
+                    <button
+                      onClick={handleNextStep}
+                      className="px-5 py-2.5 bg-primary hover:opacity-90 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-primary/10"
+                    >
+                      Next: Schedule <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setStep(1)}
+                      className="px-4 py-2.5 border border-border bg-white dark:bg-[#0c1220] hover:bg-slate-100 dark:hover:bg-white/5 text-foreground rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" /> Back
+                    </button>
+                    <button
+                      onClick={handleConfirmBooking}
+                      disabled={!selectedDate || !selectedTime}
+                      className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-emerald-600/10"
+                    >
+                      Confirm Booking <Check className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
+          )}
         </motion.div>
       </div>
     </AnimatePresence>

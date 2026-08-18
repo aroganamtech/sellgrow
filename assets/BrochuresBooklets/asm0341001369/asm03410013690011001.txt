@@ -1,0 +1,8 @@
+﻿English—Ingles	Spanish—Español	Phonetical Pronunciation—Spanish	Pronunciación fonética—Inelés
+Where is the Post-Office?	¿Dónde está el Correo?	Dohn'-day es-tah' ell Koh-rray'-oh?	Juér fs di Póst Of'-fss?
+Where is the Telegraph Office?	¿Dónde está el despacho de telégrafos?	Dohn'-day es-tah' ell dayss-pah'-choh day të-lay'-grah-fohss?	Juér ;s di Tel'-e-graf Of'-/ss?
+I wish a stamp for this letter.	Quiero un sello (una estampilla) para esta carta.	Kee-ay'-roh oon say'-yoh (oo'-nah es-tahm-pee'-yah) pah'-rah es'-tah kahr'-tah.	Ai ursch ei stamp for diss let'-ter.
+Airmail Stamp.	Sello aéreo. Estampilla aérea.	Say'-yoh ah-ay'-ray-oh. Es-tahm-pee'-yah ah-ay'-ray-ah.	Eir'-meil stamp.
+I wish to send this package.	Quiero enviar esta paquete.	Kee-ay'-roh ayn-vee-ahr' es'-tah pah-ket'-ay.	Ai uisch tu send diss pac'-ey.
+Are there letters for me?	¿Hay cartas para mí?	I kahr'-tahss pah'-rah mee?	Ar dér let'-ters for mee?
+9

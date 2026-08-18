@@ -1,0 +1,8 @@
+﻿English- Ingles	Spanish—Español	Phonetical Pronunciation—Spanish	Pronunciación fonética—Ingles
+Where is the airport?	¿Dónde está el aeropuerto?	Dohn'-day es-tah' ell ah-ay-roh-poo-ayr'-toh?	Juér fs di eir'-port?
+Where is my baggage?	¿Dónde está mi equipaje?	Dohn'-day es-tah' mee ay-kee-pah'-hay?	Juér js mai ba'-gey?
+When does the plane leave? (arrive)?	¿A qué hora sale el avión (llega el avión)?	Ah kay oh'-rah sah'-lay ell ah-vee-ohn'? (yay'-gah ell ah-vee-ohn')?	Juen' des di plein liv? (a-raiv')?
+Please call a taxi.	Sírvase llamar un (coche) taxi. Llame un (coche) taxi, por favor.	Seer'-vah-say yah-mahr' oon (koh'-chay) taxi. Yah'-may oon (koh'-chay) taxi pohr fah-vohr'.	Plis cól ei taxi.
+I wish to check my baggage.	Quiero dejar en depósito mi equipaje.	Kee-ay'-roh day-hahr' ayn day-poh'-see-toh mee ay-kee-pah'-hay.	Ai u/sch tu chek mai £a'-gey.
+I wish to have my baggage forwarded to—	Quiero que me manden mi equipaje a—	Kee-ayr'-oh kay may mahn'-dayn mee ay-kee-pah'-hay ah—	Ai uisch tu jav mai ba-gey for'-uer-ded tu—
+2

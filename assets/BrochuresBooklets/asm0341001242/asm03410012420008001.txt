@@ -1,0 +1,28 @@
+﻿New York, NY
+Reservations: 973-4000
+Airports K-JFKInt’l L-LaGuardia
+	Freq.	Leave Arrive	Flight No.	Stops or Connecting City	Aircraftt Meals
+To Tokyoo (Narita Airport) From Tokyo Res. 240-8888	Daily K 900a 450p +1 5/11 San Francisco Above Flight Effective Feb. 1 ExMoTuk 900a 450p+1 5/11 San Francisco Above Flight Discontinued After Jan. 31 Daily K1200n 355p+1 801 NON-STOP Sa K 1240p 435p +1 15 NON-STOP				sp 5-LLS sf ^-LLS sp JLLSD sp tg-LSD
+	Fr Daily	645p K 510p 715p K 540p	16 800	NON-STOP NON-STOP	sp g-DB sp $-DB
+To Washington, DC Daily		K 800a N 912a	889	NON-STOP	727 S
+Airports: 11-National	Daily	K 305p N 413p	67	NON-STOP	727
+D-Dulles	Daily	K 400p N 459p	111	NON-STOP	727
+	Daily	K 710p N 827p	800	NON-STOP	727
+	Daily	K 830p N 947p	887	NON-STOP	727
+From Washington,	Daily	N 945a K 1059a	801	NON-STOP	111
+DC	Daily	N 155p K 259p	217	NON-STOP	111
+Res. 833-1000	Daily	N 400p K 514p	110	NON-STOP	111
+	Daily	N 5 00p K 614p	116	NON-STOP	111
+	Daily	N 745p K 900p	794	NON-STOP	111
+To West Palm	Daily	K 900a 1150a	237	NON-STOP	111 B
+Beach,FL	Daily	L 900a 329p	351/326	Ft. Lauderdale	DC10 &B
+	Daily	K 1130a 217p	239	NON-STOP	727 L
+	Daily	K 400p 907p	111/327	Washington	111 D
+From West Palm	Daily	1200n K 514p	322/110	Washington	727 L
+Beach,FL	Daily	315p K 554p	234	NON-STOP	111 S
+Res. 683-2500	Daily	615p K 854p	238	NON-STOP	727 D
+Aplus( + )orminus(-)signafterthearrival	MEAL CODES:
+time indicatesarrival theday(s)following departure	S-Snack L-Lunch
+orthedayprevioustodeparture.	B-Breakfast D-Dinner
+Flight numbersin Bold areoperated by WideCabin aircraft.	All times shown are locally observed
+Standardor DaylightSaving Time.

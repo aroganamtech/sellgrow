@@ -1,16 +1,31 @@
 import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
+import { ObjectId } from 'mongodb';
 import { PRODUCTS_DATA, ProductItem } from '@/data/productsData';
 
 export async function GET() {
   try {
     const db = await getDatabase();
     const collection = db.collection('products');
+    const metaCollection = db.collection<any>('_meta');
     
+    const seedMeta = await metaCollection.findOne({ key: 'products_seeded' });
     let list = await collection.find().toArray();
-    if (list.length === 0) {
+    
+    if (list.length === 0 && !seedMeta) {
       await collection.insertMany(PRODUCTS_DATA);
+      await metaCollection.updateOne(
+        { key: 'products_seeded' },
+        { $set: { seeded: true, seededAt: new Date() } },
+        { upsert: true }
+      );
       list = await collection.find().toArray();
+    } else if (list.length > 0 && !seedMeta) {
+      await metaCollection.updateOne(
+        { key: 'products_seeded' },
+        { $set: { seeded: true, seededAt: new Date() } },
+        { upsert: true }
+      );
     }
     
     const formatted = list.map((item: any) => ({
@@ -116,10 +131,12 @@ export async function PUT(req: Request) {
       return NextResponse.json({ status: 'error', message: 'Product ID is required' }, { status: 400 });
     }
 
-    const result = await collection.updateOne(
-      { id },
-      { $set: updateData }
-    );
+    let filter: any = { id };
+    if (ObjectId.isValid(id)) {
+      filter = { $or: [{ _id: new ObjectId(id) }, { id }] };
+    }
+
+    const result = await collection.updateOne(filter, { $set: updateData });
 
     return NextResponse.json({ status: 'success', message: 'Product updated successfully', result });
   } catch (error: any) {
@@ -139,9 +156,15 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ status: 'error', message: 'Product ID is required' }, { status: 400 });
     }
 
-    await collection.deleteOne({ id });
+    let filter: any = { id };
+    if (ObjectId.isValid(id)) {
+      filter = { $or: [{ _id: new ObjectId(id) }, { id }] };
+    }
+
+    await collection.deleteOne(filter);
     return NextResponse.json({ status: 'success', message: 'Product deleted from collection' });
   } catch (error: any) {
     return NextResponse.json({ status: 'error', message: error.message }, { status: 500 });
   }
 }
+

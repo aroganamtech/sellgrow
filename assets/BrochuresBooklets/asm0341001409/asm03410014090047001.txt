@@ -1,0 +1,14 @@
+﻿Chapter 11
+TIME CONVERSIONS
+A description and explanation of Local Standard Time, Greenwich Civil Time and the 24 Hour Clock, as they apply to Pan American activities
+All of our activities at Pan American are governed by two basic “kinds” of time measurement: Local Standard Time and Greenwich Civil Time.
+LOCAL STANDARD (or ZONE) TIME
+Local Standard Time is divided into belts, or zones, measured by the earth’s meridians of longitude. The meridian of Greenwich, England, is used as the zero meridian. From this point, other standard time zones
+are assigned at every 15 degrees of longitude. There are exactly 24 time meridians in all . . . each of them one hour apart.
+Local Standard Time is used at Pan Am in giving passengers and cargo shippers the correct information on all flight arrival and departure times. For this reason, our System Time Table and most other airline schedules are printed with local times given.
+GREENWICH CIVIL TIME (GCT)
+Greenwich Civil Time—also referred to as Greenwich Meridian Time — is always the local time at Greenwich, England, which is located at zero meridian. Greenwich Civil Time (GCT) has been adopted as the reference time of international commerce.
+By using GCT, people anywhere on earth can employ the exact same hour and date for coordinating their activities. This not only makes for easier communication, but avoids the confusion of working with many different local times. If you look at your Pan Am Time Table, you will find a column at the far left of each page which contains a list of plus or minus figures. These indicate the number of hours which must be added or subtracted, in order to convert each location of GCT.
+For example, opposite the city of Hamburg, you will see a “plus 1” figure. This means that Hamburg time is one hour later than Greenwich time. In order to convert to GCT, one hour must be subtracted,
+Opposite New York, you will find a “minus 5” figure. This indicates that New York time is 5 hours earlier than Greenwich time. Due to the earth’s rotation, when it is 11 A.M. in Greenwich, England, it is only 6 A.M. in New York—so, to convert New York to GCT, 5 hours must be added.
+45

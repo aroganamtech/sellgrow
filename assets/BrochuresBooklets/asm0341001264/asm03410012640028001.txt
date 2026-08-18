@@ -1,0 +1,15 @@
+﻿MONTHS • MESES
+English—Inglés	Spanish—Español	Phonetical Pronunciation—Spanish	Pronunciación fonética-inglés
+January.	enero.	eh-neh-roh.	Cha-nu-e-ri.
+February.	febrero.	feh-breh-roh.	Fe-bru-e-ri.
+March.	marzo.	mahr-soh.	March.
+April.	abril.	ah-breel.	Ei-pril.
+May.	mayo.	mah-eeoh.	Mei.
+June.	junio.	who-nee-oh	Chun.
+July.	julio.	who-lee-oh.	Chu-lai.
+August.	agosto.	ah-qohs-toh.	O-gost.
+September.	septiembre.	sehp-tee-ehm-breh.	Seo-tem-ber.
+October.	octubre.	ok-too-breh.	Oc-to-ber.
+November.	noviembre.	noh-vee-ehm-breh.	No-vem-ber.
+December.	diciembre.	dee-cee-ehm-breh.	Di-cem-ber.
+‘Names of months are not capitalized in Spanish. Dates are written starting with the day of the month, next, the month and last the year—9 de agosto de 1949. In abbreviating dates, the second digit represents the month —8/4/49 means April 8, 1949.	13

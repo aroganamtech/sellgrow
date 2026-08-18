@@ -1,0 +1,16 @@
+﻿English—Inglés	Spanish—Español	Phonetical Pronunciation—Spanish	Pronunciación fonética-inglés
+Zero.	Zero.	Seh-roh.	Si-ro.
+One.	*Uno.	Oo-noh.	Uan.
+Two.	Dos.	Dohs.	Tu.
+Three.	Tres.	Trehs.	Zri.
+Four.	Cuatro.	Koo-gh-troh.	For.
+Five.	Cinco.	Seen-koh.	Faiv.
+Six.	Seis.	Seh-ees.	Siks.
+Seven.	Siete.	See-eh-teh.	Sev-en.
+Eight.	Ocho.	Oh-choh.	Eit.
+Nine.	Nueve.	Noo-eh-veh.	Nain.
+Ten.	Diez.	Dee-ehs.	Ten.
+Eleven.	Once.	Ohn-seh.	Y-[e-ven.
+Twelve.	Doce.	Doh-seh.	Tu-elv.
+Uno drops the "o" when used before a noun or adjective.
+15

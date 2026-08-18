@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "product_name": "GEORGE MAIJO AGRICULTURAL MACHINERY Power Weeder M800 ECO Specification Sheet",
+  "category": "Agricultural Machinery",
+  "brand": "George Maijo Agri",
+  "short_description": "",
+  "full_description": "",
+  "technical_specifications": {
+    "Engine Model": "GM-170F Commercial 4-Stroke Air-Cooled OHV Engine",
+    "Max Power Output": "7.0 HP (5.2 kW) @ 3600 RPM",
+    "Engine Displacement": "212 cc Single Cylinder",
+    "Working Width": "800 mm - 1050 mm (Adjustable 3-4 Rows)",
+    "Tilling Depth": "100 mm - 300 mm Soil Penetration",
+    "Transmission": "Direct Gear Drive (2 FWD + 1 REV)",
+    "Fuel Tank Capacity": "3.6 Litres Commercial Tank",
+    "Fuel Consumption": "0.7 - 0.9 Litres / Hour",
+    "Rotary Tines": "24 Pcs Curved Heat-Treated Steel Blades",
+    "Net Dry Weight": "115 kg Operating Mass"
+  },
+  "highlights": [
+    "Commercial Grade Heavy-Duty Industrial Construction",
+    "High Fuel Efficiency & Low Operational Cost",
+    "360-Degree Swivel & Height Adjustable Handlebar",
+    "ISO 9001 Certified George Maijo Quality Assurance"
+  ],
+  "pdf_file": "sample_brochure.pdf"
+}

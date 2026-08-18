@@ -1,0 +1,4 @@
+﻿In aviation terms, however, this “reaction” gets a new name, “thrust,” and is responsible for pushing a balloon, or a jet plane, through the air.
+In a jet engine, air is sucked into the engine and compressed. A liquid fuel, normally high-grade kerosene, is mixed with this air. A spark ignites the mixture. Hot gases expand through the turbine, forcing their way back through the engine’s tail cone. However, it is the “reaction” that gives the machine its enormous forward thrust.
+The turbo-prop engine is much like a pure jet engine. Add a prop on the right and you have a turbo-prop. It uses thrust to turn the propeller which then “pulls” the plane through the air.
+2

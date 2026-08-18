@@ -593,14 +593,37 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   useEffect(() => {
+    const applyLanguage = (langVal: string) => {
+      if (langVal && translations[langVal as Language]) {
+        const lang = langVal as Language;
+        setLanguageState(lang);
+        const isRtl = lang === "ar";
+        setDir(isRtl ? "rtl" : "ltr");
+        document.documentElement.dir = isRtl ? "rtl" : "ltr";
+        document.documentElement.lang = lang;
+      }
+    };
+
     const savedLang = localStorage.getItem("language") as Language | null;
-    if (savedLang && translations[savedLang]) {
-      setLanguageState(savedLang);
-      const isRtl = false; // Keep standard LTR layout for consistent look and feel
-      setDir(isRtl ? "rtl" : "ltr");
-      document.documentElement.dir = isRtl ? "rtl" : "ltr";
-      document.documentElement.lang = savedLang;
+    if (savedLang) {
+      applyLanguage(savedLang);
     }
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "language" && e.newValue) {
+        applyLanguage(e.newValue);
+      }
+    };
+
+    const handleCustomEvent = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail) {
+        applyLanguage(customEvent.detail);
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("languageChange", handleCustomEvent);
 
     const savedRegionMode = localStorage.getItem("regionMode") as RegionMode | null;
     const initialMode = savedRegionMode === "manual" ? "manual" : "auto";
@@ -621,6 +644,11 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
     } else {
       setHasSelectedPreferencesState(false);
     }
+
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("languageChange", handleCustomEvent);
+    };
   }, []);
 
   const setLanguage = (lang: Language) => {
@@ -628,12 +656,13 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
     
     setLanguageState(lang);
     localStorage.setItem("language", lang);
-    const isRtl = false; // Keep standard LTR layout for consistent look and feel
+    const isRtl = lang === "ar";
     setDir(isRtl ? "rtl" : "ltr");
     document.documentElement.dir = isRtl ? "rtl" : "ltr";
     document.documentElement.lang = lang;
     
     if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("languageChange", { detail: lang }));
       requestAnimationFrame(() => {
         window.scrollTo(0, currentScrollY);
         setTimeout(() => {

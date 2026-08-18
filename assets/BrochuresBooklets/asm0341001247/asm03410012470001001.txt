@@ -1,0 +1,48 @@
+﻿FLIGHTS FROM	FLIGHT NO.	LEAVE
+Miami. FL	454	830a
+	426*	130p
+	252	500p
+West Palm Beach. FL	238	1230p
+Washington. DC	801	1000a
+(Washington National	217	100p
+Airport)	110	415p
+	888	715p
+	66	800p
+Sarasota/Bradenton, FL	992	635p
+Fort Myers, FL	992	540p
+Detroit. Ml	104	640p
+Ex Fri
+NONSTOP
+NONSTOP
+NONSTOP
+NONSTOP
+NONSTOP
+NONSTOP
+NONSTOP
+NONSTOP
+NONSTOP
+One Stop NONSTOP
+1111a
+425p
+745p
+306p
+1100a
+205p
+527p
+820p
+905p
+855p
+855p
+824p
+Norfolk/Virginia	536	455p NONSTOP 600p
+Beach, VA
+Houston. TX	72*	1145a	NONSTOP	406p
+(Intercontinental Airport)	24	430p	NONSTOP	850p
+San Francisco/	6*	1115a NONSTOP 729p
+Oakland. CA
+Los Angeles, CA	114*	1000a NONSTOP 605p
+New Orleans. LA	986	1212p NONSTOP 402p
+*Widebody Service
+For reservations and additional information call your Travel Agent or Pan Am.
+Take advantage of Pan Am’s fantastic “2 for 1 ” offer on your next flight to or from JFK Airport. Ask your travel agent for details and discover how you can see the world for less. You’ll be glad you did!
+14 thru October 24,1981. Schedule subject to change without notice.
