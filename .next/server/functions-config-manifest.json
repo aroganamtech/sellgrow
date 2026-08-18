@@ -1,1 +1,1 @@
-{"version":1,"functions":{"/api/detect-region":{},"/[company]/login":{},"/[company]/sg-admin/[role]":{},"/[company]/sg-superadmin/admin-growth":{},"/sg-admin/[role]":{},"/[company]/dashboard":{},"/[company]/sg-superadmin":{}}}
+{"version":1,"functions":{"/[company]/sg-admin/[role]":{},"/[company]/dashboard":{},"/[company]/sg-superadmin":{},"/[company]/sg-superadmin/admin-growth":{},"/sg-admin/[role]":{},"/[company]/login":{},"/api/detect-region":{}}}

@@ -862,6 +862,14 @@ export default function ProductsPage() {
     setIsHologramPlaying(true);
     setIsHologramMuted(true);
     setIsHologramFullscreen(false);
+    setHoloActiveTab("chat");
+    setHoloAiHistory([
+      { sender: "user", text: "What is the max power output?" },
+      {
+        sender: "ai",
+        text: `The maximum power output of ${product.name} is: ${product.power || "1.0 kW @ 7000 RPM"}, delivering high performance for demanding operations.`
+      }
+    ]);
     setIs3DModalOpen(true);
   };
 
@@ -1928,23 +1936,23 @@ export default function ProductsPage() {
       {/* ======================================================== */}
       {is3DModalOpen && hologramProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/95 backdrop-blur-2xl overflow-hidden animate-in fade-in duration-300">
-          <div className="relative w-full max-w-6xl h-[88vh] bg-[#01040f] text-white rounded-3xl border border-cyan-500/40 p-3 sm:p-4 shadow-[0_0_100px_rgba(6,182,212,0.3)] flex flex-col justify-between overflow-hidden">
+          <div className="relative w-full max-w-6xl h-[90vh] bg-[#020817] text-white rounded-3xl border border-cyan-500/40 p-4 shadow-[0_0_100px_rgba(6,182,212,0.3)] flex flex-col justify-between overflow-hidden">
             
             {/* Ambient Sci-Fi Glow Background */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
 
             {/* Top Overlay Bar */}
-            <div className="relative z-20 flex items-center justify-between p-2">
+            <div className="relative z-20 flex items-center justify-between pb-3 border-b border-cyan-900/40">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-400/40 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-400/40 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
                   <Sparkles className="w-5 h-5 animate-pulse text-cyan-300" />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-white tracking-tight font-display">
                     {hologramProduct.name}
                   </h3>
-                  <p className="text-[11px] font-mono text-cyan-400">
+                  <p className="text-[11px] font-mono text-cyan-400 font-medium">
                     3D Spatial Hologram Projection • 7000 RPM ENGINE SIM
                   </p>
                 </div>
@@ -1953,10 +1961,10 @@ export default function ProductsPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleConnectHolo}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 border shadow-md active:scale-95 ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 border shadow-md active:scale-95 cursor-pointer ${
                     isHoloConnected
-                      ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
-                      : "bg-cyan-500/20 text-cyan-300 border-cyan-400/40"
+                      ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-emerald-500/20"
+                      : "bg-cyan-500/20 text-cyan-300 border-cyan-400/50 hover:bg-cyan-500/30 shadow-cyan-500/20"
                   }`}
                 >
                   <Cast className={`w-3.5 h-3.5 ${isHoloConnected ? "text-emerald-400" : "text-cyan-400 animate-pulse"}`} />
@@ -1972,30 +1980,16 @@ export default function ProductsPage() {
               </div>
             </div>
 
-            {/* Main Stage 3D Full-Size Viewport */}
-            <div className="relative z-10 flex-1 w-full h-full min-h-0 flex items-center justify-center overflow-hidden rounded-2xl border border-cyan-500/30 bg-[#01040f]">
-              {/* Futuristic Grid Matrix Backdrop */}
-              <div className="absolute inset-0 bg-[radial-gradient(#06b6d420_1px,transparent_1px)] bg-[size:22px_22px] pointer-events-none" />
-              
-              {/* Glowing Sci-Fi Pedestal Floor */}
-              <div className="absolute bottom-4 w-96 h-16 rounded-[100%] bg-cyan-500/20 border border-cyan-400/40 shadow-[0_0_50px_rgba(6,182,212,0.6)] animate-pulse pointer-events-none" />
-
-              {/* Corner Sci-Fi Viewport Brackets */}
-              <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-              <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-              <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-              <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-
-            {/* Main Viewport Content Area: Split 2-Column Layout (Left: 3D Stage, Right: Dedicated Separate AI Assistant Column) */}
-            <div className="relative z-10 flex-1 w-full h-full min-h-0 flex flex-col lg:flex-row gap-3.5 overflow-hidden mt-1">
+            {/* Main Stage & Sidebar: 2-Column Grid Layout */}
+            <div className="relative z-10 flex-1 w-full h-full min-h-0 flex flex-col lg:flex-row gap-4 overflow-hidden mt-3">
               
               {/* LEFT COLUMN: Interactive 3D Hologram Stage */}
-              <div className="relative flex-1 w-full h-full min-h-[300px] flex flex-col justify-between overflow-hidden rounded-2xl border border-cyan-500/30 bg-[#01040f]">
+              <div className="relative flex-1 w-full h-full min-h-[300px] flex flex-col justify-between overflow-hidden rounded-2xl border border-cyan-500/40 bg-[#010512]">
                 {/* Futuristic Grid Matrix Backdrop */}
                 <div className="absolute inset-0 bg-[radial-gradient(#06b6d420_1px,transparent_1px)] bg-[size:22px_22px] pointer-events-none" />
                 
-                {/* Glowing Sci-Fi Pedestal Floor */}
-                <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-80 sm:w-96 h-16 rounded-[100%] bg-cyan-500/20 border border-cyan-400/40 shadow-[0_0_50px_rgba(6,182,212,0.6)] animate-pulse pointer-events-none" />
+                {/* Glowing Sci-Fi Pedestal Floor (Oval Ring) */}
+                <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-80 sm:w-[420px] h-14 rounded-[100%] border-2 border-dashed border-cyan-400/40 bg-cyan-500/10 shadow-[0_0_50px_rgba(6,182,212,0.4)] animate-pulse pointer-events-none" />
 
                 {/* Corner Sci-Fi Viewport Brackets */}
                 <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
@@ -2004,7 +1998,7 @@ export default function ProductsPage() {
                 <div className="absolute bottom-16 right-3 w-5 h-5 border-b-2 border-r-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
 
                 {/* Top Left HUD Stats Badge */}
-                <div className="absolute top-3 left-3 z-20 bg-slate-950/85 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-cyan-500/35 text-xs font-mono text-cyan-300 flex items-center gap-2 shadow-lg">
+                <div className="absolute top-3.5 left-3.5 z-20 bg-slate-950/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-cyan-500/40 text-xs font-mono text-cyan-300 flex items-center gap-2 shadow-lg">
                   <Activity className="w-4 h-4 text-cyan-400 animate-pulse" />
                   <span className="font-bold">HUD MATRIX • 360° WIREFRAME</span>
                 </div>
@@ -2047,7 +2041,7 @@ export default function ProductsPage() {
                 </div>
 
                 {/* Floating Custom HUD Control Bar at bottom of 3D stage */}
-                <div className="relative z-30 bg-slate-950/90 backdrop-blur-2xl border-t border-cyan-500/35 p-2.5 flex items-center justify-between shadow-2xl shrink-0">
+                <div className="relative z-30 bg-[#020817]/95 backdrop-blur-2xl border-t border-cyan-500/40 p-2.5 flex items-center justify-between shadow-2xl shrink-0">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={toggleHologramPlay}
@@ -2093,31 +2087,31 @@ export default function ProductsPage() {
               </div>
 
               {/* RIGHT COLUMN: Dedicated Separate AI Voice Assistant & Chat Panel */}
-              <div className="w-full lg:w-[380px] xl:w-[400px] h-full flex flex-col justify-between bg-slate-950/95 backdrop-blur-2xl border border-cyan-500/40 rounded-2xl p-4 shadow-2xl overflow-y-auto shrink-0 space-y-3">
+              <div className="w-full lg:w-[380px] xl:w-[410px] h-full flex flex-col justify-between bg-[#020817] border border-cyan-500/40 rounded-2xl p-4 shadow-2xl overflow-hidden shrink-0 space-y-3">
                 <div className="flex items-center justify-between border-b border-cyan-900/40 pb-2.5">
                   <div className="flex items-center gap-1.5">
                     <Sparkles className={`w-4 h-4 ${isSpeaking ? "text-cyan-400 animate-spin" : "text-cyan-400 animate-pulse"}`} />
                     <span className="text-xs font-black uppercase tracking-wider text-cyan-300 font-display">
-                      AI Voice Assistant & Chat
+                      AI VOICE ASSISTANT & CHAT
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setHoloActiveTab("specs")}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer ${
+                      className={`px-3 py-1 rounded-xl text-[10.5px] font-extrabold transition-all cursor-pointer ${
                         holoActiveTab === "specs"
                           ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
-                          : "bg-slate-900 text-slate-400 hover:text-white border border-cyan-900/50"
+                          : "bg-slate-900/90 text-slate-400 hover:text-white border border-cyan-900/50"
                       }`}
                     >
                       Specs
                     </button>
                     <button
                       onClick={() => setHoloActiveTab("chat")}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer relative ${
+                      className={`px-3 py-1 rounded-xl text-[10.5px] font-extrabold transition-all cursor-pointer relative ${
                         holoActiveTab === "chat"
                           ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
-                          : "bg-slate-900 text-slate-400 hover:text-white border border-cyan-900/50"
+                          : "bg-slate-900/90 text-slate-400 hover:text-white border border-cyan-900/50"
                       }`}
                     >
                       Ask AI
@@ -2129,7 +2123,7 @@ export default function ProductsPage() {
                 </div>
 
                 {/* Language Switcher Bar: English, Hindi, Tamil ONLY */}
-                <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-cyan-900/50">
+                <div className="flex items-center gap-1.5 bg-[#0a1329] p-1 rounded-xl border border-cyan-900/50">
                   <button
                     onClick={() => {
                       setHoloAiLang("en");
@@ -2177,7 +2171,7 @@ export default function ProductsPage() {
                 {holoActiveTab === "specs" ? (
                   <div className="flex-1 flex flex-col justify-between space-y-3 min-h-0 overflow-y-auto">
                     {/* Specification Overview Display Box */}
-                    <div className="p-3 bg-slate-900/90 rounded-xl border border-cyan-500/25 space-y-2 text-xs">
+                    <div className="p-3 bg-[#0a1329] rounded-xl border border-cyan-500/25 space-y-2 text-xs">
                       <p className="text-[12px] text-cyan-200 leading-relaxed font-medium">
                         {getProductSpecsText(hologramProduct, holoAiLang)}
                       </p>
@@ -2221,7 +2215,7 @@ export default function ProductsPage() {
                 ) : (
                   /* Chat Stream View */
                   <div className="flex-1 flex flex-col justify-between space-y-2 min-h-0">
-                    <div className="flex-1 overflow-y-auto space-y-2 p-3 bg-slate-900/90 rounded-xl border border-cyan-500/25 text-xs">
+                    <div className="flex-1 overflow-y-auto space-y-2.5 p-3 bg-[#0a1329]/90 rounded-xl border border-cyan-500/25 text-xs">
                       {holoAiHistory.length === 0 ? (
                         <div className="text-center py-8 space-y-2">
                           <Sparkles className="w-7 h-7 text-cyan-400 mx-auto animate-bounce" />
@@ -2232,10 +2226,10 @@ export default function ProductsPage() {
                         holoAiHistory.map((h, i) => (
                           <div key={i} className={`flex ${h.sender === "user" ? "justify-end" : "justify-start"}`}>
                             <div
-                              className={`p-2.5 rounded-xl max-w-[90%] text-[11.5px] leading-relaxed ${
+                              className={`p-3 rounded-2xl max-w-[88%] text-[11.5px] leading-relaxed shadow-md ${
                                 h.sender === "user"
                                   ? "bg-cyan-600 text-white font-medium"
-                                  : "bg-slate-800 text-cyan-100 border border-cyan-800/60 flex items-start justify-between gap-2"
+                                  : "bg-[#0f1d38] text-cyan-100 border border-cyan-800/60 flex items-start justify-between gap-2"
                               }`}
                             >
                               <span>{h.text}</span>
@@ -2256,13 +2250,13 @@ export default function ProductsPage() {
                   </div>
                 )}
 
-                {/* Interactive Question Input Form with Mic Button */}
+                {/* Interactive Question Input Form with Mic Button & Round Cyan Send Button */}
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     handleHoloVoiceQuerySubmit(holoUserQuery);
                   }}
-                  className="flex items-center gap-1.5 pt-2 border-t border-cyan-900/40 shrink-0"
+                  className="flex items-center gap-2 pt-2 border-t border-cyan-900/40 shrink-0"
                 >
                   <div className="relative flex-1">
                     <input
@@ -2276,7 +2270,7 @@ export default function ProductsPage() {
                           ? "प्रश्न पूछें: उदा. 'पावर क्या है?'"
                           : "Ask question about engine, power, price..."
                       }
-                      className="w-full pl-3 pr-8 py-2 bg-slate-900 text-white text-xs rounded-xl border border-cyan-900 focus:outline-none focus:border-cyan-400 placeholder:text-slate-500 font-medium"
+                      className="w-full pl-3.5 pr-9 py-2.5 bg-[#0a1329] text-white text-xs rounded-full border border-cyan-800 focus:outline-none focus:border-cyan-400 placeholder:text-slate-500 font-medium shadow-inner"
                     />
                     <button
                       type="button"
@@ -2286,7 +2280,7 @@ export default function ProductsPage() {
                           handleHoloVoiceQuerySubmit(transcript);
                         })
                       }
-                      className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-lg transition-colors ${
+                      className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors ${
                         isListening
                           ? "bg-rose-500 text-white animate-pulse"
                           : "text-slate-400 hover:text-cyan-400"
@@ -2300,14 +2294,12 @@ export default function ProductsPage() {
                   <button
                     type="submit"
                     disabled={!holoUserQuery.trim()}
-                    className="p-2 bg-cyan-500 disabled:opacity-50 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-xl text-xs transition-all active:scale-95 cursor-pointer shrink-0"
+                    className="w-9 h-9 bg-cyan-500 disabled:opacity-50 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-full text-xs transition-all active:scale-95 cursor-pointer shrink-0 flex items-center justify-center shadow-md shadow-cyan-500/30"
                   >
                     <Send className="w-4 h-4" />
                   </button>
                 </form>
               </div>
-
-            </div>
 
             </div>
 
