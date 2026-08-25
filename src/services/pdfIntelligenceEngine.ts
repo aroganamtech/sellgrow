@@ -125,6 +125,16 @@ export class ProductPdfIntelligenceModel {
         weight = "95 kg Lightweight Operating Mass";
         fuelTank = "3.0 Litres Commercial Steel Tank";
         fuelCons = "0.6 - 0.8 Litres / Hour High Efficiency";
+      } else if (!isM800 && /wm-990|wm_990|990/i.test(rawInput)) {
+        modelName = "George Maijo Power Weeder WM-990 Heavy Duty";
+        engineModel = "WM-170F Commercial 4-Stroke Air-Cooled OHV Engine";
+        maxPower = "7.0 HP (5.2 kW) @ 3,600 RPM";
+        displacement = "212 cc Single Cylinder";
+        workingWidth = "800 mm - 1,100 mm (Adjustable Swath)";
+        bladeCount = "24 Pcs Curved Heat-Treated Carbon Steel Blades";
+        weight = "118 kg Operating Mass";
+        fuelTank = "3.6 Litres Commercial Steel Tank";
+        fuelCons = "0.7 - 0.9 Litres / Hour High Efficiency";
       } else if (!isM800 && /wm-1100|1100/i.test(rawInput)) {
         modelName = "George Maijo Power Weeder WM-1100 Commercial";
       }
@@ -170,10 +180,44 @@ export class ProductPdfIntelligenceModel {
       };
     }
 
-    // 2. BRUSH CUTTERS & TRIMMERS (BC-520, BC-430, 4SP PR, 2-Stroke / 4-Stroke)
-    if (/brush|cutter|bc-520|bc-430|4sp|trimmer|grass|harvester/i.test(rawInput)) {
+    // 2. BRUSH CUTTERS & TRIMMERS (BC-520, BC-430, BC-4 BP PR, 4SP PR, 2-Stroke / 4-Stroke)
+    if (/brush|cutter|bc-520|bc-430|bc-4|bc_4|bp_pr|4sp|trimmer|grass|harvester/i.test(rawInput)) {
+      const isBC4 = /bc-4|bc_4|bp_pr|backpack/i.test(rawInput);
       const is4SP = /4sp|35\.8/i.test(rawInput);
       const isBC430 = /bc-430|43cc/i.test(rawInput);
+
+      if (isBC4) {
+        return {
+          name: "George Maijo BC-4 BP PR Backpack Brush Cutter",
+          category: "Brush Cutter",
+          brand: companyBrand,
+          shortDesc: "Padded backpack 4-stroke air-cooled brush cutter designed for effortless weight distribution and steep terrace farming.",
+          fullDesc: "Engineered with 35.8cc GM-35 engine, flexible high-tensile inner drive cable, and ergonomic padded backpack frame for continuous commercial operations.",
+          highlights: [
+            "Padded Backpack Design Transfers Weight Away From Arms",
+            "35.8cc 4-Stroke Air-Cooled Engine (1.7 HP Output)",
+            "Flexible High-Tensile Inner Drive Cable for Terraces",
+            "Includes 3-Tooth Steel Blade and Nylon Tap-n-Go Head"
+          ],
+          specs: {
+            "Model Name": "George Maijo BC-4 BP PR Backpack Brush Cutter",
+            "Equipment Category": "Backpack Brush Cutter & Trimmer",
+            "Brand Manufacturer": companyBrand,
+            "Engine Model": "GM-35 Backpack 4-Stroke Air-Cooled Engine",
+            "Engine Displacement": "35.8 cc Single Cylinder",
+            "Max Power Output": "1.25 kW (1.7 HP) @ 7,000 RPM",
+            "Flex Shaft Drive": "Flexible High-Tensile Steel Inner Cable Drive",
+            "Backpack Frame": "Padded Ergonomic Backpack Weight Distribution Frame",
+            "Starting Mechanism": "Easy Recoil Pull Starter",
+            "Net Dry Weight": "9.5 kg Balance Backpack Mass",
+            "Brochure Document": pdfFileName || "George_Maijo_BC-4_BP_PR_Brush_Cutter_Brochure.pdf"
+          },
+          voiceGreeting: {
+            en: "Welcome! You are viewing the George Maijo BC-4 BP PR Backpack Brush Cutter.",
+            ta: "வணக்கம்! இது ஜார்ஜ் மேஜோ BC-4 BP PR பேக்பேக் பிரஷ் கட்டர்."
+          }
+        };
+      }
 
       const modelName = is4SP 
         ? "George Maijo Brush Cutter 4SP PR" 

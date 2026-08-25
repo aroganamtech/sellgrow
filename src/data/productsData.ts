@@ -62,7 +62,7 @@ export const PRODUCTS_DATA: ProductItem[] = [
     cuttingWidth: "450 mm",
     fuelCapacity: "0.65 L",
     imageBgColor: "#eefbf2",
-    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.1.BC-4SP-E@2x.png",
+    image: "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png",
     hologramVideo: "/videos/remove_all_the_background.mp4",
     highlights: [
       "Pure Petrol Operation – No petrol-oil mixing required.",
@@ -97,7 +97,7 @@ export const PRODUCTS_DATA: ProductItem[] = [
     cuttingWidth: "800 - 1050 mm",
     fuelCapacity: "3.6 L",
     imageBgColor: "#f0fdf4",
-    image: "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/5.1.WM-700-ECO@2x.png",
+    image: "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png",
     hologramVideo: "/videos/remove_all_the_background.mp4",
     highlights: [
       "7.0 HP High Torque Engine – Powerful 4-stroke performance for tough agricultural terrain.",

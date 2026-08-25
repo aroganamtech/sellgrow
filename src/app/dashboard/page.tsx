@@ -4017,8 +4017,9 @@ export default function DashboardPage() {
                               {categoryTag}
                             </span>
                             <img
-                              src={p.image || "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png"}
+                              src={p.image || "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png"}
                               alt={p.name}
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png"; }}
                               className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                             />
                             <button

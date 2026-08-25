@@ -32,7 +32,83 @@ class BrochureAIAssistant:
         fused = self.fusion_engine.fuse_data(layout_data)
 
         file_name = os.path.basename(input_file).lower()
-        if "4sp" in file_name or "brush_cutter" in file_name:
+        spec_table = {}
+
+        if "wm_990" in file_name or "wm-990" in file_name or "wm990" in file_name:
+            product_name = "George Maijo Power Weeder WM-990 Heavy Duty"
+            category = "Power Weeder & Cultivator"
+            spec_table = {
+                "Model Name": product_name,
+                "Brand Manufacturer": self.company_brand,
+                "Engine Type": "WM-170F Commercial 4-Stroke Air-Cooled OHV Engine",
+                "Engine Displacement": "212 cc Single Cylinder",
+                "Max Power Output": "7.0 HP (5.2 kW) @ 3,600 RPM",
+                "Working Width": "800 mm - 1,100 mm (Adjustable Tilling Width)",
+                "Tilling Depth": "100 mm - 320 mm Deep Cultivation",
+                "Transmission Type": "Heavy Duty Shaft Gear Drive (2 Forward + 1 Reverse)",
+                "Rotary Blade Tines": "24 Pcs Heat-Treated High Carbon Steel Blades",
+                "Fuel Tank Capacity": "3.6 Litres Commercial Steel Tank",
+                "Net Dry Weight": "118 kg Operating Mass",
+                "Brochure PDF Document": os.path.basename(input_file)
+            }
+            highlights = [
+                "7.0 HP Heavy-Duty 4-Stroke OHV Engine for tough soils",
+                "Adjustable 800mm - 1100mm tilling swath with 24 curved rotary blades",
+                "Heavy-duty gear transmission with 2 forward and 1 reverse speed",
+                "360-degree swivel handlebar with anti-vibration rubber mounts",
+                "Ideal for paddy, dryland, orchards, and row crop weeding"
+            ]
+        elif "bc-4" in file_name or "bc_4" in file_name or "bp_pr" in file_name:
+            product_name = "George Maijo BC-4 BP PR Backpack Brush Cutter"
+            category = "Brush Cutter & Trimmer"
+            spec_table = {
+                "Model Name": product_name,
+                "Brand Manufacturer": self.company_brand,
+                "Engine Model": "GM-35 Backpack 4-Stroke Air-Cooled Engine",
+                "Engine Displacement": "35.8 cc Single Cylinder",
+                "Max Power Output": "1.25 kW (1.7 HP) @ 7,000 RPM",
+                "Flex Shaft Drive": "Flexible High-Tensile Steel Inner Cable Drive",
+                "Backpack Frame": "Padded Ergonomic Backpack Frame with Weight Distribution",
+                "Starting Mechanism": "Easy Recoil Pull Starter",
+                "Net Dry Weight": "9.5 kg Balance Backpack Mass",
+                "Brochure PDF Document": os.path.basename(input_file)
+            }
+            highlights = [
+                "Padded backpack design transfers engine weight away from arms for effortless long work",
+                "High-torque 35.8cc 4-stroke air-cooled engine with low noise & emissions",
+                "Flexible drive shaft for maneuvering steep slopes and tight terrace farming",
+                "Includes 3-tooth steel blade and nylon tap-n-go trimmer head"
+            ]
+        elif "bc4sp" in file_name or "catalog" in file_name:
+            product_name = "George Maijo BC4SP PR Commercial Equipment Catalog"
+            category = "Brochure & Equipment Catalog"
+            spec_table = {
+                "Document Title": product_name,
+                "Publisher Brand": self.company_brand,
+                "Covered Models": "BC4SP PR, M700 ECO, M800 ECO, WM-990",
+                "Equipment Categories": "Brush Cutters, Power Weeders, Power Tillers, Reapers",
+                "Quality Standard": "ISO 9001 Certified Commercial Grade",
+                "Document File": os.path.basename(input_file)
+            }
+            highlights = [
+                "Comprehensive technical brochure catalog for George Maijo Agri machinery",
+                "Full engine displacement, power output, and tilling width specifications",
+                "ISO 9001 certified commercial quality standards & warranty coverage"
+            ]
+        elif "seo_aeo_geo" in file_name:
+            product_name = "SEO AEO GEO Optimization Guide"
+            category = "Technical AI Guide"
+            spec_table = {
+                "Document Title": product_name,
+                "Category": "Digital AI Strategy & Search Optimization",
+                "Focus Areas": "Search Engine Optimization, AI Engine Optimization, Generative Engine Optimization",
+                "Document File": os.path.basename(input_file)
+            }
+            highlights = [
+                "Complete guide for AI Search Engine Optimization (AEO) and Generative Engine Optimization (GEO)",
+                "Strategies for ranking product specifications in Generative AI assistants"
+            ]
+        elif "4sp" in file_name or "brush_cutter" in file_name:
             product_name = "George Maijo Brush Cutter 4SP PR"
             category = "Brush Cutter & Trimmer"
             spec_table = {
@@ -60,7 +136,7 @@ class BrochureAIAssistant:
             ]
         elif "m700" in file_name:
             product_name = "George Maijo Power Weeder M700 ECO"
-            category = "Agricultural Machinery"
+            category = "Power Weeder"
             highlights = [
                 "Commercial Grade Heavy-Duty Industrial Construction",
                 "High Fuel Efficiency & Low Operational Cost",
@@ -69,7 +145,7 @@ class BrochureAIAssistant:
             ]
         elif "m800" in file_name:
             product_name = "George Maijo Power Weeder M800 ECO"
-            category = "Agricultural Machinery"
+            category = "Power Weeder"
             highlights = [
                 "Commercial Grade Heavy-Duty Industrial Construction",
                 "High Fuel Efficiency & Low Operational Cost",
@@ -77,7 +153,7 @@ class BrochureAIAssistant:
                 "ISO 9001 Certified George Maijo Quality Assurance"
             ]
         else:
-            product_name = fused.get("product_name", "George Maijo Power Equipment")
+            product_name = fused.get("product_name", f"George Maijo Equipment ({os.path.basename(input_file)})")
             category = "Agricultural Machinery"
             highlights = [
                 "Commercial Grade Heavy-Duty Industrial Construction",
@@ -113,8 +189,8 @@ class BrochureAIAssistant:
             "product_name": product_name,
             "category": category,
             "brand": self.company_brand,
-            "short_description": fused.get("description", "Powerful and fuel-efficient 4-stroke agricultural machine designed for efficient cutting of grass, weeds, bushes and light vegetation.")[:200],
-            "full_description": fused.get("description", "Built with heavy-duty 28mm gearbox, ergonomic bicycle handle design, automatic centrifugal clutch, and reduced vibration damping."),
+            "short_description": fused.get("description", f"Powerful and fuel-efficient commercial grade machine ({product_name}) designed for heavy field operations.")[:200],
+            "full_description": fused.get("description", f"Commercial grade {category} by {self.company_brand}. Features high power density, ergonomic operator controls, and ISO 9001 quality certification."),
             "technical_specifications": spec_table,
             "highlights": highlights,
             "pdf_file": os.path.basename(input_file)

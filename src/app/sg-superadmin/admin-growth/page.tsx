@@ -3113,8 +3113,9 @@ export default function AdminGrowthPage() {
                           ) : (
                             <div className="relative w-full h-36 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 mb-2 flex items-center justify-center p-2">
                               <img
-                                src={PRODUCTS_DATA.find((d) => d.id === p.id)?.image || "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png"}
+                                src={PRODUCTS_DATA.find((d) => d.id === p.id)?.image || "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png"}
                                 alt={p.name}
+                                onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png"; }}
                                 className="max-h-full max-w-full object-contain"
                               />
                             </div>

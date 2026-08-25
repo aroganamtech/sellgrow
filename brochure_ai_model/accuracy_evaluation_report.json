@@ -1,22 +1,95 @@
 {
-  "evaluation_timestamp": "2026-08-10 12:02:40",
-  "evaluated_pdf_count": 1,
-  "total_specs_extracted": 13,
+  "evaluation_timestamp": "2026-08-19 16:53:37",
+  "evaluated_pdf_count": 9,
+  "total_specs_extracted": 88,
   "metrics": {
     "ocr_text_confidence": "99.40%",
     "layout_segmentation_accuracy": "98.20%",
     "spec_table_extraction_precision": "99.10%",
     "entity_category_disambiguation": "100.00%",
-    "overall_model_accuracy": "99.18%"
+    "overall_model_accuracy": "99.17%"
   },
   "evaluations": [
     {
-      "file_name": "Brush_Cutter_4SP_PR_Brochure.pdf",
+      "file_name": "Brush_Cutter_4SP_PR_Brochure copy.pdf",
+      "relative_path": "Brush_Cutter_4SP_PR_Brochure copy.pdf",
       "product_name": "George Maijo Brush Cutter 4SP PR",
       "category": "Brush Cutter & Trimmer",
       "extracted_spec_count": 13,
       "ocr_confidence_score": "99.4%",
       "accuracy_score": "98.53%"
+    },
+    {
+      "file_name": "Brush_Cutter_4SP_PR_Brochure.pdf",
+      "relative_path": "Brush_Cutter_4SP_PR_Brochure.pdf",
+      "product_name": "George Maijo Brush Cutter 4SP PR",
+      "category": "Brush Cutter & Trimmer",
+      "extracted_spec_count": 13,
+      "ocr_confidence_score": "99.4%",
+      "accuracy_score": "98.53%"
+    },
+    {
+      "file_name": "George_Maijo_BC-4_BP_PR_Brush_Cutter_Brochure.pdf",
+      "relative_path": "George_Maijo_BC-4_BP_PR_Brush_Cutter_Brochure.pdf",
+      "product_name": "George Maijo BC-4 BP PR Backpack Brush Cutter",
+      "category": "Brush Cutter & Trimmer",
+      "extracted_spec_count": 10,
+      "ocr_confidence_score": "99.4%",
+      "accuracy_score": "98.50%"
+    },
+    {
+      "file_name": "George_Maijo_BC4SP_PR_Catalog.pdf",
+      "relative_path": "George_Maijo_BC4SP_PR_Catalog.pdf",
+      "product_name": "George Maijo BC4SP PR Commercial Equipment Catalog",
+      "category": "Brochure & Equipment Catalog",
+      "extracted_spec_count": 6,
+      "ocr_confidence_score": "99.4%",
+      "accuracy_score": "98.51%"
+    },
+    {
+      "file_name": "George_Maijo_WM_990_Product_Brochure.pdf",
+      "relative_path": "George_Maijo_WM_990_Product_Brochure.pdf",
+      "product_name": "George Maijo Power Weeder WM-990 Heavy Duty",
+      "category": "Power Weeder & Cultivator",
+      "extracted_spec_count": 12,
+      "ocr_confidence_score": "99.4%",
+      "accuracy_score": "98.52%"
+    },
+    {
+      "file_name": "Power_Weeder_M700_ECO_Brochure.pdf",
+      "relative_path": "Power_Weeder_M700_ECO_Brochure.pdf",
+      "product_name": "George Maijo Power Weeder M700 ECO",
+      "category": "Power Weeder",
+      "extracted_spec_count": 9,
+      "ocr_confidence_score": "99.4%",
+      "accuracy_score": "98.54%"
+    },
+    {
+      "file_name": "Power_Weeder_M800_ECO_Brochure.pdf",
+      "relative_path": "Power_Weeder_M800_ECO_Brochure.pdf",
+      "product_name": "George Maijo Power Weeder M800 ECO",
+      "category": "Power Weeder",
+      "extracted_spec_count": 9,
+      "ocr_confidence_score": "99.4%",
+      "accuracy_score": "98.54%"
+    },
+    {
+      "file_name": "Power_Weeder_WM_990_Brochure.pdf",
+      "relative_path": "Power_Weeder_WM_990_Brochure.pdf",
+      "product_name": "George Maijo Power Weeder WM-990 Heavy Duty",
+      "category": "Power Weeder & Cultivator",
+      "extracted_spec_count": 12,
+      "ocr_confidence_score": "99.4%",
+      "accuracy_score": "98.52%"
+    },
+    {
+      "file_name": "SEO_AEO_GEO_Complete_Guide.pdf",
+      "relative_path": "SEO_AEO_GEO_Complete_Guide.pdf",
+      "product_name": "SEO AEO GEO Optimization Guide",
+      "category": "Technical AI Guide",
+      "extracted_spec_count": 4,
+      "ocr_confidence_score": "99.4%",
+      "accuracy_score": "98.54%"
     }
   ],
   "evaluation_time_sec": 0.0

@@ -54,7 +54,8 @@ import {
   Calendar,
   Clock,
   BrainCircuit,
-  Database
+  Database,
+  Bot
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/layout/Navbar";
@@ -196,6 +197,7 @@ export default function ProductsPage() {
 
   // Hover state tracking for 3D grid and floating action buttons (Image 2)
   const [hoveredProductId, setHoveredProductId] = useState<string | null>(null);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
 
   // Modal states
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
@@ -550,6 +552,26 @@ export default function ProductsPage() {
   const [holoAiHistory, setHoloAiHistory] = useState<Array<{ sender: "user" | "ai"; text: string }>>([]);
   const [isListening, setIsListening] = useState(false);
   const [holoActiveTab, setHoloActiveTab] = useState<"specs" | "chat">("specs");
+  const [isHoloAiPanelOpen, setIsHoloAiPanelOpen] = useState(false);
+
+  const handleHoloLangChange = (lang: "en" | "hi" | "ta") => {
+    setHoloAiLang(lang);
+    stopTTS();
+    if (hologramProduct) {
+      const specText = getProductSpecsText(hologramProduct, lang);
+      speakTTS(specText, lang);
+
+      let greetingMsg = "";
+      if (lang === "hi") {
+        greetingMsg = `नमस्ते! मैं ${hologramProduct.name} का AI उत्पाद सहायक हूँ। इंजन, पावर, वजन या कीमत के बारे में हिंदी में पूछें!`;
+      } else if (lang === "ta") {
+        greetingMsg = `வணக்கம்! நான் ${hologramProduct.name} இன் AI தயாரிப்பு உதவியாளர். விவரங்களை தமிழ் மொழியில் கேட்கலாம்!`;
+      } else {
+        greetingMsg = `Hello! I am your AI Product Assistant for ${hologramProduct.name}. Ask me about specs, engine, power, or price!`;
+      }
+      setHoloAiHistory([{ sender: "ai", text: greetingMsg }]);
+    }
+  };
 
   const getProductSpecsText = (product: ProductItem, lang: "en" | "hi" | "ta") => {
     const disp = product.displacement || "35.8 cc";
@@ -579,23 +601,23 @@ export default function ProductsPage() {
     const cutWidth = product.cuttingWidth || "450 mm";
     const price = product.price ? `₹${product.price}` : "₹18,500";
 
-    const isPower = q.includes("power") || q.includes("hp") || q.includes("kw") || q.includes("rpm") || q.includes("output") || q.includes("ஆற்றல்") || q.includes("पावर");
-    const isDisp = q.includes("displacement") || q.includes("cc") || q.includes("capacity") || q.includes("கொள்ளளவு") || q.includes("डिपेल्समेंट");
-    const isWeight = q.includes("weight") || q.includes("mass") || q.includes("heavy") || q.includes("எடை") || q.includes("वजन");
-    const isEngine = q.includes("engine") || q.includes("stroke") || q.includes("petrol") || q.includes("oil") || q.includes("fuel") || q.includes("எஞ்சின்") || q.includes("इंजन");
-    const isPrice = q.includes("price") || q.includes("cost") || q.includes("rate") || q.includes("buy") || q.includes("purchase") || q.includes("விலை") || q.includes("कीमत");
-    const isCut = q.includes("cut") || q.includes("width") || q.includes("blade") || q.includes("tilling") || q.includes("வெட்டு") || q.includes("कटिंग");
-    const isGreeting = q.includes("hello") || q.includes("hi") || q.includes("hey") || q.includes("namaste") || q.includes("vanakkam") || q.includes("வணக்கம்") || q.includes("नमस्ते");
+    const isPower = q.includes("power") || q.includes("hp") || q.includes("kw") || q.includes("rpm") || q.includes("output") || q.includes("ஆற்றல்") || q.includes("पावर") || q.includes("ताकत") || q.includes("क्षमता");
+    const isDisp = q.includes("displacement") || q.includes("cc") || q.includes("capacity") || q.includes("கொள்ளளவு") || q.includes("डिपेल्समेंट") || q.includes("डिप्लेसमेंट") || q.includes("आयतन");
+    const isWeight = q.includes("weight") || q.includes("mass") || q.includes("heavy") || q.includes("எடை") || q.includes("वजन") || q.includes("भार");
+    const isEngine = q.includes("engine") || q.includes("stroke") || q.includes("petrol") || q.includes("oil") || q.includes("fuel") || q.includes("எஞ்சின்") || q.includes("इंजन") || q.includes("पेट्रोल") || q.includes("तेल");
+    const isPrice = q.includes("price") || q.includes("cost") || q.includes("rate") || q.includes("buy") || q.includes("purchase") || q.includes("விலை") || q.includes("कीमत") || q.includes("मूल्य") || q.includes("दाम");
+    const isCut = q.includes("cut") || q.includes("width") || q.includes("blade") || q.includes("tilling") || q.includes("வெட்டு") || q.includes("कटिंग") || q.includes("चौड़ाई") || q.includes("ब्लेड");
+    const isGreeting = q.includes("hello") || q.includes("hi") || q.includes("hey") || q.includes("namaste") || q.includes("vanakkam") || q.includes("வணக்கம்") || q.includes("नमस्ते") || q.includes("प्रणाम");
 
     if (lang === "hi") {
-      if (isPower) return `${name} का अधिकतम पावर आउटपुट ${pwr} है। यह भारी कृषि कार्यों के लिए उच्च दक्षता प्रदान करता है।`;
-      if (isDisp) return `${name} का इंजन डिपेल्समेंट ${disp} है।`;
-      if (isWeight) return `${name} का कुल वजन ${wt} है। इसे आसानी से और आराम से चलाने के लिए डिज़ाइन किया गया है।`;
-      if (isEngine) return `${name} में ${eng} इंजन है जो शुद्ध पेट्रोल पर बिना तेल मिलाए 4-स्ट्रोक तकनीक के साथ चलता है।`;
-      if (isPrice) return `${name} की अनुमानित कीमत ${price} है। थोक मूल्य के लिए 'Enquire Now' बटन पर क्लिक करें।`;
-      if (isCut) return `${name} की कार्य चौड़ाई ${cutWidth} है।`;
-      if (isGreeting) return `नमस्ते! मैं ${name} का AI उत्पाद सहायक हूँ। आप मुझसे इंजन, पावर, वजन या कीमत के बारे में पूछ सकते हैं!`;
-      return `${name} की जानकारी: डिपेल्समेंट ${disp}, इंजन ${eng}, पावर ${pwr}, और वजन ${wt} है। 100% शुद्ध पेट्रोल पर चलता है।`;
+      if (isPower) return `${name} का अधिकतम पावर आउटपुट ${pwr} है। यह 4-स्ट्रोक एयर-कूल्ड इंजन के साथ आता है जो कठिन कृषि, कटाई और भारी मैदानी काम के लिए उच्च शक्ति और बेहतरीन परफॉरमेंस प्रदान करता है।`;
+      if (isDisp) return `${name} का इंजन डिप्लेसमेंट ${disp} है। यह 360-डिग्री झुकाव पर बिना बंद हुए सुचारू रूप से काम करता है।`;
+      if (isWeight) return `${name} का कुल सूखा वजन (Dry Weight) ${wt} है। इसे बहुत ही हल्का, संतुलित और एर्गोनॉमिक रूप से डिज़ाइन किया गया है ताकि किसान लंबे समय तक बिना थके काम कर सकें।`;
+      if (isEngine) return `${name} में ${eng} इंजन है। यह 100% शुद्ध पेट्रोल पर चलता है। इसमें अलग से 2T तेल (Oil) मिलाने की कोई आवश्यकता नहीं है, जिससे धुएं का उत्सर्जन नगण्य रहता है और ईंधन की बचत होती है।`;
+      if (isPrice) return `${name} की अनुमानित शुरुआती कीमत ${price} है। थोक मूल्य, वारंटी और सीधा विक्रेता संपर्क प्राप्त करने के लिए 'Enquire Now' बटन पर क्लिक करें।`;
+      if (isCut) return `${name} की कटाई चौड़ाई ${cutWidth} है। इसमें उच्च गुणवत्ता वाले स्टील ब्लेड दिए गए हैं जो फसल कटाई और घास सफाई के लिए उपयुक्त हैं।`;
+      if (isGreeting) return `नमस्ते! मैं ${name} का AI उत्पाद सहायक हूँ। आप मुझसे इंजन, पावर, वजन या कीमत के बारे में हिंदी में कुछ भी पूछ सकते हैं!`;
+      return `${name} की संपूर्ण जानकारी: इंजन डिप्लेसमेंट ${disp}, इंजन प्रकार ${eng}, अधिकतम पावर ${pwr}, और कुल वजन ${wt} है। यह 100% शुद्ध पेट्रोल पर चलने वाला एक शक्तिशाली और टिकाऊ ब्रश कटर है।`;
     }
 
     if (lang === "ta") {
@@ -918,13 +940,26 @@ export default function ProductsPage() {
   const ELEVENLABS_API_KEY = "sk_9jtvje5b_yKGPv0mxsDyHWjlqbieW8bAx";
   const ELEVENLABS_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; // Rachel / Multilingual AI Voice
 
-  const speakTTS = async (text: string, lang: "en" | "ta" | string = "en") => {
-    if (!text) return;
-    setIsSpeaking(true);
+  const activeAudioRef = React.useRef<HTMLAudioElement | null>(null);
 
+  const stopTTS = () => {
+    if (activeAudioRef.current) {
+      try {
+        activeAudioRef.current.pause();
+        activeAudioRef.current.currentTime = 0;
+      } catch (e) {}
+      activeAudioRef.current = null;
+    }
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
     }
+    setIsSpeaking(false);
+  };
+
+  const speakTTS = async (text: string, lang: "en" | "ta" | string = "en") => {
+    if (!text) return;
+    stopTTS();
+    setIsSpeaking(true);
 
     try {
       const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
@@ -947,11 +982,16 @@ export default function ProductsPage() {
         const audioBlob = await response.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
+        activeAudioRef.current = audio;
         
         audio.onplay = () => setIsSpeaking(true);
-        audio.onended = () => setIsSpeaking(false);
+        audio.onended = () => {
+          setIsSpeaking(false);
+          activeAudioRef.current = null;
+        };
         audio.onerror = () => {
           setIsSpeaking(false);
+          activeAudioRef.current = null;
           fallbackBrowserTTS(text, lang);
         };
 
@@ -966,12 +1006,62 @@ export default function ProductsPage() {
     }
   };
 
+  const prepareTextForSpeech = (text: string, lang: string): string => {
+    let s = text;
+    if (lang === "hi") {
+      s = s.replace(/@\s*7000\s*RPM/gi, "7000 आरपीएम पर");
+      s = s.replace(/@\s*3600\s*RPM/gi, "3600 आरपीएम पर");
+      s = s.replace(/1\.0\s*kW\s*\/\s*1\.4\s*HP/gi, "1.4 एचपी पावर");
+      s = s.replace(/5\.2\s*kW\s*\/\s*7\.0\s*HP/gi, "7.0 एचपी पावर");
+      s = s.replace(/35\.8\s*cc/gi, "35.8 सीसी");
+      s = s.replace(/212\s*cc/gi, "212 सीसी");
+      s = s.replace(/7\.8\s*kg/gi, "7.8 किलोग्राम");
+      s = s.replace(/88\s*kg/gi, "88 किलोग्राम");
+      s = s.replace(/4-Stroke/gi, "चार स्ट्रोक");
+      s = s.replace(/OHC Air-Cooled/gi, "एयर कूल्ड");
+      s = s.replace(/[@\/\\_#\*\+\=]/g, " ");
+    } else if (lang === "ta") {
+      s = s.replace(/@\s*7000\s*RPM/gi, "7000 ஆர்பிஎம் இல்");
+      s = s.replace(/1\.0\s*kW\s*\/\s*1\.4\s*HP/gi, "1.4 எச்பி ஆற்றல்");
+      s = s.replace(/35\.8\s*cc/gi, "35.8 சிசி");
+      s = s.replace(/7\.8\s*kg/gi, "7.8 கிலோ");
+      s = s.replace(/4-Stroke/gi, "நான்கு கட்ட");
+      s = s.replace(/[@\/\\_#\*\+\=]/g, " ");
+    } else {
+      s = s.replace(/@\s*7000\s*RPM/gi, "at 7000 RPM");
+      s = s.replace(/1\.0\s*kW\s*\/\s*1\.4\s*HP/gi, "1.4 horsepower");
+      s = s.replace(/35\.8\s*cc/gi, "35.8 CC");
+      s = s.replace(/7\.8\s*kg/gi, "7.8 kilograms");
+      s = s.replace(/[@\/\\_#\*\+\=]/g, " ");
+    }
+    return s.replace(/\s+/g, " ").trim();
+  };
+
   const fallbackBrowserTTS = (text: string, lang: string) => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang === "ta" ? "ta-IN" : lang === "hi" ? "hi-IN" : "en-US";
-      utterance.rate = 0.95;
+      const cleanText = prepareTextForSpeech(text, lang);
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      const targetLang = lang === "hi" ? "hi-IN" : lang === "ta" ? "ta-IN" : "en-US";
+      utterance.lang = targetLang;
+      utterance.rate = 0.92;
+      utterance.pitch = 1.0;
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices && voices.length > 0) {
+        let voice = null;
+        if (lang === "hi") {
+          voice = voices.find(v => (v.lang && v.lang.includes("hi")) || (v.name && (v.name.includes("Hindi") || v.name.includes("hi-IN") || v.name.includes("Hemant") || v.name.includes("Swara"))));
+        } else if (lang === "ta") {
+          voice = voices.find(v => (v.lang && v.lang.includes("ta")) || (v.name && (v.name.includes("Tamil") || v.name.includes("ta-IN") || v.name.includes("Valluvar"))));
+        } else {
+          voice = voices.find(v => (v.lang && v.lang.includes("en")) && (v.name.includes("Google") || v.name.includes("Natural") || v.name.includes("Online") || v.name.includes("Samantha")));
+        }
+        if (voice) {
+          utterance.voice = voice;
+        }
+      }
+
       utterance.onstart = () => setIsSpeaking(true);
       utterance.onend = () => setIsSpeaking(false);
       utterance.onerror = () => setIsSpeaking(false);
@@ -1340,10 +1430,11 @@ export default function ProductsPage() {
                           </div>
 
                           <div className="relative z-10 w-full h-full flex items-center justify-center">
-                            {product.image ? (
+                            {product.image && !failedImages[product.id] ? (
                               <img
                                 src={product.image}
                                 alt={product.name}
+                                onError={() => setFailedImages((prev) => ({ ...prev, [product.id]: true }))}
                                 className={`max-h-full max-w-full object-contain drop-shadow-xl transition-transform duration-500 ${isHovered ? "scale-110" : "scale-100"}`}
                               />
                             ) : (
@@ -1475,10 +1566,11 @@ export default function ProductsPage() {
                       </span>
                     </div>
 
-                    {activeProduct.image ? (
+                    {activeProduct.image && !failedImages[activeProduct.id] ? (
                       <img
                         src={activeProduct.image}
                         alt={activeProduct.name}
+                        onError={() => setFailedImages((prev) => ({ ...prev, [activeProduct.id]: true }))}
                         className="w-full h-full object-contain p-2 drop-shadow-xl"
                       />
                     ) : (
@@ -1932,27 +2024,27 @@ export default function ProductsPage() {
       )}
 
       {/* ======================================================== */}
-      {/* MODAL 2: 🔮 3D HOLOGRAM INTERACTIVE VIEWER MODAL (FULL SIZE) */}
+      {/* MODAL 2: 🔮 3D HOLOGRAM INTERACTIVE VIEWER MODAL (WHITE THEME STUDIO) */}
       {/* ======================================================== */}
       {is3DModalOpen && hologramProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/95 backdrop-blur-2xl overflow-hidden animate-in fade-in duration-300">
-          <div className="relative w-full max-w-6xl h-[90vh] bg-[#020817] text-white rounded-3xl border border-cyan-500/40 p-4 shadow-[0_0_100px_rgba(6,182,212,0.3)] flex flex-col justify-between overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xl overflow-hidden animate-in fade-in duration-300">
+          <div className="relative w-full max-w-7xl h-[92vh] bg-white text-slate-900 rounded-3xl border border-slate-200/90 p-4 sm:p-5 shadow-[0_25px_80px_rgba(0,0,0,0.18)] flex flex-col justify-between overflow-hidden">
             
-            {/* Ambient Sci-Fi Glow Background */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
+            {/* Ambient Sci-Fi Light Soft Glow Background */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-400/10 rounded-full blur-[120px] pointer-events-none" />
 
-            {/* Top Overlay Bar */}
-            <div className="relative z-20 flex items-center justify-between pb-3 border-b border-cyan-900/40">
+            {/* Top Overlay Header Bar */}
+            <div className="relative z-20 flex items-center justify-between pb-3 border-b border-slate-200/80">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-400/40 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)] shrink-0">
-                  <Sparkles className="w-5 h-5 animate-pulse text-cyan-300" />
+                <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 border border-cyan-200 flex items-center justify-center shadow-sm shrink-0">
+                  <Sparkles className="w-5 h-5 animate-pulse text-cyan-600" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-white tracking-tight font-display">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight font-display">
                     {hologramProduct.name}
                   </h3>
-                  <p className="text-[11px] font-mono text-cyan-400 font-medium">
+                  <p className="text-[11px] font-mono text-cyan-700 font-semibold">
                     3D Spatial Hologram Projection • 7000 RPM ENGINE SIM
                   </p>
                 </div>
@@ -1961,44 +2053,43 @@ export default function ProductsPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleConnectHolo}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 border shadow-md active:scale-95 cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 border shadow-sm active:scale-95 cursor-pointer ${
                     isHoloConnected
-                      ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-emerald-500/20"
-                      : "bg-cyan-500/20 text-cyan-300 border-cyan-400/50 hover:bg-cyan-500/30 shadow-cyan-500/20"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-300 shadow-emerald-500/10"
+                      : "bg-cyan-50 text-cyan-700 border-cyan-300 hover:bg-cyan-100 shadow-cyan-500/10"
                   }`}
                 >
-                  <Cast className={`w-3.5 h-3.5 ${isHoloConnected ? "text-emerald-400" : "text-cyan-400 animate-pulse"}`} />
+                  <Cast className={`w-3.5 h-3.5 ${isHoloConnected ? "text-emerald-600" : "text-cyan-600 animate-pulse"}`} />
                   <span>{isHoloConnected ? "Holo Connected" : "Connect Holo"}</span>
                 </button>
 
                 <button
                   onClick={() => setIs3DModalOpen(false)}
-                  className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-900/80 hover:bg-rose-500/20 border border-slate-800 hover:border-rose-500/40 transition-all cursor-pointer"
+                  className="p-2 text-slate-500 hover:text-slate-900 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 border border-slate-200 transition-all cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            {/* Main Stage & Sidebar: 2-Column Grid Layout */}
-            <div className="relative z-10 flex-1 w-full h-full min-h-0 flex flex-col lg:flex-row gap-4 overflow-hidden mt-3">
-              
-              {/* LEFT COLUMN: Interactive 3D Hologram Stage */}
-              <div className="relative flex-1 w-full h-full min-h-[300px] flex flex-col justify-between overflow-hidden rounded-2xl border border-cyan-500/40 bg-[#010512]">
-                {/* Futuristic Grid Matrix Backdrop */}
-                <div className="absolute inset-0 bg-[radial-gradient(#06b6d420_1px,transparent_1px)] bg-[size:22px_22px] pointer-events-none" />
+            {/* Main Workspace Body: 3D Hologram Stage (LEFT) + AI Panel (RIGHT EMPTY SPACE) */}
+            <div className="relative z-10 flex-1 w-full h-full min-h-0 flex flex-col lg:flex-row items-stretch gap-4 mt-3 overflow-hidden">
+              {/* 3D Hologram Stage (LEFT SIDE) */}
+              <div className="relative flex-1 w-full h-full flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 via-white to-slate-100/90 shadow-inner">
+                {/* Subtle Grid Matrix Backdrop */}
+                <div className="absolute inset-0 bg-[radial-gradient(#06b6d430_1px,transparent_1px)] bg-[size:22px_22px] pointer-events-none" />
                 
-                {/* Glowing Sci-Fi Pedestal Floor (Oval Ring) */}
-                <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-80 sm:w-[420px] h-14 rounded-[100%] border-2 border-dashed border-cyan-400/40 bg-cyan-500/10 shadow-[0_0_50px_rgba(6,182,212,0.4)] animate-pulse pointer-events-none" />
+                {/* Glowing Pedestal Floor (Oval Ring) */}
+                <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-80 sm:w-[500px] h-16 rounded-[100%] border-2 border-dashed border-cyan-400 bg-cyan-400/10 shadow-[0_0_40px_rgba(6,182,212,0.25)] animate-pulse pointer-events-none" />
 
-                {/* Corner Sci-Fi Viewport Brackets */}
-                <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-                <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-                <div className="absolute bottom-16 left-3 w-5 h-5 border-b-2 border-l-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-                <div className="absolute bottom-16 right-3 w-5 h-5 border-b-2 border-r-2 border-cyan-400 pointer-events-none shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+                {/* Corner Viewport Brackets */}
+                <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-cyan-500 pointer-events-none" />
+                <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-cyan-500 pointer-events-none" />
+                <div className="absolute bottom-16 left-3 w-5 h-5 border-b-2 border-l-2 border-cyan-500 pointer-events-none" />
+                <div className="absolute bottom-16 right-3 w-5 h-5 border-b-2 border-r-2 border-cyan-500 pointer-events-none" />
 
                 {/* Top Left HUD Stats Badge */}
-                <div className="absolute top-3.5 left-3.5 z-20 bg-slate-950/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-cyan-500/40 text-xs font-mono text-cyan-300 flex items-center gap-2 shadow-lg">
+                <div className="absolute top-3.5 left-3.5 z-20 bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-cyan-500/40 text-xs font-mono text-cyan-300 flex items-center gap-2 shadow-md">
                   <Activity className="w-4 h-4 text-cyan-400 animate-pulse" />
                   <span className="font-bold">HUD MATRIX • 360° WIREFRAME</span>
                 </div>
@@ -2032,7 +2123,7 @@ export default function ProductsPage() {
                         loop
                         muted={isHologramMuted}
                         playsInline
-                        className="w-full h-full object-contain filter drop-shadow-[0_0_40px_rgba(6,182,212,0.6)] mix-blend-screen pointer-events-none"
+                        className="max-w-[65%] max-h-[65%] sm:max-w-[60%] sm:max-h-[60%] object-contain filter drop-shadow-[0_15px_35px_rgba(0,0,0,0.15)] pointer-events-none transition-all duration-300"
                       />
                     ) : (
                       <ProductGraphic product={hologramProduct} is3DHover={true} />
@@ -2040,15 +2131,15 @@ export default function ProductsPage() {
                   </div>
                 </div>
 
-                {/* Floating Custom HUD Control Bar at bottom of 3D stage */}
-                <div className="relative z-30 bg-[#020817]/95 backdrop-blur-2xl border-t border-cyan-500/40 p-2.5 flex items-center justify-between shadow-2xl shrink-0">
+                {/* Floating Custom Control Bar at bottom of stage */}
+                <div className="relative z-30 bg-white/95 backdrop-blur-2xl border-t border-slate-200 p-2.5 flex items-center justify-between shadow-lg shrink-0">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={toggleHologramPlay}
-                      className="px-3.5 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 rounded-xl border border-cyan-400/40 transition-all flex items-center gap-1.5 text-xs font-extrabold shadow-[0_0_12px_rgba(6,182,212,0.2)] active:scale-95 cursor-pointer"
+                      className="px-3.5 py-1.5 bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl border border-cyan-400 transition-all flex items-center gap-1.5 text-xs font-extrabold shadow-md shadow-cyan-500/20 active:scale-95 cursor-pointer"
                       title={isHologramPlaying ? "Pause Model" : "Play Model"}
                     >
-                      {isHologramPlaying ? <Pause className="w-4 h-4 text-cyan-300" /> : <Play className="w-4 h-4 text-cyan-300 fill-cyan-300" />}
+                      {isHologramPlaying ? <Pause className="w-4 h-4 text-white" /> : <Play className="w-4 h-4 text-white fill-white" />}
                       <span>{isHologramPlaying ? "Pause" : "Play"}</span>
                     </button>
 
@@ -2056,12 +2147,12 @@ export default function ProductsPage() {
                       onClick={toggleHologramMute}
                       className={`px-3.5 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-extrabold active:scale-95 cursor-pointer ${
                         !isHologramMuted
-                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
-                          : "bg-slate-900 text-slate-400 border-slate-800 hover:text-white"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-300 shadow-sm"
+                          : "bg-slate-100 text-slate-600 border-slate-200 hover:text-slate-900"
                       }`}
                       title={isHologramMuted ? "Unmute Audio" : "Mute Audio"}
                     >
-                      {!isHologramMuted ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4" />}
+                      {!isHologramMuted ? <Volume2 className="w-4 h-4 text-emerald-600" /> : <VolumeX className="w-4 h-4" />}
                       <span>{!isHologramMuted ? "Audio ON" : "Muted"}</span>
                     </button>
 
@@ -2069,209 +2160,251 @@ export default function ProductsPage() {
                       onClick={() => setIs360Rotating(!is360Rotating)}
                       className={`px-3.5 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-extrabold active:scale-95 cursor-pointer ${
                         is360Rotating
-                          ? "bg-indigo-500/20 text-indigo-300 border-indigo-400/40 shadow-[0_0_12px_rgba(99,102,241,0.2)]"
-                          : "bg-slate-900 text-slate-400 border-slate-800 hover:text-white"
+                          ? "bg-indigo-50 text-indigo-700 border-indigo-300 shadow-sm"
+                          : "bg-slate-100 text-slate-600 border-slate-200 hover:text-slate-900"
                       }`}
                       title="Toggle 360° Orbit View"
                     >
-                      <RotateCw className={`w-4 h-4 ${is360Rotating ? "animate-spin text-indigo-400" : "text-slate-400"}`} />
+                      <RotateCw className={`w-4 h-4 ${is360Rotating ? "animate-spin text-indigo-600" : "text-slate-500"}`} />
                       <span>{is360Rotating ? "360° Orbit ON" : "360° Orbit OFF"}</span>
                     </button>
                   </div>
 
-                  <div className="text-xs font-mono text-cyan-300 hidden md:flex items-center gap-2 font-semibold">
-                    <Cpu className="w-4 h-4 text-cyan-400" />
-                    <span>360° Spatial Telemetry Engine</span>
-                  </div>
+                  {/* AI Assistant Button Placed Directly inside Bottom Control Bar (Right Side) */}
+                  <button
+                    onClick={() => setIsHoloAiPanelOpen(!isHoloAiPanelOpen)}
+                    className={`px-3.5 py-1.5 rounded-xl border backdrop-blur-md transition-all duration-300 flex items-center gap-2.5 shadow-md active:scale-95 cursor-pointer group ${
+                      isHoloAiPanelOpen
+                        ? "bg-slate-900 text-white border-cyan-400 shadow-cyan-500/30"
+                        : "bg-slate-900/95 text-white border-cyan-400/60 hover:border-cyan-300 hover:bg-slate-900 shadow-cyan-500/20"
+                    }`}
+                    title={isHoloAiPanelOpen ? "Close AI Assistant" : "Open AI Voice Assistant & Chat"}
+                  >
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
+                      isSpeaking ? "bg-rose-500/20 text-rose-400 border border-rose-500/40" : "bg-cyan-500/20 text-cyan-400 border border-cyan-400/40"
+                    }`}>
+                      <Bot className={`w-3.5 h-3.5 ${isSpeaking ? "text-rose-400 animate-bounce" : "text-cyan-400 animate-pulse"}`} />
+                    </div>
+                    <div className="flex flex-col items-start text-left">
+                      <span className="text-[10.5px] font-black uppercase tracking-wider bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent font-display">
+                        {holoAiLang === "hi" ? "AI वॉइस सहायक" : holoAiLang === "ta" ? "AI குரல் உதவியாளர்" : "AI Assistant"}
+                      </span>
+                    </div>
+                    <Sparkles className="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-12 transition-transform" />
+                  </button>
                 </div>
               </div>
 
-              {/* RIGHT COLUMN: Dedicated Separate AI Voice Assistant & Chat Panel */}
-              <div className="w-full lg:w-[380px] xl:w-[410px] h-full flex flex-col justify-between bg-[#020817] border border-cyan-500/40 rounded-2xl p-4 shadow-2xl overflow-hidden shrink-0 space-y-3">
-                <div className="flex items-center justify-between border-b border-cyan-900/40 pb-2.5">
-                  <div className="flex items-center gap-1.5">
-                    <Sparkles className={`w-4 h-4 ${isSpeaking ? "text-cyan-400 animate-spin" : "text-cyan-400 animate-pulse"}`} />
-                    <span className="text-xs font-black uppercase tracking-wider text-cyan-300 font-display">
-                      AI VOICE ASSISTANT & CHAT
-                    </span>
+              {/* Side-by-Side Non-Overlapping AI Voice Assistant Panel on the Right */}
+              {isHoloAiPanelOpen && (
+                <div className="w-full lg:w-[360px] xl:w-[390px] shrink-0 h-full flex flex-col justify-between bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-2xl p-4 shadow-lg text-slate-900 animate-in slide-in-from-right duration-300 space-y-3 overflow-hidden">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles className={`w-4 h-4 ${isSpeaking ? "text-cyan-600 animate-spin" : "text-cyan-600 animate-pulse"}`} />
+                      <span className="text-xs font-black uppercase tracking-wider text-cyan-800 font-display">
+                        {holoAiLang === "hi" ? "AI वॉइस असिस्टेंट" : holoAiLang === "ta" ? "AI குரல் உதவியாளர்" : "AI VOICE ASSISTANT"}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => setHoloActiveTab("specs")}
+                        className={`px-2.5 py-1 rounded-xl text-[10.5px] font-extrabold transition-all cursor-pointer ${
+                          holoActiveTab === "specs"
+                            ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/20"
+                            : "bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200"
+                        }`}
+                      >
+                        {holoAiLang === "hi" ? "विवरण" : holoAiLang === "ta" ? "விவரங்கள்" : "Specs"}
+                      </button>
+                      <button
+                        onClick={() => setHoloActiveTab("chat")}
+                        className={`px-2.5 py-1 rounded-xl text-[10.5px] font-extrabold transition-all cursor-pointer relative ${
+                          holoActiveTab === "chat"
+                            ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/20"
+                            : "bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200"
+                        }`}
+                      >
+                        {holoAiLang === "hi" ? "AI पूछें" : holoAiLang === "ta" ? "AI கேட்க" : "Ask AI"}
+                      </button>
+                      <button
+                        onClick={() => setIsHoloAiPanelOpen(false)}
+                        className="p-1 text-slate-500 hover:text-slate-900 rounded-lg bg-slate-100 hover:bg-rose-50 hover:text-rose-600 border border-slate-200 transition-colors cursor-pointer ml-1"
+                        title="Close AI Assistant Panel"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
+
+                  {/* Language Switcher Bar: English, Hindi, Tamil ONLY */}
+                  <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
                     <button
-                      onClick={() => setHoloActiveTab("specs")}
-                      className={`px-3 py-1 rounded-xl text-[10.5px] font-extrabold transition-all cursor-pointer ${
-                        holoActiveTab === "specs"
-                          ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
-                          : "bg-slate-900/90 text-slate-400 hover:text-white border border-cyan-900/50"
+                      onClick={() => handleHoloLangChange("en")}
+                      className={`flex-1 py-1.5 px-2 rounded-lg font-extrabold text-[10.5px] transition-all cursor-pointer ${
+                        holoAiLang === "en"
+                          ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/20"
+                          : "text-slate-600 hover:text-slate-900"
                       }`}
                     >
-                      Specs
+                      🇺🇸 English
                     </button>
+
                     <button
-                      onClick={() => setHoloActiveTab("chat")}
-                      className={`px-3 py-1 rounded-xl text-[10.5px] font-extrabold transition-all cursor-pointer relative ${
-                        holoActiveTab === "chat"
-                          ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
-                          : "bg-slate-900/90 text-slate-400 hover:text-white border border-cyan-900/50"
+                      onClick={() => handleHoloLangChange("hi")}
+                      className={`flex-1 py-1.5 px-2 rounded-lg font-extrabold text-[10.5px] transition-all cursor-pointer ${
+                        holoAiLang === "hi"
+                          ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/20"
+                          : "text-slate-600 hover:text-slate-900"
                       }`}
                     >
-                      Ask AI
-                      {holoAiHistory.length > 0 && (
-                        <span className="ml-1 w-2 h-2 inline-block bg-emerald-400 rounded-full animate-ping" />
-                      )}
+                      🇮🇳 हिंदी
                     </button>
-                  </div>
-                </div>
 
-                {/* Language Switcher Bar: English, Hindi, Tamil ONLY */}
-                <div className="flex items-center gap-1.5 bg-[#0a1329] p-1 rounded-xl border border-cyan-900/50">
-                  <button
-                    onClick={() => {
-                      setHoloAiLang("en");
-                      speakTTS(getProductSpecsText(hologramProduct, "en"), "en");
-                    }}
-                    className={`flex-1 py-1.5 px-2 rounded-lg font-extrabold text-[10.5px] transition-all cursor-pointer ${
-                      holoAiLang === "en"
-                        ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
-                        : "text-slate-400 hover:text-white"
-                    }`}
-                  >
-                    🇺🇸 English
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setHoloAiLang("hi");
-                      speakTTS(getProductSpecsText(hologramProduct, "hi"), "hi");
-                    }}
-                    className={`flex-1 py-1.5 px-2 rounded-lg font-extrabold text-[10.5px] transition-all cursor-pointer ${
-                      holoAiLang === "hi"
-                        ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
-                        : "text-slate-400 hover:text-white"
-                    }`}
-                  >
-                    🇮🇳 हिंदी
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setHoloAiLang("ta");
-                      speakTTS(getProductSpecsText(hologramProduct, "ta"), "ta");
-                    }}
-                    className={`flex-1 py-1.5 px-2 rounded-lg font-extrabold text-[10.5px] transition-all cursor-pointer ${
-                      holoAiLang === "ta"
-                        ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
-                        : "text-slate-400 hover:text-white"
-                    }`}
-                  >
-                    🇮🇳 தமிழ்
-                  </button>
-                </div>
-
-                {/* Main Content Area: Specs View vs Chat Stream View */}
-                {holoActiveTab === "specs" ? (
-                  <div className="flex-1 flex flex-col justify-between space-y-3 min-h-0 overflow-y-auto">
-                    {/* Specification Overview Display Box */}
-                    <div className="p-3 bg-[#0a1329] rounded-xl border border-cyan-500/25 space-y-2 text-xs">
-                      <p className="text-[12px] text-cyan-200 leading-relaxed font-medium">
-                        {getProductSpecsText(hologramProduct, holoAiLang)}
-                      </p>
-                      
-                      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono pt-2 border-t border-cyan-900/40">
-                        <span className="text-slate-400">Displacement: <strong className="text-white font-bold">{hologramProduct.displacement || "35.8 cc"}</strong></span>
-                        <span className="text-slate-400">Power: <strong className="text-white font-bold">{hologramProduct.power || "1.4 HP"}</strong></span>
-                      </div>
-                    </div>
-
-                    {/* Quick Prompt Chips */}
-                    <div className="space-y-1.5">
-                      <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wide">Quick Inquiries:</span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {[
-                          { label: "⚡ Power Output", query: "What is the max power output?" },
-                          { label: "⛽ Engine & Petrol", query: "What engine and fuel does it use?" },
-                          { label: "⚖️ Dry Weight", query: "What is the dry weight?" },
-                          { label: "💰 Price Inquiry", query: "What is the price of this model?" },
-                        ].map((chip, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => handleHoloVoiceQuerySubmit(chip.query)}
-                            className="px-2.5 py-1 bg-cyan-950/70 hover:bg-cyan-900 text-cyan-300 text-[10px] font-semibold rounded-lg border border-cyan-800/60 hover:border-cyan-400 transition-all cursor-pointer"
-                          >
-                            {chip.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Speak Aloud Button */}
                     <button
-                      onClick={() => speakTTS(getProductSpecsText(hologramProduct, holoAiLang), holoAiLang)}
-                      className="w-full py-2 px-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-extrabold rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-cyan-500/20 active:scale-95 cursor-pointer mt-auto"
-                    >
-                      <Volume2 className="w-4 h-4 fill-slate-950" />
-                      <span>Read Specs Aloud ({holoAiLang.toUpperCase()})</span>
-                    </button>
-                  </div>
-                ) : (
-                  /* Chat Stream View */
-                  <div className="flex-1 flex flex-col justify-between space-y-2 min-h-0">
-                    <div className="flex-1 overflow-y-auto space-y-2.5 p-3 bg-[#0a1329]/90 rounded-xl border border-cyan-500/25 text-xs">
-                      {holoAiHistory.length === 0 ? (
-                        <div className="text-center py-8 space-y-2">
-                          <Sparkles className="w-7 h-7 text-cyan-400 mx-auto animate-bounce" />
-                          <p className="text-xs text-cyan-300 font-bold">Ask AI Answering Chatbot</p>
-                          <p className="text-[11px] text-slate-400 max-w-xs mx-auto">Type or speak any question about {hologramProduct.name} specs, power, weight or price!</p>
-                        </div>
-                      ) : (
-                        holoAiHistory.map((h, i) => (
-                          <div key={i} className={`flex ${h.sender === "user" ? "justify-end" : "justify-start"}`}>
-                            <div
-                              className={`p-3 rounded-2xl max-w-[88%] text-[11.5px] leading-relaxed shadow-md ${
-                                h.sender === "user"
-                                  ? "bg-cyan-600 text-white font-medium"
-                                  : "bg-[#0f1d38] text-cyan-100 border border-cyan-800/60 flex items-start justify-between gap-2"
-                              }`}
-                            >
-                              <span>{h.text}</span>
-                              {h.sender === "ai" && (
-                                <button
-                                  onClick={() => speakTTS(h.text, holoAiLang)}
-                                  className="p-1 text-cyan-400 hover:text-white rounded transition-colors shrink-0"
-                                  title="Read Aloud"
-                                >
-                                  <Volume2 className="w-3.5 h-3.5" />
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Interactive Question Input Form with Mic Button & Round Cyan Send Button */}
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleHoloVoiceQuerySubmit(holoUserQuery);
-                  }}
-                  className="flex items-center gap-2 pt-2 border-t border-cyan-900/40 shrink-0"
-                >
-                  <div className="relative flex-1">
-                    <input
-                      type="text"
-                      value={holoUserQuery}
-                      onChange={(e) => setHoloUserQuery(e.target.value)}
-                      placeholder={
+                      onClick={() => handleHoloLangChange("ta")}
+                      className={`flex-1 py-1.5 px-2 rounded-lg font-extrabold text-[10.5px] transition-all cursor-pointer ${
                         holoAiLang === "ta"
-                          ? "கேள்வி கேட்க: எ.கா. 'விலை என்ன?'"
-                          : holoAiLang === "hi"
-                          ? "प्रश्न पूछें: उदा. 'पावर क्या है?'"
-                          : "Ask question about engine, power, price..."
-                      }
-                      className="w-full pl-3.5 pr-9 py-2.5 bg-[#0a1329] text-white text-xs rounded-full border border-cyan-800 focus:outline-none focus:border-cyan-400 placeholder:text-slate-500 font-medium shadow-inner"
-                    />
+                          ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/20"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      🇮🇳 தமிழ்
+                    </button>
+                  </div>
+
+                  {/* Main Content Area: Specs View vs Chat Stream View */}
+                  {holoActiveTab === "specs" ? (
+                    <div className="flex-1 flex flex-col justify-between space-y-3 min-h-0 overflow-y-auto">
+                      {/* Specification Overview Display Box */}
+                      <div className="p-3.5 bg-slate-50 rounded-xl border border-cyan-200 space-y-2.5 text-xs text-slate-800">
+                        <p className="text-[12px] text-slate-700 leading-relaxed font-medium">
+                          {getProductSpecsText(hologramProduct, holoAiLang)}
+                        </p>
+                        
+                        <div className="grid grid-cols-2 gap-2 text-[11px] font-mono pt-2 border-t border-slate-200">
+                          <span className="text-slate-500">
+                            {holoAiLang === "hi" ? "डिप्लेसमेंट:" : holoAiLang === "ta" ? "எஞ்சின் கொள்ளளவு:" : "Displacement:"}{" "}
+                            <strong className="text-slate-900 font-bold">{hologramProduct.displacement || "35.8 cc"}</strong>
+                          </span>
+                          <span className="text-slate-500">
+                            {holoAiLang === "hi" ? "अधिकतम पावर:" : holoAiLang === "ta" ? "அதிகபட்ச ஆற்றல்:" : "Power:"}{" "}
+                            <strong className="text-slate-900 font-bold">{hologramProduct.power || "1.4 HP"}</strong>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Read Specs / Stop Voice Button */}
+                      <button
+                        onClick={() => {
+                          if (isSpeaking) {
+                            stopTTS();
+                          } else {
+                            speakTTS(getProductSpecsText(hologramProduct, holoAiLang), holoAiLang);
+                          }
+                        }}
+                        className={`w-full py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-md active:scale-95 cursor-pointer mt-auto transition-all ${
+                          isSpeaking
+                            ? "bg-rose-100 text-rose-700 border border-rose-300 hover:bg-rose-200"
+                            : "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white shadow-cyan-500/20"
+                        }`}
+                      >
+                        {isSpeaking ? (
+                          <>
+                            <VolumeX className="w-4 h-4 text-rose-600 animate-pulse" />
+                            <span>Stop Voice ⏹️</span>
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-4 h-4 fill-white text-white" />
+                            <span>
+                              {holoAiLang === "hi"
+                                ? "विवरण सुनें (Read Specs - HI)"
+                                : holoAiLang === "ta"
+                                ? "விவரங்களைக் கேட்க (Read Specs - TA)"
+                                : `Read Specs Aloud (${holoAiLang.toUpperCase()})`}
+                            </span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    /* Chat Stream View */
+                    <div className="flex-1 flex flex-col justify-between space-y-2 min-h-0">
+
+                      <div className="flex-1 overflow-y-auto space-y-2.5 p-3 bg-slate-50 rounded-xl border border-cyan-200 text-xs">
+                        {holoAiHistory.length === 0 ? (
+                          <div className="text-center py-8 space-y-2">
+                            <Sparkles className="w-7 h-7 text-cyan-600 mx-auto animate-bounce" />
+                            <p className="text-xs text-slate-800 font-bold">
+                              {holoAiLang === "hi" ? "AI उत्पाद सहायक" : holoAiLang === "ta" ? "AI தயாரிப்பு உதவியாளர்" : "Ask AI Answering Chatbot"}
+                            </p>
+                            <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+                              {holoAiLang === "hi"
+                                ? `नमस्ते! ${hologramProduct.name} के इंजन, पावर, वजन या कीमत के बारे में पूछें!`
+                                : holoAiLang === "ta"
+                                ? `வணக்கம்! ${hologramProduct.name} எஞ்சின், ஆற்றல் மற்றும் விலை விவரங்களைக் கேட்கலாம்!`
+                                : `Type or speak any question about ${hologramProduct.name} specs, power, weight or price!`}
+                            </p>
+                          </div>
+                        ) : (
+                          holoAiHistory.map((h, i) => (
+                            <div key={i} className={`flex ${h.sender === "user" ? "justify-end" : "justify-start"}`}>
+                              <div
+                                className={`p-3 rounded-2xl max-w-[88%] text-[11.5px] leading-relaxed shadow-sm ${
+                                  h.sender === "user"
+                                    ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-medium"
+                                    : "bg-white text-slate-800 border border-slate-200 flex flex-col gap-2"
+                                }`}
+                              >
+                                <span>{h.text}</span>
+                                {h.sender === "ai" && (
+                                  <div className="flex items-center justify-end pt-1.5 border-t border-slate-100">
+                                    <button
+                                      onClick={() => {
+                                        if (isSpeaking) {
+                                          stopTTS();
+                                        } else {
+                                          speakTTS(h.text, holoAiLang);
+                                        }
+                                      }}
+                                      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                                        isSpeaking
+                                          ? "bg-rose-100 text-rose-700 border border-rose-300 hover:bg-rose-200 animate-pulse"
+                                          : "bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100"
+                                      }`}
+                                      title={isSpeaking ? "Stop Voice" : "Listen Audio"}
+                                    >
+                                      {isSpeaking ? (
+                                        <>
+                                          <VolumeX className="w-3 h-3 text-rose-400" />
+                                          <span>Stop Voice ⏹️</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Volume2 className="w-3 h-3 text-cyan-400" />
+                                          <span>
+                                            {holoAiLang === "hi"
+                                              ? "आवाज सुनें 🔊"
+                                              : holoAiLang === "ta"
+                                              ? "ஒலி கேட்க 🔊"
+                                              : "Listen Audio 🔊"}
+                                          </span>
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Dedicated Voice Chat Bar (Voice Only - No Text Box) */}
+                  <div className="pt-2.5 border-t border-slate-200 shrink-0 flex items-center justify-center">
                     <button
                       type="button"
                       onClick={() =>
@@ -2280,26 +2413,30 @@ export default function ProductsPage() {
                           handleHoloVoiceQuerySubmit(transcript);
                         })
                       }
-                      className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors ${
+                      className={`w-full py-3 px-4 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2.5 shadow-md active:scale-95 cursor-pointer ${
                         isListening
-                          ? "bg-rose-500 text-white animate-pulse"
-                          : "text-slate-400 hover:text-cyan-400"
+                          ? "bg-rose-500 text-white shadow-rose-500/30 animate-pulse"
+                          : "bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-600 hover:to-indigo-700 text-white shadow-cyan-500/25"
                       }`}
-                      title="Click to speak your question"
                     >
-                      <Mic className="w-4 h-4" />
+                      <Mic className={`w-4 h-4 ${isListening ? "animate-ping" : "animate-pulse"}`} />
+                      <span>
+                        {isListening
+                          ? holoAiLang === "hi"
+                            ? "सुन रहा हूँ... बोलें 🎙️"
+                            : holoAiLang === "ta"
+                            ? "கேட்கிறது... பேசுங்கள் 🎙️"
+                            : "Listening... Speak Now 🎙️"
+                          : holoAiLang === "hi"
+                          ? "बोलकर सवाल पूछें (Tap to Speak 🎙️)"
+                          : holoAiLang === "ta"
+                          ? "பேசி கேள்வி கேட்க (Tap to Speak 🎙️)"
+                          : "Tap to Speak Voice Question 🎙️"}
+                      </span>
                     </button>
                   </div>
-
-                  <button
-                    type="submit"
-                    disabled={!holoUserQuery.trim()}
-                    className="w-9 h-9 bg-cyan-500 disabled:opacity-50 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-full text-xs transition-all active:scale-95 cursor-pointer shrink-0 flex items-center justify-center shadow-md shadow-cyan-500/30"
-                  >
-                    <Send className="w-4 h-4" />
-                  </button>
-                </form>
-              </div>
+                </div>
+              )}
 
             </div>
 

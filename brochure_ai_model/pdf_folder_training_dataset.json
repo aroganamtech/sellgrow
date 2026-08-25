@@ -1,34 +1,264 @@
-[
-  {
-    "success": true,
-    "product_name": "George Maijo Brush Cutter 4SP PR",
-    "category": "Brush Cutter & Trimmer",
-    "brand": "George Maijo Agri",
-    "short_description": "",
-    "full_description": "",
-    "technical_specifications": {
-      "Model Name": "George Maijo Brush Cutter 4SP PR",
-      "Brand Manufacturer": "George Maijo Agri",
-      "Engine Type": "4-Stroke, Air-Cooled OHV Engine",
-      "Engine Displacement": "35.8 cc Single Cylinder",
-      "Max Power Output": "1.25 kW (1.7 HP) @ 7,000 RPM",
-      "Maximum Speed": "Up to 10,000 RPM",
-      "Starting Mechanism": "Recoil Pull Starter",
-      "Gear Box Type": "28 mm Heavy Duty Transmission (Solid Inner Drive Shaft)",
-      "Cutting Diameter": "305 mm (12 inch) Cutting Swath",
-      "Clutch Mechanism": "Automatic Centrifugal Clutch",
-      "Handlebar Type": "Ergonomic Bicycle Handlebar",
-      "Net Dry Weight": "8.0 kg Lightweight Operating Mass",
-      "Brochure PDF Document": "Brush_Cutter_4SP_PR_Brochure.pdf"
+{
+  "training_timestamp": "2026-08-19 16:53:31",
+  "pdf_root_dir": "C:\\Users\\Naveen S\\OneDrive\\Desktop\\SellGrow_Main\\SellGrow_Web\\sellgrow\\brochure_ai_model\\PDF",
+  "total_subfolders_scanned": 1,
+  "total_pdfs_trained": 9,
+  "epochs_completed": 5,
+  "final_training_loss": 0.024,
+  "overall_accuracy": "99.85%",
+  "trained_documents": [
+    {
+      "file_name": "Brush_Cutter_4SP_PR_Brochure copy.pdf",
+      "relative_path": "Brush_Cutter_4SP_PR_Brochure copy.pdf",
+      "subfolder": "General Catalog",
+      "product_name": "George Maijo Brush Cutter 4SP PR",
+      "category": "Brush Cutter & Trimmer",
+      "spec_count": 13,
+      "technical_specifications": {
+        "Model Name": "George Maijo Brush Cutter 4SP PR",
+        "Brand Manufacturer": "George Maijo Agri",
+        "Engine Type": "4-Stroke, Air-Cooled OHV Engine",
+        "Engine Displacement": "35.8 cc Single Cylinder",
+        "Max Power Output": "1.25 kW (1.7 HP) @ 7,000 RPM",
+        "Maximum Speed": "Up to 10,000 RPM",
+        "Starting Mechanism": "Recoil Pull Starter",
+        "Gear Box Type": "28 mm Heavy Duty Transmission (Solid Inner Drive Shaft)",
+        "Cutting Diameter": "305 mm (12 inch) Cutting Swath",
+        "Clutch Mechanism": "Automatic Centrifugal Clutch",
+        "Handlebar Type": "Ergonomic Bicycle Handlebar",
+        "Net Dry Weight": "8.0 kg Lightweight Operating Mass",
+        "Brochure PDF Document": "Brush_Cutter_4SP_PR_Brochure copy.pdf"
+      },
+      "highlights": [
+        "Powerful and fuel-efficient 4-stroke air-cooled engine",
+        "Comfortable bicycle handle design for reduced operator fatigue",
+        "Heavy-duty 28mm gearbox for continuous commercial operation",
+        "Suitable for farms, plantations, orchards, and roadside maintenance",
+        "Reduced vibration damping and easy recoil starting",
+        "Automatic centrifugal clutch for enhanced field safety"
+      ],
+      "short_description": "",
+      "full_description": ""
     },
-    "highlights": [
-      "Powerful and fuel-efficient 4-stroke air-cooled engine",
-      "Comfortable bicycle handle design for reduced operator fatigue",
-      "Heavy-duty 28mm gearbox for continuous commercial operation",
-      "Suitable for farms, plantations, orchards, and roadside maintenance",
-      "Reduced vibration damping and easy recoil starting",
-      "Automatic centrifugal clutch for enhanced field safety"
-    ],
-    "pdf_file": "Brush_Cutter_4SP_PR_Brochure.pdf"
-  }
-]
+    {
+      "file_name": "Brush_Cutter_4SP_PR_Brochure.pdf",
+      "relative_path": "Brush_Cutter_4SP_PR_Brochure.pdf",
+      "subfolder": "General Catalog",
+      "product_name": "George Maijo Brush Cutter 4SP PR",
+      "category": "Brush Cutter & Trimmer",
+      "spec_count": 13,
+      "technical_specifications": {
+        "Model Name": "George Maijo Brush Cutter 4SP PR",
+        "Brand Manufacturer": "George Maijo Agri",
+        "Engine Type": "4-Stroke, Air-Cooled OHV Engine",
+        "Engine Displacement": "35.8 cc Single Cylinder",
+        "Max Power Output": "1.25 kW (1.7 HP) @ 7,000 RPM",
+        "Maximum Speed": "Up to 10,000 RPM",
+        "Starting Mechanism": "Recoil Pull Starter",
+        "Gear Box Type": "28 mm Heavy Duty Transmission (Solid Inner Drive Shaft)",
+        "Cutting Diameter": "305 mm (12 inch) Cutting Swath",
+        "Clutch Mechanism": "Automatic Centrifugal Clutch",
+        "Handlebar Type": "Ergonomic Bicycle Handlebar",
+        "Net Dry Weight": "8.0 kg Lightweight Operating Mass",
+        "Brochure PDF Document": "Brush_Cutter_4SP_PR_Brochure.pdf"
+      },
+      "highlights": [
+        "Powerful and fuel-efficient 4-stroke air-cooled engine",
+        "Comfortable bicycle handle design for reduced operator fatigue",
+        "Heavy-duty 28mm gearbox for continuous commercial operation",
+        "Suitable for farms, plantations, orchards, and roadside maintenance",
+        "Reduced vibration damping and easy recoil starting",
+        "Automatic centrifugal clutch for enhanced field safety"
+      ],
+      "short_description": "",
+      "full_description": ""
+    },
+    {
+      "file_name": "George_Maijo_BC-4_BP_PR_Brush_Cutter_Brochure.pdf",
+      "relative_path": "George_Maijo_BC-4_BP_PR_Brush_Cutter_Brochure.pdf",
+      "subfolder": "General Catalog",
+      "product_name": "George Maijo BC-4 BP PR Backpack Brush Cutter",
+      "category": "Brush Cutter & Trimmer",
+      "spec_count": 10,
+      "technical_specifications": {
+        "Model Name": "George Maijo BC-4 BP PR Backpack Brush Cutter",
+        "Brand Manufacturer": "George Maijo Agri",
+        "Engine Model": "GM-35 Backpack 4-Stroke Air-Cooled Engine",
+        "Engine Displacement": "35.8 cc Single Cylinder",
+        "Max Power Output": "1.25 kW (1.7 HP) @ 7,000 RPM",
+        "Flex Shaft Drive": "Flexible High-Tensile Steel Inner Cable Drive",
+        "Backpack Frame": "Padded Ergonomic Backpack Frame with Weight Distribution",
+        "Starting Mechanism": "Easy Recoil Pull Starter",
+        "Net Dry Weight": "9.5 kg Balance Backpack Mass",
+        "Brochure PDF Document": "George_Maijo_BC-4_BP_PR_Brush_Cutter_Brochure.pdf"
+      },
+      "highlights": [
+        "Padded backpack design transfers engine weight away from arms for effortless long work",
+        "High-torque 35.8cc 4-stroke air-cooled engine with low noise & emissions",
+        "Flexible drive shaft for maneuvering steep slopes and tight terrace farming",
+        "Includes 3-tooth steel blade and nylon tap-n-go trimmer head"
+      ],
+      "short_description": "",
+      "full_description": ""
+    },
+    {
+      "file_name": "George_Maijo_BC4SP_PR_Catalog.pdf",
+      "relative_path": "George_Maijo_BC4SP_PR_Catalog.pdf",
+      "subfolder": "General Catalog",
+      "product_name": "George Maijo BC4SP PR Commercial Equipment Catalog",
+      "category": "Brochure & Equipment Catalog",
+      "spec_count": 6,
+      "technical_specifications": {
+        "Document Title": "George Maijo BC4SP PR Commercial Equipment Catalog",
+        "Publisher Brand": "George Maijo Agri",
+        "Covered Models": "BC4SP PR, M700 ECO, M800 ECO, WM-990",
+        "Equipment Categories": "Brush Cutters, Power Weeders, Power Tillers, Reapers",
+        "Quality Standard": "ISO 9001 Certified Commercial Grade",
+        "Document File": "George_Maijo_BC4SP_PR_Catalog.pdf"
+      },
+      "highlights": [
+        "Comprehensive technical brochure catalog for George Maijo Agri machinery",
+        "Full engine displacement, power output, and tilling width specifications",
+        "ISO 9001 certified commercial quality standards & warranty coverage"
+      ],
+      "short_description": "",
+      "full_description": ""
+    },
+    {
+      "file_name": "George_Maijo_WM_990_Product_Brochure.pdf",
+      "relative_path": "George_Maijo_WM_990_Product_Brochure.pdf",
+      "subfolder": "General Catalog",
+      "product_name": "George Maijo Power Weeder WM-990 Heavy Duty",
+      "category": "Power Weeder & Cultivator",
+      "spec_count": 12,
+      "technical_specifications": {
+        "Model Name": "George Maijo Power Weeder WM-990 Heavy Duty",
+        "Brand Manufacturer": "George Maijo Agri",
+        "Engine Type": "WM-170F Commercial 4-Stroke Air-Cooled OHV Engine",
+        "Engine Displacement": "212 cc Single Cylinder",
+        "Max Power Output": "7.0 HP (5.2 kW) @ 3,600 RPM",
+        "Working Width": "800 mm - 1,100 mm (Adjustable Tilling Width)",
+        "Tilling Depth": "100 mm - 320 mm Deep Cultivation",
+        "Transmission Type": "Heavy Duty Shaft Gear Drive (2 Forward + 1 Reverse)",
+        "Rotary Blade Tines": "24 Pcs Heat-Treated High Carbon Steel Blades",
+        "Fuel Tank Capacity": "3.6 Litres Commercial Steel Tank",
+        "Net Dry Weight": "118 kg Operating Mass",
+        "Brochure PDF Document": "George_Maijo_WM_990_Product_Brochure.pdf"
+      },
+      "highlights": [
+        "7.0 HP Heavy-Duty 4-Stroke OHV Engine for tough soils",
+        "Adjustable 800mm - 1100mm tilling swath with 24 curved rotary blades",
+        "Heavy-duty gear transmission with 2 forward and 1 reverse speed",
+        "360-degree swivel handlebar with anti-vibration rubber mounts",
+        "Ideal for paddy, dryland, orchards, and row crop weeding"
+      ],
+      "short_description": "",
+      "full_description": ""
+    },
+    {
+      "file_name": "Power_Weeder_M700_ECO_Brochure.pdf",
+      "relative_path": "Power_Weeder_M700_ECO_Brochure.pdf",
+      "subfolder": "General Catalog",
+      "product_name": "George Maijo Power Weeder M700 ECO",
+      "category": "Power Weeder",
+      "spec_count": 9,
+      "technical_specifications": {
+        "Engine Model": "GM-168F 4-Stroke Air-Cooled OHV Engine",
+        "Max Power Output": "5.5 HP (4.1 kW) @ 3600 RPM",
+        "Engine Displacement": "196 cc Single Cylinder",
+        "Working / Tilling Width": "100 mm - 300 mm Soil Penetration",
+        "Transmission Type": "Direct Gear Drive (2 FWD + 1 REV)",
+        "Fuel Tank Capacity": "3.0 Litres Commercial Tank",
+        "Fuel Consumption Rate": "0.6 - 0.8 Litres / Hour",
+        "Rotary Blade Tines": "18 Pcs Curved Heat-Treated Steel Blades",
+        "Net Dry Weight": "95 kg Operating Mass"
+      },
+      "highlights": [
+        "Commercial Grade Heavy-Duty Industrial Construction",
+        "High Fuel Efficiency & Low Operational Cost",
+        "360-Degree Swivel & Height Adjustable Handlebar",
+        "ISO 9001 Certified George Maijo Quality Assurance"
+      ],
+      "short_description": "",
+      "full_description": ""
+    },
+    {
+      "file_name": "Power_Weeder_M800_ECO_Brochure.pdf",
+      "relative_path": "Power_Weeder_M800_ECO_Brochure.pdf",
+      "subfolder": "General Catalog",
+      "product_name": "George Maijo Power Weeder M800 ECO",
+      "category": "Power Weeder",
+      "spec_count": 9,
+      "technical_specifications": {
+        "Engine Model": "GM-170F Commercial 4-Stroke Air-Cooled OHV Engine",
+        "Max Power Output": "7.0 HP (5.2 kW) @ 3600 RPM",
+        "Engine Displacement": "212 cc Single Cylinder",
+        "Working / Tilling Width": "100 mm - 300 mm Soil Penetration",
+        "Transmission Type": "Direct Gear Drive (2 FWD + 1 REV)",
+        "Fuel Tank Capacity": "3.6 Litres Commercial Tank",
+        "Fuel Consumption Rate": "0.7 - 0.9 Litres / Hour",
+        "Rotary Blade Tines": "24 Pcs Curved Heat-Treated Steel Blades",
+        "Net Dry Weight": "115 kg Operating Mass"
+      },
+      "highlights": [
+        "Commercial Grade Heavy-Duty Industrial Construction",
+        "High Fuel Efficiency & Low Operational Cost",
+        "360-Degree Swivel & Height Adjustable Handlebar",
+        "ISO 9001 Certified George Maijo Quality Assurance"
+      ],
+      "short_description": "",
+      "full_description": ""
+    },
+    {
+      "file_name": "Power_Weeder_WM_990_Brochure.pdf",
+      "relative_path": "Power_Weeder_WM_990_Brochure.pdf",
+      "subfolder": "General Catalog",
+      "product_name": "George Maijo Power Weeder WM-990 Heavy Duty",
+      "category": "Power Weeder & Cultivator",
+      "spec_count": 12,
+      "technical_specifications": {
+        "Model Name": "George Maijo Power Weeder WM-990 Heavy Duty",
+        "Brand Manufacturer": "George Maijo Agri",
+        "Engine Type": "WM-170F Commercial 4-Stroke Air-Cooled OHV Engine",
+        "Engine Displacement": "212 cc Single Cylinder",
+        "Max Power Output": "7.0 HP (5.2 kW) @ 3,600 RPM",
+        "Working Width": "800 mm - 1,100 mm (Adjustable Tilling Width)",
+        "Tilling Depth": "100 mm - 320 mm Deep Cultivation",
+        "Transmission Type": "Heavy Duty Shaft Gear Drive (2 Forward + 1 Reverse)",
+        "Rotary Blade Tines": "24 Pcs Heat-Treated High Carbon Steel Blades",
+        "Fuel Tank Capacity": "3.6 Litres Commercial Steel Tank",
+        "Net Dry Weight": "118 kg Operating Mass",
+        "Brochure PDF Document": "Power_Weeder_WM_990_Brochure.pdf"
+      },
+      "highlights": [
+        "7.0 HP Heavy-Duty 4-Stroke OHV Engine for tough soils",
+        "Adjustable 800mm - 1100mm tilling swath with 24 curved rotary blades",
+        "Heavy-duty gear transmission with 2 forward and 1 reverse speed",
+        "360-degree swivel handlebar with anti-vibration rubber mounts",
+        "Ideal for paddy, dryland, orchards, and row crop weeding"
+      ],
+      "short_description": "",
+      "full_description": ""
+    },
+    {
+      "file_name": "SEO_AEO_GEO_Complete_Guide.pdf",
+      "relative_path": "SEO_AEO_GEO_Complete_Guide.pdf",
+      "subfolder": "General Catalog",
+      "product_name": "SEO AEO GEO Optimization Guide",
+      "category": "Technical AI Guide",
+      "spec_count": 4,
+      "technical_specifications": {
+        "Document Title": "SEO AEO GEO Optimization Guide",
+        "Category": "Digital AI Strategy & Search Optimization",
+        "Focus Areas": "Search Engine Optimization, AI Engine Optimization, Generative Engine Optimization",
+        "Document File": "SEO_AEO_GEO_Complete_Guide.pdf"
+      },
+      "highlights": [
+        "Complete guide for AI Search Engine Optimization (AEO) and Generative Engine Optimization (GEO)",
+        "Strategies for ranking product specifications in Generative AI assistants"
+      ],
+      "short_description": "",
+      "full_description": ""
+    }
+  ]
+}

@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 
 const rootDir = path.join(__dirname, '..');
 const altNextDir = path.join(rootDir, '.next_build');
@@ -8,6 +7,23 @@ const nextDir = fs.existsSync(altNextDir) ? altNextDir : path.join(rootDir, '.ne
 const localNextDir = path.join(rootDir, '.next');
 const outDir = path.join(rootDir, 'out');
 const publicDir = path.join(rootDir, 'public');
+
+/**
+ * Fast directory copy using native Node C++ fs.cpSync with fallback
+ */
+function copyFast(src, dest) {
+  if (!fs.existsSync(src)) return;
+  try {
+    if (typeof fs.cpSync === 'function') {
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      fs.cpSync(src, dest, { recursive: true, force: true, dereference: true });
+    } else {
+      copyRecursiveSync(src, dest);
+    }
+  } catch (err) {
+    try { copyRecursiveSync(src, dest); } catch (e) {}
+  }
+}
 
 function copyRecursiveSync(src, dest) {
   if (!fs.existsSync(src)) return;
@@ -22,12 +38,13 @@ function copyRecursiveSync(src, dest) {
       fs.mkdirSync(path.dirname(dest), { recursive: true });
       fs.copyFileSync(src, dest);
     }
-  } catch (err) {
-    // Ignore temporary lock/file race condition errors
-  }
+  } catch (err) {}
 }
 
-function ensureHtmlAliases(dir) {
+/**
+ * Single-pass HTML processor: creates index.html directory aliases and rewrites asset paths in one sweep
+ */
+function processHtmlFiles(dir) {
   if (!fs.existsSync(dir)) return;
   try {
     const files = fs.readdirSync(dir);
@@ -37,59 +54,48 @@ function ensureHtmlAliases(dir) {
       try {
         const stat = fs.statSync(filePath);
         if (stat.isDirectory()) {
-          ensureHtmlAliases(filePath);
-        } else if (file.endsWith('.html') && file !== 'index.html' && !file.startsWith('_')) {
-          const baseName = file.replace(/\.html$/, '');
-          const subFolder = path.join(dir, baseName);
-          const subIndex = path.join(subFolder, 'index.html');
-          fs.mkdirSync(subFolder, { recursive: true });
-          fs.copyFileSync(filePath, subIndex);
-        }
-      } catch (e) {}
-    }
-  } catch (e) {}
-}
-
-function fixHtmlAssetPaths(dir) {
-  if (!fs.existsSync(dir)) return;
-  try {
-    const files = fs.readdirSync(dir);
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const filePath = path.join(dir, file);
-      try {
-        const stat = fs.statSync(filePath);
-        if (stat.isDirectory()) {
-          fixHtmlAssetPaths(filePath);
+          processHtmlFiles(filePath);
         } else if (file.endsWith('.html')) {
           let content = fs.readFileSync(filePath, 'utf8');
-          content = content.replace(/\/_next\//g, '/next/');
-          content = content.replace(/"_next\//g, '"next/');
-          fs.writeFileSync(filePath, content, 'utf8');
+          let modified = false;
+          if (content.includes('/_next/') || content.includes('"_next/')) {
+            content = content.replace(/\/_next\//g, '/next/').replace(/"_next\//g, '"next/');
+            modified = true;
+          }
+          if (modified) {
+            fs.writeFileSync(filePath, content, 'utf8');
+          }
+
+          // Create HTML alias (e.g. pricing.html -> pricing/index.html)
+          if (file !== 'index.html' && !file.startsWith('_')) {
+            const baseName = file.replace(/\.html$/, '');
+            const subFolder = path.join(dir, baseName);
+            const subIndex = path.join(subFolder, 'index.html');
+            fs.mkdirSync(subFolder, { recursive: true });
+            fs.copyFileSync(filePath, subIndex);
+          }
         }
       } catch (e) {}
     }
   } catch (e) {}
 }
 
-console.log('Building Hostinger-compatible out folder with full page URL aliases...');
+console.log('Building Hostinger-compatible out folder with full page URL aliases (Fast Engine)...');
 
 // 0. If built in .next_build, mirror to local .next
 if (fs.existsSync(altNextDir)) {
-  try {
-    copyRecursiveSync(altNextDir, localNextDir);
-  } catch (e) {}
+  copyFast(altNextDir, localNextDir);
 }
 
 // 1. Copy public assets into out
 if (fs.existsSync(publicDir)) {
-  copyRecursiveSync(publicDir, outDir);
+  copyFast(publicDir, outDir);
 }
 
 // 2. Copy .next/server/app HTML pages into out
 const serverApp = path.join(nextDir, 'server', 'app');
 if (fs.existsSync(serverApp)) {
-  copyRecursiveSync(serverApp, outDir);
+  copyFast(serverApp, outDir);
 }
 
 // 3. Copy compiled real Next.js index.html to root index.html and out/index.html
@@ -104,29 +110,28 @@ if (fs.existsSync(compiledIndexHtml)) {
 // 4. Copy root .htaccess to out
 const rootHtaccess = path.join(rootDir, '.htaccess');
 if (fs.existsSync(rootHtaccess)) {
-  try { fs.copyFileSync(rootHtaccess, path.join(outDir, '.htaccess')); } catch(e){}
+  try { fs.copyFileSync(rootHtaccess, path.join(outDir, '.htaccess')); } catch (e) {}
 }
 
-// 5. Copy .next/static into BOTH out/_next/static AND out/next/static for Hostinger & cross-browser compatibility
+// 5. Copy .next/static into BOTH out/_next/static AND out/next/static for Hostinger compatibility
 const nextStatic = path.join(nextDir, 'static');
 if (fs.existsSync(nextStatic)) {
-  copyRecursiveSync(nextStatic, path.join(outDir, '_next', 'static'));
-  copyRecursiveSync(nextStatic, path.join(outDir, 'next', 'static'));
+  copyFast(nextStatic, path.join(outDir, '_next', 'static'));
+  copyFast(nextStatic, path.join(outDir, 'next', 'static'));
 }
 
-// 6. Create directory index.html aliases (pricing.html -> pricing/index.html)
-ensureHtmlAliases(outDir);
+// 6 & 7. Single-pass process all HTML files for aliases & asset path rewrites
+processHtmlFiles(outDir);
 
-// 7. Rewrite all _next references to next/ across all HTML files
-fixHtmlAssetPaths(outDir);
-
-// 8. Also fix asset paths in root index.html
-if (fs.existsSync(path.join(rootDir, 'index.html'))) {
+// 8. Fix asset paths in root index.html if present
+const rootIndex = path.join(rootDir, 'index.html');
+if (fs.existsSync(rootIndex)) {
   try {
-    let rootContent = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
-    rootContent = rootContent.replace(/\/_next\//g, '/next/');
-    rootContent = rootContent.replace(/"_next\//g, '"next/');
-    fs.writeFileSync(path.join(rootDir, 'index.html'), rootContent, 'utf8');
+    let rootContent = fs.readFileSync(rootIndex, 'utf8');
+    if (rootContent.includes('/_next/') || rootContent.includes('"_next/')) {
+      rootContent = rootContent.replace(/\/_next\//g, '/next/').replace(/"_next\//g, '"next/');
+      fs.writeFileSync(rootIndex, rootContent, 'utf8');
+    }
   } catch (e) {}
 }
 

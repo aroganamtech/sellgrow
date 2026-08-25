@@ -1,7 +1,12 @@
 import os
+import sys
 import json
 import time
 import argparse
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 from typing import Dict, Any, List
 from brochure_ai_assistant import BrochureAIAssistant
 
@@ -9,11 +14,22 @@ class ModelAccuracyEvaluator:
     """
     Evaluation Engine for Brochure AI Model.
     Evaluates OCR Text Confidence, Layout Segmentation Accuracy, Specification Table
-    Extraction Precision, Entity Disambiguation, and Overall Model Accuracy.
+    Extraction Precision, Entity Disambiguation, and Overall Model Accuracy across all PDF subfolders.
     """
     def __init__(self, pdf_dir: str):
         self.pdf_dir = pdf_dir
         self.assistant = BrochureAIAssistant(company_brand="George Maijo Agri")
+
+    def find_all_pdfs_recursively(self) -> List[str]:
+        pdf_list = []
+        if not os.path.exists(self.pdf_dir):
+            return pdf_list
+
+        for root, dirs, files in os.walk(self.pdf_dir):
+            for file in files:
+                if file.lower().endswith(".pdf"):
+                    pdf_list.append(os.path.join(root, file))
+        return pdf_list
 
     def evaluate_accuracy(self) -> Dict[str, Any]:
         print("============================================================")
@@ -21,25 +37,25 @@ class ModelAccuracyEvaluator:
         print("============================================================\n")
 
         start_time = time.time()
-        pdf_files = [f for f in os.listdir(self.pdf_dir) if f.lower().endswith(".pdf")] if os.path.exists(self.pdf_dir) else []
+        pdf_paths = self.find_all_pdfs_recursively()
 
-        if not pdf_files:
+        if not pdf_paths:
             print(f"[WARN] No PDF files found in {self.pdf_dir}. Using synthetic dataset evaluation benchmark.")
-            pdf_files = ["Brush_Cutter_4SP_PR_Brochure.pdf", "Power_Weeder_M700_ECO_Brochure.pdf", "Power_Weeder_M800_ECO_Brochure.pdf"]
+            pdf_paths = ["Brush_Cutter_4SP_PR_Brochure.pdf", "Power_Weeder_M700_ECO_Brochure.pdf", "Power_Weeder_M800_ECO_Brochure.pdf"]
 
         total_specs_extracted = 0
         total_ocr_boxes = 0
         ocr_confidence_sum = 0.0
         evaluation_details = []
 
-        for pdf_file in pdf_files:
-            pdf_path = os.path.join(self.pdf_dir, pdf_file)
-            print(f"[TESTING] Evaluating Model Accuracy on: {pdf_file}")
+        for pdf_path in pdf_paths:
+            pdf_file = os.path.basename(pdf_path)
+            rel_path = os.path.relpath(pdf_path, self.pdf_dir) if os.path.isabs(pdf_path) else pdf_path
+            print(f"[TESTING] Evaluating Model Accuracy on: {rel_path}")
 
             if os.path.exists(pdf_path):
                 analysis = self.assistant.analyze_brochure_document(pdf_path)
             else:
-                # Evaluation fallback simulation if path relative
                 analysis = self.assistant.analyze_brochure_document(pdf_file)
 
             specs = analysis.get("technical_specifications", {})
@@ -55,6 +71,7 @@ class ModelAccuracyEvaluator:
             doc_accuracy = 98.5 + (0.01 * (spec_count % 5))
             evaluation_details.append({
                 "file_name": pdf_file,
+                "relative_path": rel_path,
                 "product_name": analysis.get("product_name"),
                 "category": analysis.get("category"),
                 "extracted_spec_count": spec_count,
@@ -73,7 +90,7 @@ class ModelAccuracyEvaluator:
 
         metrics = {
             "evaluation_timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
-            "evaluated_pdf_count": len(pdf_files),
+            "evaluated_pdf_count": len(pdf_paths),
             "total_specs_extracted": total_specs_extracted,
             "metrics": {
                 "ocr_text_confidence": f"{avg_ocr_conf:.2f}%",
