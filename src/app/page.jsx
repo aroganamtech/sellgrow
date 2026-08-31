@@ -1,0 +1,580 @@
+"use client";
+import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import SolutionsShowcase from "@/components/sections/SolutionsShowcase";
+import OnboardingModal from "@/components/modals/OnboardingModal";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { motion } from "framer-motion";
+import { MessageSquare, ArrowRight, Sparkles, Video, X, } from "lucide-react";
+const heroContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.12,
+            delayChildren: 0.1,
+        }
+    }
+};
+const heroItemVariants = {
+    hidden: { opacity: 0, y: 25 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.6, ease: "easeOut" }
+    }
+};
+const heroMockupVariants = {
+    hidden: { opacity: 0, scale: 0.96, y: 35 },
+    visible: {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+    }
+};
+const cardContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+        }
+    }
+};
+const cardItemVariants = {
+    hidden: { opacity: 0, y: 25 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.5, ease: "easeOut" }
+    }
+};
+function CanvasParticles() {
+    const canvasRef = useRef(null);
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas)
+            return;
+        const ctx = canvas.getContext("2d");
+        if (!ctx)
+            return;
+        let animationFrameId;
+        let width = (canvas.width = window.innerWidth);
+        let height = (canvas.height = window.innerHeight);
+        const particles = [];
+        const colors = ["rgba(56, 189, 248, 0.4)", "rgba(52, 211, 153, 0.4)", "rgba(129, 140, 248, 0.4)"];
+        for (let i = 0; i < 40; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.6,
+                vy: (Math.random() - 0.5) * 0.6,
+                radius: Math.random() * 2 + 1,
+                color: colors[Math.floor(Math.random() * colors.length)],
+            });
+        }
+        let rippleRadius = 0;
+        const rippleSpeed = 4.5;
+        const handleResize = () => {
+            if (!canvas)
+                return;
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        };
+        window.addEventListener("resize", handleResize);
+        const draw = () => {
+            ctx.clearRect(0, 0, width, height);
+            // Expanding Shockwave Radar Ripple
+            rippleRadius += rippleSpeed;
+            if (rippleRadius > Math.max(width, height) * 0.7) {
+                rippleRadius = 0;
+            }
+            // Draw Grid backdrop
+            ctx.strokeStyle = "rgba(56, 189, 248, 0.015)";
+            ctx.lineWidth = 1;
+            const gridSize = 80;
+            for (let x = 0; x < width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+            // Draw ripple circle
+            ctx.strokeStyle = `rgba(56, 189, 248, ${Math.max(0, 1 - rippleRadius / (Math.max(width, height) * 0.7)) * 0.12})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(width / 2, height / 2, rippleRadius, 0, Math.PI * 2);
+            ctx.stroke();
+            particles.forEach((p) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > width)
+                    p.vx *= -1;
+                if (p.y < 0 || p.y > height)
+                    p.vy *= -1;
+                // Shockwave ripple interaction: make particle glow/grow when shockwave passes it
+                const distToCenter = Math.hypot(p.x - width / 2, p.y - height / 2);
+                const difference = Math.abs(distToCenter - rippleRadius);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius * (difference < 60 ? 1.8 : 1), 0, Math.PI * 2);
+                if (difference < 60) {
+                    ctx.fillStyle = "rgba(56, 189, 248, 0.9)";
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = "#38bdf8";
+                }
+                else {
+                    ctx.fillStyle = p.color;
+                    ctx.shadowBlur = 0;
+                }
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+            // Connection lines
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dist = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
+                    if (dist < 120) {
+                        const avgDist = (Math.hypot(particles[i].x - width / 2, particles[i].y - height / 2) + Math.hypot(particles[j].x - width / 2, particles[j].y - height / 2)) / 2;
+                        const diff = Math.abs(avgDist - rippleRadius);
+                        let alpha = (1 - dist / 120) * 0.12;
+                        if (diff < 60) {
+                            alpha = (1 - dist / 120) * 0.6;
+                            ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+                            ctx.lineWidth = 1;
+                        }
+                        else {
+                            ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+                            ctx.lineWidth = 0.5;
+                        }
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            animationFrameId = requestAnimationFrame(draw);
+        };
+        draw();
+        return () => {
+            window.removeEventListener("resize", handleResize);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, []);
+    return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none"/>;
+}
+export default function HomePage() {
+    const { t, language, dir, region } = useLanguage();
+    const [pageLoading, setPageLoading] = useState(true);
+    const [hasCheckedSession, setHasCheckedSession] = useState(false);
+    const [mounted, setMounted] = useState(false);
+    const [techStatus, setTechStatus] = useState("Initializing System...");
+    const [activeTab, setActiveTab] = useState("crm");
+    const [activeVideo, setActiveVideo] = useState(null);
+    useEffect(() => {
+        setMounted(true);
+        if (typeof window !== "undefined") {
+            const hasLoadedBefore = sessionStorage.getItem("sellgrow_loaded");
+            if (hasLoadedBefore) {
+                setPageLoading(false);
+                setHasCheckedSession(true);
+                return;
+            }
+        }
+        setHasCheckedSession(true);
+        const timer = setTimeout(() => {
+            setPageLoading(false);
+            try {
+                sessionStorage.setItem("sellgrow_loaded", "true");
+            }
+            catch (e) { }
+        }, 1500); // 1.5 seconds to show cycling tech status logs
+        return () => clearTimeout(timer);
+    }, []);
+    useEffect(() => {
+        if (!pageLoading)
+            return;
+        const statuses = [
+            "Initializing secure handshakes...",
+            "Querying database cluster...",
+            "Loading deep-tech speech engines...",
+            "Mounting unified omnichannel CRM...",
+            "Connecting SellGrow gateways...",
+            "Core engines online."
+        ];
+        let idx = 0;
+        const interval = setInterval(() => {
+            if (idx < statuses.length - 1) {
+                idx++;
+                setTechStatus(statuses[idx]);
+            }
+        }, 220);
+        return () => clearInterval(interval);
+    }, [pageLoading]);
+    // Voice Simulation State
+    const [callState, setCallState] = useState("idle");
+    const [transcripts, setTranscripts] = useState([]);
+    const [isAiSpeaking, setIsAiSpeaking] = useState(false);
+    const audioRingRef = useRef(null);
+    // Chatbot State
+    const [chatOpen, setChatOpen] = useState(false);
+    const [chatMessages, setChatMessages] = useState([
+        { sender: "ai", text: "Hi there! I am the SellGrow AI. Ask me anything about our Operating System modules!" },
+    ]);
+    const [chatInput, setChatInput] = useState("");
+    const chatEndRef = useRef(null);
+    useEffect(() => {
+        if (chatOpen && chatEndRef.current) {
+            chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [chatMessages, chatOpen]);
+    const speak = (text) => {
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            // Cancel ongoing speech
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            // Attempt to find a suitable voice matching the local language
+            const voices = window.speechSynthesis.getVoices();
+            let selectedVoice = voices.find(v => v.lang.startsWith(language));
+            if (!selectedVoice && language === "ta") {
+                selectedVoice = voices.find(v => v.name.includes("Tamil") || v.lang.includes("ta"));
+            }
+            if (!selectedVoice && language === "hi") {
+                selectedVoice = voices.find(v => v.name.includes("Hindi") || v.lang.includes("hi"));
+            }
+            if (!selectedVoice && language === "ar") {
+                selectedVoice = voices.find(v => v.name.includes("Arabic") || v.lang.includes("ar"));
+            }
+            if (selectedVoice)
+                utterance.voice = selectedVoice;
+            utterance.onstart = () => setIsAiSpeaking(true);
+            utterance.onend = () => setIsAiSpeaking(false);
+            utterance.onerror = () => setIsAiSpeaking(false);
+            window.speechSynthesis.speak(utterance);
+        }
+    };
+    const handleStartCall = () => {
+        setCallState("ringing");
+        setTranscripts([]);
+        // Simulate ring delay, then auto-accept or trigger ringing
+        setTimeout(() => {
+            // Auto accept for UX ease
+            handleAcceptCall();
+        }, 1500);
+    };
+    const handleAcceptCall = () => {
+        setCallState("active");
+        const welcome = t("heroSubtitle").split(".")[0] + ". " + "I am your automated AI business assistant. How can I help you?";
+        setTranscripts([{ sender: "ai", text: welcome }]);
+        speak(welcome);
+    };
+    const handleUserSpeech = (replyText, aiText) => {
+        setTranscripts(prev => [
+            ...prev,
+            { sender: "user", text: replyText }
+        ]);
+        // Simulate AI processing delay
+        setIsAiSpeaking(true);
+        setTimeout(() => {
+            setTranscripts(prev => [
+                ...prev,
+                { sender: "ai", text: aiText }
+            ]);
+            speak(aiText);
+        }, 800);
+    };
+    const handleEndCall = () => {
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        setCallState("ended");
+        setIsAiSpeaking(false);
+        setTimeout(() => setCallState("idle"), 2500);
+    };
+    const handleSendChatMessage = (e) => {
+        e.preventDefault();
+        if (!chatInput.trim())
+            return;
+        const userText = chatInput;
+        setChatMessages(prev => [...prev, { sender: "user", text: userText }]);
+        setChatInput("");
+        // Simple keyword chatbot response matching SellGrow modules
+        setTimeout(() => {
+            let reply = "SellGrow is a unified Business Operating System. You can control leads, check chats from WhatsApp, customize workflows, and schedule AI voice calls in one place.";
+            const lowerText = userText.toLowerCase();
+            if (lowerText.includes("pricing") || lowerText.includes("cost")) {
+                reply = "Pricing is modular! Choose monthly, quarterly, or yearly packages starting at $29/mo, enabling only the components you need (CRM, Voice, or Catalog).";
+            }
+            else if (lowerText.includes("crm") || lowerText.includes("sales")) {
+                reply = "Our CRM automates sales pipelines, records client follow-ups, saves location GPS visit coordinates, and generates meeting notes.";
+            }
+            else if (lowerText.includes("voice") || lowerText.includes("call")) {
+                reply = "AI Voice uses real-time WebRTC for lightning-fast speech response, call records, translation, and automated receptionist scheduling.";
+            }
+            else if (lowerText.includes("whatsapp") || lowerText.includes("communication")) {
+                reply = "Unified Inbox connects WhatsApp Business API, Facebook Messenger, Live Chat, and SMS. Includes custom automated replies.";
+            }
+            else if (lowerText.includes("workflow") || lowerText.includes("automate")) {
+                reply = "The visual workflow builder connects webhooks, database actions, email reminders, and API routes with simple drag-and-drop configurations.";
+            }
+            setChatMessages(prev => [...prev, { sender: "ai", text: reply }]);
+            speak(reply);
+        }, 600);
+    };
+    // Pre-load voices on client
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.getVoices();
+        }
+    }, []);
+    return (<div className="relative min-h-screen flex flex-col">
+      <OnboardingModal />
+      {/* Script to block hydration flash for returning users */}
+      <script dangerouslySetInnerHTML={{
+            __html: `
+            try {
+              if (sessionStorage.getItem('sellgrow_loaded') === 'true') {
+                document.documentElement.classList.add('sellgrow-already-loaded');
+              }
+            } catch (e) {}
+          `
+        }}/>
+      {/* Loading Splash Screen Overlay */}
+      {(!hasCheckedSession || pageLoading) && (<div className={`loading-overlay fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#070b13] space-y-8 select-none transition-all duration-700 ${pageLoading ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+          {/* Particle Canvas Background */}
+          {pageLoading && <CanvasParticles />}
+
+          <style>{`
+            html.sellgrow-already-loaded .loading-overlay {
+              display: none !important;
+            }
+            @keyframes shimmer-travel {
+              0% { left: -30%; }
+              100% { left: 110%; }
+            }
+            @keyframes neon-pulse {
+              0%, 100% {
+                filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4)) drop-shadow(0 0 20px rgba(52, 211, 153, 0.2));
+                transform: scale(0.95);
+              }
+              50% {
+                filter: drop-shadow(0 0 28px rgba(56, 189, 248, 0.95)) drop-shadow(0 0 45px rgba(52, 211, 153, 0.65));
+                transform: scale(1.05);
+              }
+            }
+            @keyframes eq-bar {
+              0% { height: 4px; }
+              100% { height: 22px; }
+            }
+          `}</style>
+
+          <div className="relative w-72 h-72 flex items-center justify-center scale-95 md:scale-100">
+            {/* Glow backdrop */}
+            <div className="absolute w-72 h-72 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"/>
+            
+            {/* Layered Cyber Rings centered perfectly with inset-0 m-auto */}
+            <div className="w-56 h-56 rounded-full border border-sky-400/20 border-t-sky-400/80 border-b-sky-400/80 absolute inset-0 m-auto" style={{ animation: "spin 6s linear infinite" }}/>
+            <div className="w-48 h-48 rounded-full border border-dashed border-emerald-400/20 border-l-emerald-400/80 border-r-emerald-400/80 absolute inset-0 m-auto" style={{ animation: "spin 4s linear infinite reverse" }}/>
+            
+            {/* Radar Sweep Wedge */}
+            <div className="w-44 h-44 rounded-full absolute inset-0 m-auto overflow-hidden pointer-events-none" style={{ animation: "spin 3s linear infinite" }}>
+              <div className="w-1/2 h-1/2 absolute top-0 left-0 bg-gradient-to-br from-sky-500/20 to-transparent origin-bottom-right transform rotate-45"/>
+            </div>
+
+            {/* Holographic Hex Backplate */}
+            <div className="w-36 h-36 rounded-full border border-white/5 bg-slate-950/90 shadow-[inset_0_0_30px_rgba(56,189,248,0.2),0_10px_30px_rgba(0,0,0,0.6)] absolute inset-0 m-auto flex items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 opacity-15" style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='27.71' viewBox='0 0 16 27.71'%3E%3Cpath d='M8 0 L16 4.62 L16 13.86 L8 18.48 L0 13.86 L0 4.62 Z M8 27.71 L16 23.09 L16 13.86 L8 18.48 L0 13.86 L0 23.09 Z' fill='none' stroke='%2338bdf8' stroke-width='1'/%3E%3C/svg%3E")`,
+                backgroundSize: "16px 28px"
+            }}/>
+            </div>
+            
+            {/* Central Breathing Neon Logo with HUD Brackets */}
+            <div className="relative z-10 w-24 h-24 flex items-center justify-center p-2" style={{ animation: "neon-pulse 2.2s ease-in-out infinite" }}>
+              {/* Brackets */}
+              <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-sky-400/80 rounded-tl"/>
+              <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-sky-400/80 rounded-tr"/>
+              <div className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-sky-400/80 rounded-bl"/>
+              <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-sky-400/80 rounded-br"/>
+
+              <img src="/logos/Logo-removebg-preview1.png" alt="SellGrow Loading..." className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]"/>
+            </div>
+          </div>
+          
+          {/* Loading copy & HUD Console visual */}
+          <div className="text-center space-y-4 max-w-sm px-4 z-20">
+            <div className="space-y-1">
+              <p className="text-sm font-black tracking-[0.25em] uppercase text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]">
+                {!mounted ? "Connecting SellGrow" : t("connectingSellgrow").replace("...", "")}
+              </p>
+              <p className="text-[10px] font-mono text-sky-400/80 tracking-wider">
+                {techStatus}
+              </p>
+            </div>
+
+            {/* Equalizer Waveform indicator */}
+            <div className="flex items-center justify-center space-x-1 h-6 my-2 opacity-80">
+              <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.6s ease-in-out infinite alternate" }}/>
+              <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.9s ease-in-out infinite alternate 0.1s" }}/>
+              <div className="w-0.5 rounded-full bg-emerald-400" style={{ animation: "eq-bar 0.7s ease-in-out infinite alternate 0.2s" }}/>
+              <div className="w-0.5 rounded-full bg-emerald-400" style={{ animation: "eq-bar 1.1s ease-in-out infinite alternate 0.3s" }}/>
+              <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.5s ease-in-out infinite alternate 0.4s" }}/>
+              <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.8s ease-in-out infinite alternate 0.5s" }}/>
+              <div className="w-0.5 rounded-full bg-emerald-400" style={{ animation: "eq-bar 1.0s ease-in-out infinite alternate 0.2s" }}/>
+              <div className="w-0.5 rounded-full bg-sky-400" style={{ animation: "eq-bar 0.6s ease-in-out infinite alternate 0.1s" }}/>
+            </div>
+
+            <div className="w-48 h-1 bg-slate-800/85 rounded-full mx-auto overflow-hidden relative border border-white/5">
+              <div className="h-full bg-gradient-to-r from-primary via-secondary to-accent-brand rounded-full animate-progress"/>
+              <div className="absolute top-0 bottom-0 w-12 bg-gradient-to-r from-transparent via-white/40 to-transparent" style={{
+                animation: "shimmer-travel 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite"
+            }}/>
+            </div>
+          </div>
+        </div>)}
+
+      <Navbar />
+
+      {/* Main Content Area */}
+      <main className="flex-grow pt-16">
+        
+        {/* HERO SECTION */}
+        <section className="relative overflow-hidden pt-8 pb-4 md:pt-10 md:pb-6">
+          {/* Radial Light Glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-primary/10 via-secondary/5 to-transparent blur-3xl pointer-events-none -z-10"/>
+
+          <motion.div variants={heroContainerVariants} initial="hidden" animate={pageLoading ? "hidden" : "visible"} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+            <motion.div variants={heroItemVariants} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 animate-pulse">
+              <Sparkles className="w-3.5 h-3.5"/>
+              <span>{t("heroBadge")}</span>
+            </motion.div>
+
+            <motion.h1 variants={heroItemVariants} className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight font-display max-w-4xl mx-auto leading-tight">
+              <span className="gradient-text">{t("heroTitle")}</span>
+            </motion.h1>
+
+            <motion.p variants={heroItemVariants} className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              {t("heroSubtitle")}
+            </motion.p>
+          </motion.div>
+        </section>
+
+        {/* SOLUTIONS SHOWCASE (TABBED INTERACTIVE AGENTS) */}
+        <SolutionsShowcase />
+
+        {/* CORE PLATFORM FEATURES */}
+        <section id="features" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display text-foreground">
+              {t("featuresTitle")}
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              {t("featuresSubtitle")}
+            </p>
+          </motion.div>
+
+          {/* CLEAN COMPACT STANDALONE VIDEO SHOWCASE */}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, ease: "easeOut" }} className="max-w-3xl mx-auto relative rounded-2xl border border-primary/20 bg-slate-950 overflow-hidden shadow-2xl">
+            <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black">
+              <video src="/videos/generate_the_video.mp4" autoPlay loop muted playsInline controls className="w-full h-full object-cover"/>
+            </div>
+          </motion.div>
+        </section>
+      </main>
+
+      {/* SAMPLE VIDEO PLAYER MODAL */}
+      {activeVideo && (<div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="relative w-full max-w-4xl bg-white dark:bg-[#0c101d] border border-border rounded-3xl shadow-2xl overflow-hidden flex flex-col space-y-4 p-6 sm:p-8 animate-scaleUp">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-border/60 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <Video className="w-5 h-5"/>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground font-display">{activeVideo.title}</h3>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-semibold border border-primary/20">
+                    {activeVideo.tag}
+                  </span>
+                </div>
+              </div>
+              <button onClick={() => setActiveVideo(null)} className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" aria-label="Close Video Modal">
+                <X className="w-5 h-5"/>
+              </button>
+            </div>
+
+            {/* Video Player */}
+            <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-border/80 shadow-inner group">
+              <video src={activeVideo.videoUrl} controls autoPlay playsInline className="w-full h-full object-contain"/>
+            </div>
+
+            {/* Modal Footer / Actions */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+              <p className="text-xs text-muted-foreground text-center sm:text-left max-w-lg">
+                {activeVideo.desc}
+              </p>
+              <div className="flex items-center gap-3 shrink-0">
+                <button onClick={() => setActiveVideo(null)} className="px-4 py-2 text-xs font-semibold rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                  Close
+                </button>
+                <Link href="/register" className="px-4 py-2 text-xs font-semibold rounded-xl bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 shadow-md transition-all flex items-center gap-1.5">
+                  <span>Get Started Now</span>
+                  <ArrowRight className="w-3.5 h-3.5"/>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>)}
+
+      {/* FLOATING CHATBOT WIDGET */}
+      <div className="fixed bottom-6 right-6 z-40">
+        {!chatOpen ? (<button onClick={() => setChatOpen(true)} className="w-14 h-14 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white shadow-lg shadow-primary/30 hover:scale-105 active:scale-95 transition-all" aria-label="Open Chatbot">
+            <MessageSquare className="w-6 h-6"/>
+          </button>) : (<div data-lenis-prevent className="w-80 sm:w-96 rounded-2xl border border-border bg-white dark:bg-[#0d1322] shadow-2xl overflow-hidden flex flex-col justify-between max-h-[480px]">
+            {/* Chat header */}
+            <div className="bg-gradient-to-r from-primary to-secondary p-4 text-white flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 animate-pulse"/>
+                <div>
+                  <h4 className="text-sm font-bold leading-tight">SellGrow AI Assistant</h4>
+                  <p className="text-[10px] text-white/80">Active in {language.toUpperCase()}</p>
+                </div>
+              </div>
+              <button onClick={() => setChatOpen(false)} className="text-white/80 hover:text-white text-xs font-semibold">
+                Close
+              </button>
+            </div>
+
+            {/* Chat Messages */}
+            <div className="p-4 space-y-3 overflow-y-auto flex-grow h-72 text-xs">
+              {chatMessages.map((msg, idx) => (<div key={idx} className={`p-2.5 rounded-xl max-w-[85%] ${msg.sender === "ai"
+                    ? "bg-slate-100 dark:bg-slate-800 text-foreground"
+                    : "bg-primary text-white ml-auto"}`}>
+                  <p className="leading-relaxed">{msg.text}</p>
+                </div>))}
+              <div ref={chatEndRef}/>
+            </div>
+
+            {/* Chat input */}
+            <form onSubmit={handleSendChatMessage} className="p-3 border-t border-border bg-slate-50 dark:bg-black/10 flex gap-2">
+              <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder={t("chatbotHelp")} className="flex-grow pl-3 pr-2 py-1.5 text-xs rounded-lg border border-border glass-input"/>
+              <button type="submit" className="px-3 bg-primary hover:opacity-90 text-white rounded-lg text-xs font-semibold">
+                Send
+              </button>
+            </form>
+          </div>)}
+      </div>
+
+      <Footer />
+    </div>);
+}

@@ -1,6 +1,0 @@
-User-Agent: *
-Allow: /
-Disallow: /api/
-Disallow: /sg-superadmin/
-
-Sitemap: https://sellgrow.io/sitemap.xml
