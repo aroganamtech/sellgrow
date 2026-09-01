@@ -39,7 +39,7 @@ export default function PricingPage() {
       name: "Gold Plan",
       badge: "Starter Package",
       description:
-        "Essential commerce services to launch your brand online, generate marketing assets, and track basic sessions.",
+        "Essential growth suite with 4-page static site, 5 CRM users, 4 AI languages, 500 WhatsApp messages, and 2 brand designs.",
       priceMonthly: isINR ? 1499 : 19,
       priceYearly: isINR ? 1199 : 15,
       period: "/month",
@@ -57,13 +57,13 @@ export default function PricingPage() {
       buttonText: "Start 14-Day Free Trial",
       link: "/register?plan=gold",
       features: [
-        { text: "Website (Page Builder Engine)", highlight: true },
-        { text: "Brochure Logo (Brand Materials)", highlight: true },
-        { text: "Mobile View (Interface Logs)", highlight: false },
-        { text: "Website View (Traffic Tracker)", highlight: false },
-        { text: "Up to 1,000 Leads & Contacts", highlight: false },
-        { text: "Standard Email Support", highlight: false },
-        { text: "14-Day Free Trial Included", highlight: true },
+        { text: "Sales CRM: 5 Users", highlight: true },
+        { text: "AI Agent: 4 Languages", highlight: true },
+        { text: "WhatsApp Business: 500 Messages", highlight: true },
+        { text: "Website: 4 Pages | Static Site | 1 Year Server Free", highlight: true },
+        { text: "Brochure & Logo: 2 Designs", highlight: false },
+        { text: "Mobile View & Website View Included", highlight: false },
+        { text: "Digital Marketing: Social Media Creation", highlight: false },
       ],
     },
     {
@@ -71,7 +71,7 @@ export default function PricingPage() {
       name: "Elite Plan",
       badge: "Most Popular",
       description:
-        "Comprehensive growth suite with official WhatsApp API, Generative AI Agent, and multi-channel marketing.",
+        "Advanced scale package with 8-page static site, 8 CRM users, 8 AI languages, 1,000 WhatsApp messages, and SEO/Google Ads.",
       priceMonthly: isINR ? 3999 : 49,
       priceYearly: isINR ? 3199 : 39,
       period: "/month",
@@ -89,14 +89,13 @@ export default function PricingPage() {
       buttonText: "Start 14-Day Free Trial",
       link: "/register?plan=elite",
       features: [
-        { text: "Everything in Gold Plan", highlight: true },
-        { text: "WhatsApp API (Meta Business Gateway)", highlight: true },
-        { text: "AI Agent (Generative Customer Bot)", highlight: true },
-        { text: "Social Media Creation (Auto-Posting)", highlight: true },
-        { text: "SEO/AEO/GEO, Google Ads (Metrics)", highlight: true },
-        { text: "Up to 10,000 Leads & Contacts", highlight: false },
-        { text: "24/7 Priority Support", highlight: true },
-        { text: "14-Day Free Trial Included", highlight: true },
+        { text: "Sales CRM: 8 Users", highlight: true },
+        { text: "AI Agent: 8 Languages", highlight: true },
+        { text: "WhatsApp Business: 1,000 Messages", highlight: true },
+        { text: "Website: 8 Pages | Static Site | 1 Year Server Free", highlight: true },
+        { text: "Brochure & Logo: 5 Designs", highlight: false },
+        { text: "Mobile View & Website View Included", highlight: false },
+        { text: "Digital Marketing: Social Media Creation + SEO/AEO/GEO & Google Ads", highlight: true },
       ],
     },
     {
@@ -104,7 +103,7 @@ export default function PricingPage() {
       name: "Platinum Plan",
       badge: "Enterprise Tier",
       description:
-        "Maximum growth power featuring immersive 3D View rendering, custom fine-tuned AI Agents, and VIP care.",
+        "Maximum performance with 10-page static site, 10 CRM users, 10 AI languages, Unlimited WhatsApp messages & 3D View.",
       priceMonthly: isINR ? 8999 : 119,
       priceYearly: isINR ? 7199 : 95,
       period: "/month",
@@ -122,13 +121,14 @@ export default function PricingPage() {
       buttonText: "Start 14-Day Free Trial",
       link: "/register?plan=platinum",
       features: [
-        { text: "Everything in Elite Plan", highlight: true },
-        { text: "3D View (Immersive WebGL Engine)", highlight: true },
-        { text: "AI Agent (Custom Fine-Tuned Model)", highlight: true },
-        { text: "Unlimited Leads & Broadcasts", highlight: false },
-        { text: "Custom Webhooks & API Access", highlight: false },
-        { text: "Dedicated Account Manager & VIP Onboarding", highlight: true },
-        { text: "14-Day Free Trial Included", highlight: true },
+        { text: "Sales CRM: 10 Users", highlight: true },
+        { text: "AI Agent: 10 Languages", highlight: true },
+        { text: "WhatsApp Business: Unlimited Messages", highlight: true },
+        { text: "Website: 10 Pages | Static Site | 1 Year Server Free", highlight: true },
+        { text: "Brochure & Logo: 8 Designs", highlight: false },
+        { text: "Immersive 3D View Rendering", highlight: true },
+        { text: "Mobile View & Website View Included", highlight: false },
+        { text: "Digital Marketing: Full Social Media & Google Ads Suite", highlight: true },
       ],
     },
     {
@@ -136,7 +136,7 @@ export default function PricingPage() {
       name: "Custom Plan",
       badge: "Tailored Architecture",
       description:
-        "Bespoke enterprise setup, dedicated cloud/on-premise deployment, custom AI agents, and SLA guarantees.",
+        "Bespoke enterprise setup with custom users, unlimited languages, dedicated WhatsApp gateway, and custom server stack.",
       isCustomPrice: true,
       priceLabel: "Custom Quote",
       period: "/tailored",
@@ -152,47 +152,46 @@ export default function PricingPage() {
       buttonText: "Contact Sales",
       link: "/about#contact",
       features: [
-        { text: "Everything in Platinum Plan", highlight: true },
-        { text: "Custom Website, Mobile View & Website View Specs", highlight: true },
-        { text: "Dedicated WhatsApp API Instance & Multi-Agent Inbox", highlight: false },
-        { text: "Custom AI Agent Engine & Fine-Tuned Datasets", highlight: true },
-        { text: "Bespoke 3D View Renderings & Custom Assets", highlight: false },
-        { text: "Dedicated Solution Architect & SOC2 Compliance", highlight: false },
-        { text: "Strict SLA Guarantees & 24/7 VIP Phone Support", highlight: true },
+        { text: "Custom Support & Dedicated Architecture", highlight: true },
       ],
     },
   ];
 
   const comparisonFeatures = [
     {
-      category: "Growth Services Included",
+      category: "Sales CRM & AI Services",
       items: [
-        { name: "Website", gold: true, elite: true, platinum: true, custom: "Custom Specs" },
-        { name: "Brochure Logo", gold: true, elite: true, platinum: true, custom: true },
-        { name: "Mobile View", gold: true, elite: true, platinum: true, custom: true },
-        { name: "Website View", gold: true, elite: true, platinum: true, custom: true },
-        { name: "Social Media Creation", gold: false, elite: true, platinum: true, custom: true },
-        { name: "SEO/AEO/GEO, Google Ads", gold: false, elite: true, platinum: true, custom: true },
-        { name: "WhatsApp API", gold: false, elite: true, platinum: true, custom: "Dedicated Instance" },
-        { name: "AI Agent", gold: false, elite: "Standard Agent", platinum: "Custom Trained", custom: "Fine-Tuned Model" },
-        { name: "3D View", gold: false, elite: false, platinum: true, custom: "Custom Assets" },
+        { name: "Sales CRM Capacity", gold: "5 Users", elite: "8 Users", platinum: "10 Users", custom: "Custom Unlimited Users" },
+        { name: "AI Agent Languages", gold: "4 Languages", elite: "8 Languages", platinum: "10 Languages", custom: "Custom Fine-tuned" },
+        { name: "WhatsApp Business Messages", gold: "500 Messages", elite: "1,000 Messages", platinum: "Unlimited Messages", custom: "Unlimited Dedicated" },
       ],
     },
     {
-      category: "Capacity, SLAs & Support",
+      category: "Website & Visualization",
       items: [
-        { name: "Leads & Contacts Capacity", gold: "1,000", elite: "10,000", platinum: "Unlimited", custom: "Unlimited + Isolated DB" },
-        { name: "14-Day Free Trial / Proof of Concept", gold: true, elite: true, platinum: true, custom: "Custom PoC / Demo" },
-        { name: "Support Service Level", gold: "Standard Email", elite: "24/7 Priority", platinum: "VIP & Dedicated Manager", custom: "24/7 Dedicated SLA & Architect" },
+        { name: "Website Package", gold: "4 Pages | Static Site | 1 Year Server Free", elite: "8 Pages | Static Site | 1 Year Server Free", platinum: "10 Pages | Static Site | 1 Year Server Free", custom: "Custom Pages & Dedicated Server" },
+        { name: "Website View Analytics", gold: true, elite: true, platinum: true, custom: true },
+        { name: "Mobile View Analytics", gold: true, elite: true, platinum: true, custom: true },
+        { name: "3D View Rendering", gold: false, elite: false, platinum: true, custom: true },
+      ],
+    },
+    {
+      category: "Branding & Digital Marketing",
+      items: [
+        { name: "Brochure & Logo Designs", gold: "2 Designs", elite: "5 Designs", platinum: "8 Designs", custom: "Unlimited Custom" },
+        { name: "Social Media Creation", gold: true, elite: true, platinum: true, custom: "Dedicated Campaign" },
+        { name: "SEO / AEO / GEO & Google Ads", gold: false, elite: true, platinum: true, custom: "Dedicated Strategy" },
+      ],
+    },
+    {
+      category: "Support & Guarantees",
+      items: [
+        { name: "Support Level", gold: "Standard Email", elite: "24/7 Priority", platinum: "VIP & Account Manager", custom: "24/7 Dedicated Architect & SLA" },
       ],
     },
   ];
 
   const faqs = [
-    {
-      q: "Which services are included in each plan?",
-      a: "Gold Plan includes Website, Brochure Logo, Mobile View, and Website View. Elite Plan adds WhatsApp API, AI Agent, Social Media Creation, and SEO/AEO/GEO, Google Ads. Platinum Plan includes all of the above plus 3D View rendering and custom AI Agent training.",
-    },
     {
       q: "Can I try any plan for free before committing?",
       a: "Yes! All SellGrow standard plans (Gold, Elite, and Platinum) come with a 14-Day Free Trial with no credit card required. For Custom Plans, our sales team can set up a personalized Proof of Concept.",
@@ -200,6 +199,10 @@ export default function PricingPage() {
     {
       q: "What is included in the Custom Plan?",
       a: "The Custom Plan is tailored for enterprise organizations needing custom integrations, dedicated cloud/on-premise deployment, bespoke AI model training, SLA guarantees, and a dedicated solution architect.",
+    },
+    {
+      q: "What is the difference between Gold, Elite, and Platinum?",
+      a: "Gold Plan includes 5 CRM users, 4 AI languages, 500 WhatsApp messages, 4-page site, and 2 logo designs. Elite Plan upgrades to 8 CRM users, 8 AI languages, 1,000 WhatsApp messages, 8-page site, 5 logo designs, and SEO/Google Ads. Platinum Plan offers 10 CRM users, 10 AI languages, Unlimited WhatsApp messages, 10-page site, 8 logo designs, and 3D View rendering.",
     },
     {
       q: "Can I switch plans or upgrade anytime?",
@@ -219,29 +222,16 @@ export default function PricingPage() {
         {/* Ambient Glow */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-primary/5 dark:bg-primary/10 rounded-full blur-[140px] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
           {/* HERO HEADER */}
-          <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/30 shadow-md shadow-primary/10"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>
-                {isINR
-                  ? "🇮🇳 India Pricing (INR ₹)"
-                  : "🌍 Global Pricing (USD $)"}
-              </span>
-            </motion.div>
-
+          <div className="text-center space-y-4 max-w-3xl mx-auto pt-1">
             <motion.h1
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-display text-slate-900 dark:text-white leading-tight"
             >
-              Simple, Transparent Plans for Every Business
+              SellGrow Plans
             </motion.h1>
 
             <motion.p
@@ -255,203 +245,13 @@ export default function PricingPage() {
               <span className="font-bold text-purple-500">Platinum</span>, and{" "}
               <span className="font-bold text-sky-500">Custom</span> plans. Test drive standard plans free for 14 days.
             </motion.p>
-
-            {/* MONTHLY / YEARLY BILLING TOGGLE */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="pt-4 flex items-center justify-center"
-            >
-              <div className="p-1.5 rounded-2xl bg-slate-200/80 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 inline-flex items-center gap-2 shadow-inner">
-                <button
-                  onClick={() => setBillingCycle("monthly")}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
-                    billingCycle === "monthly"
-                      ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-md border border-slate-250 dark:border-slate-700"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                  }`}
-                >
-                  Monthly Billing
-                </button>
-
-                <button
-                  onClick={() => setBillingCycle("yearly")}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-                    billingCycle === "yearly"
-                      ? "bg-gradient-to-r from-primary to-indigo-600 text-white shadow-md shadow-primary/20"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                  }`}
-                >
-                  <Zap className="w-4 h-4" />
-                  <span>Annual Billing</span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[10px] font-black uppercase border border-emerald-500/30">
-                    Save 20%
-                  </span>
-                </button>
-              </div>
-            </motion.div>
           </div>
 
-          {/* 4 PLAN CARDS GRID (GOLD, ELITE, PLATINUM, CUSTOM) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch pt-4">
-            {plans.map((plan, idx) => {
-              const Icon = plan.icon;
-              const price = plan.isCustomPrice
-                ? plan.priceLabel
-                : billingCycle === "yearly"
-                ? plan.priceYearly
-                : plan.priceMonthly;
-              const formattedPrice = plan.isCustomPrice
-                ? plan.priceLabel
-                : isINR
-                ? `₹${price.toLocaleString("en-IN")}`
-                : `$${price}`;
-
-              return (
-                <motion.div
-                  key={plan.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * idx }}
-                  className={`relative p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#090f1d] border flex flex-col justify-between transition-all duration-300 ${
-                    plan.borderStyle
-                  } ${plan.glowStyle} ${
-                    plan.popular ? "lg:-translate-y-3" : ""
-                  }`}
-                >
-                  {/* POPULAR BADGE */}
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[11px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/30 flex items-center gap-1.5">
-                      <Star className="w-3.5 h-3.5 fill-white" />
-                      <span>{plan.badge}</span>
-                    </div>
-                  )}
-
-                  <div className="space-y-6">
-                    {/* Header */}
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="space-y-1">
-                        <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${plan.badgeStyle}`}
-                        >
-                          {plan.badge}
-                        </span>
-                        <h2 className="text-xl font-black text-slate-900 dark:text-white font-display">
-                          {plan.name}
-                        </h2>
-                      </div>
-                      <div
-                        className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${plan.accentGradient} flex items-center justify-center text-white shadow-md shrink-0`}
-                      >
-                        <Icon className="w-5 h-5" />
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium min-h-[48px]">
-                      {plan.description}
-                    </p>
-
-                    {/* Pricing Display */}
-                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-150 dark:border-slate-800 space-y-1">
-                      <div className="flex items-baseline gap-1.5">
-                        <span className={`font-black text-slate-900 dark:text-white font-display ${plan.isCustomPrice ? "text-2xl" : "text-3xl"}`}>
-                          {formattedPrice}
-                        </span>
-                        {!plan.isCustomPrice && (
-                          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                            {plan.period}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 block">
-                        {plan.isCustomPrice
-                          ? plan.billingNote
-                          : billingCycle === "yearly"
-                          ? plan.billingNote
-                          : "Billed monthly"}
-                      </span>
-                    </div>
-
-                    {/* CTA BUTTON */}
-                    <Link
-                      href={plan.link}
-                      className={`w-full py-3.5 px-4 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all ${plan.buttonStyle}`}
-                    >
-                      <span>{plan.buttonText}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-
-                    {/* Features List */}
-                    <div className="space-y-3 pt-2">
-                      <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block font-mono">
-                        Included Capabilities:
-                      </span>
-                      <ul className="space-y-2.5">
-                        {plan.features.map((feat, fIdx) => (
-                          <li
-                            key={fIdx}
-                            className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300 font-medium"
-                          >
-                            <CheckCircle2
-                              className={`w-3.5 h-3.5 mt-0.5 shrink-0 stroke-[2.5] ${
-                                feat.highlight
-                                  ? "text-emerald-500"
-                                  : "text-slate-400 dark:text-slate-500"
-                              }`}
-                            />
-                            <span
-                              className={
-                                feat.highlight
-                                  ? "font-bold text-slate-900 dark:text-white"
-                                  : ""
-                              }
-                            >
-                              {feat.text}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Trust Footer inside card */}
-                  <div className="pt-5 border-t border-slate-150 dark:border-slate-800/80 mt-6 text-center">
-                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                      {plan.isCustomPrice
-                        ? "🤝 Dedicated Solutions Architect"
-                        : "⚡ Instant setup • Cancel anytime"}
-                    </span>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* TRUST GUARANTEES BAR */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#090f1e] border border-slate-200 dark:border-slate-800 shadow-xl flex flex-wrap items-center justify-around gap-6 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-emerald-500" />
-              <span>14-Day Free Trial on Standard Plans</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-amber-500" />
-              <span>No Credit Card Required</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail className="w-5 h-5 text-sky-500" />
-              <span>Custom Enterprise Contracts Available</span>
-            </div>
-          </div>
-
-          {/* DETAILED PLAN COMPARISON MATRIX */}
-          <div className="space-y-6 pt-10">
-            <div className="text-center space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                Detailed Breakdown
-              </span>
+          {/* 1. DETAILED PLAN COMPARISON MATRIX (FIRST) */}
+          <div className="space-y-4 pt-1">
+            <div className="text-center">
               <h2 className="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 dark:text-white">
-                Compare Plan Capabilities
+                Compare Plan Service Specifications
               </h2>
             </div>
 
@@ -463,16 +263,16 @@ export default function PricingPage() {
                       Service Name
                     </th>
                     <th className="p-4 font-black text-amber-600 dark:text-amber-400 text-center w-[20%]">
-                      Gold
+                      Gold Plan
                     </th>
                     <th className="p-4 font-black text-emerald-600 dark:text-emerald-400 text-center w-[20%] bg-emerald-500/5">
-                      Elite
+                      Elite Plan
                     </th>
                     <th className="p-4 font-black text-purple-600 dark:text-purple-400 text-center w-[20%]">
-                      Platinum
+                      Platinum Plan
                     </th>
                     <th className="p-4 font-black text-sky-600 dark:text-sky-400 text-center w-[20%]">
-                      Custom
+                      Custom Plan
                     </th>
                   </tr>
                 </thead>
@@ -489,7 +289,7 @@ export default function PricingPage() {
                       </tr>
                       {sec.items.map((item, iIdx) => (
                         <tr key={iIdx} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
-                          <td className="p-4 font-bold text-slate-800 dark:text-slate-200">
+                          <td className="p-4 font-semibold text-slate-800 dark:text-slate-200">
                             {item.name}
                           </td>
                           <td className="p-4 text-center">
@@ -550,6 +350,201 @@ export default function PricingPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          {/* 2. 4 PLAN CARDS GRID WITH BILLING TOGGLE DIRECTLY BELOW HEADING */}
+          <div className="space-y-6 pt-4">
+            <div className="text-center space-y-3">
+              <h2 className="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 dark:text-white">
+                Choose the Right Tier for Your Scale
+              </h2>
+
+              {/* MONTHLY / YEARLY BILLING TOGGLE BELOW HEADING */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className="pt-2 flex items-center justify-center"
+              >
+                <div className="p-1.5 rounded-2xl bg-slate-200/80 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 inline-flex items-center gap-2 shadow-inner">
+                  <button
+                    onClick={() => setBillingCycle("monthly")}
+                    className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
+                      billingCycle === "monthly"
+                        ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-md border border-slate-250 dark:border-slate-700"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    Monthly Billing
+                  </button>
+
+                  <button
+                    onClick={() => setBillingCycle("yearly")}
+                    className={`px-5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                      billingCycle === "yearly"
+                        ? "bg-gradient-to-r from-primary to-indigo-600 text-white shadow-md shadow-primary/20"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <Zap className="w-4 h-4" />
+                    <span>Annual Billing</span>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[10px] font-black uppercase border border-emerald-500/30">
+                      Save 20%
+                    </span>
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch pt-2">
+              {plans.map((plan, idx) => {
+                const Icon = plan.icon;
+                const price = plan.isCustomPrice
+                  ? plan.priceLabel
+                  : billingCycle === "yearly"
+                  ? plan.priceYearly
+                  : plan.priceMonthly;
+                const formattedPrice = plan.isCustomPrice
+                  ? plan.priceLabel
+                  : isINR
+                  ? `₹${price.toLocaleString("en-IN")}`
+                  : `$${price}`;
+
+                return (
+                  <motion.div
+                    key={plan.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * idx }}
+                    className={`relative p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#090f1d] border flex flex-col justify-between transition-all duration-300 ${
+                      plan.borderStyle
+                    } ${plan.glowStyle} ${
+                      plan.popular ? "lg:-translate-y-3" : ""
+                    }`}
+                  >
+                    {/* POPULAR BADGE */}
+                    {plan.popular && (
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[11px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/30 flex items-center gap-1.5">
+                        <Star className="w-3.5 h-3.5 fill-white" />
+                        <span>{plan.badge}</span>
+                      </div>
+                    )}
+
+                    <div className="space-y-6">
+                      {/* Header */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="space-y-1">
+                          <span
+                            className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${plan.badgeStyle}`}
+                          >
+                            {plan.badge}
+                          </span>
+                          <h2 className="text-xl font-black text-slate-900 dark:text-white font-display">
+                            {plan.name}
+                          </h2>
+                        </div>
+                        <div
+                          className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${plan.accentGradient} flex items-center justify-center text-white shadow-md shrink-0`}
+                        >
+                          <Icon className="w-5 h-5" />
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-slate-600 dark:text-slate-400 font-medium min-h-[48px]">
+                        {plan.description}
+                      </p>
+
+                      {/* Pricing Display */}
+                      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-150 dark:border-slate-800 space-y-1">
+                        <div className="flex items-baseline gap-1.5">
+                          <span className={`font-black text-slate-900 dark:text-white font-display ${plan.isCustomPrice ? "text-2xl" : "text-3xl"}`}>
+                            {formattedPrice}
+                          </span>
+                          {!plan.isCustomPrice && (
+                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                              {plan.period}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 block">
+                          {plan.isCustomPrice
+                            ? plan.billingNote
+                            : billingCycle === "yearly"
+                            ? plan.billingNote
+                            : "Billed monthly"}
+                        </span>
+                      </div>
+
+                      {/* CTA BUTTON */}
+                      <Link
+                        href={plan.link}
+                        className={`w-full py-3.5 px-4 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all ${plan.buttonStyle}`}
+                      >
+                        <span>{plan.buttonText}</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+
+                      {/* Features List */}
+                      <div className="space-y-3 pt-2">
+                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block font-mono">
+                          Included Services:
+                        </span>
+                        <ul className="space-y-2.5">
+                          {plan.features.map((feat, fIdx) => (
+                            <li
+                              key={fIdx}
+                              className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300 font-medium"
+                            >
+                              <CheckCircle2
+                                className={`w-3.5 h-3.5 mt-0.5 shrink-0 stroke-[2.5] ${
+                                  feat.highlight
+                                    ? "text-emerald-500"
+                                    : "text-slate-400 dark:text-slate-500"
+                                }`}
+                              />
+                              <span
+                                className={
+                                  feat.highlight
+                                    ? "font-bold text-slate-900 dark:text-white"
+                                    : ""
+                                }
+                              >
+                                {feat.text}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Trust Footer inside card */}
+                    <div className="pt-5 border-t border-slate-150 dark:border-slate-800/80 mt-6 text-center">
+                      <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                        {plan.isCustomPrice
+                          ? "🤝 Dedicated Solutions Architect"
+                          : "⚡ Instant setup • Cancel anytime"}
+                      </span>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* TRUST GUARANTEES BAR */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-[#090f1e] border border-slate-200 dark:border-slate-800 shadow-xl flex flex-wrap items-center justify-around gap-6 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-emerald-500" />
+              <span>14-Day Free Trial on Standard Plans</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-amber-500" />
+              <span>No Credit Card Required</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Mail className="w-5 h-5 text-sky-500" />
+              <span>Custom Enterprise Contracts Available</span>
             </div>
           </div>
 

@@ -454,11 +454,6 @@ export default function HomePage() {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-primary/10 via-secondary/5 to-transparent blur-3xl pointer-events-none -z-10"/>
 
           <motion.div variants={heroContainerVariants} initial="hidden" animate={pageLoading ? "hidden" : "visible"} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <motion.div variants={heroItemVariants} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 animate-pulse">
-              <Sparkles className="w-3.5 h-3.5"/>
-              <span>{t("heroBadge")}</span>
-            </motion.div>
-
             <motion.h1 variants={heroItemVariants} className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight font-display max-w-4xl mx-auto leading-tight">
               <span className="gradient-text">{t("heroTitle")}</span>
             </motion.h1>
