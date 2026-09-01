@@ -6,10 +6,11 @@ import { Target, Compass, ArrowRight, Sparkles, Cpu, Award, Shield, TrendingUp, 
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
+
 export default function AboutPage() {
     const { language, t } = useLanguage();
     const [activeMilestone, setActiveMilestone] = useState(2);
-    // Set document title and meta description dynamically
+
     useEffect(() => {
         document.title = "About Us | SellGrow Digital Operating System";
         const metaDesc = document.querySelector('meta[name="description"]');
@@ -17,7 +18,7 @@ export default function AboutPage() {
             metaDesc.setAttribute("content", "Learn about SellGrow, our mission to build the world's most intelligent autonomous business CRM, VoIP, and communication engine.");
         }
     }, []);
-    // Translated local contents
+
     const localContent = {
         en: {
             headline: "Reimagining Commerce with Autonomous Intelligence",
@@ -131,220 +132,211 @@ export default function AboutPage() {
             gradient: "from-emerald-500 to-teal-600",
         },
     ];
-    return (<div className="min-h-screen flex flex-col bg-[#070b13] text-slate-100 font-sans transition-colors duration-200">
-      <Navbar />
 
-      <main className="flex-grow pt-16">
-        
-        {/* HERO SECTION */}
-        <section className="relative overflow-hidden pt-12 pb-16 md:pt-16 md:pb-24 border-b border-white/5">
-          {/* Radial ambient lighting */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-gradient-to-b from-primary/15 via-secondary/5 to-transparent blur-3xl pointer-events-none -z-10"/>
+    return (
+        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans transition-colors duration-200">
+            <Navbar />
 
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
-              <Sparkles className="w-3.5 h-3.5"/>
-              <span>{t("about").toUpperCase()}</span>
-            </motion.div>
+            <main className="flex-grow pt-16">
+                {/* HERO SECTION */}
+                <section className="relative overflow-hidden pt-12 pb-16 md:pt-16 md:pb-24 border-b border-slate-200">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-gradient-to-b from-primary/10 via-secondary/5 to-transparent blur-3xl pointer-events-none -z-10"/>
 
-            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }} className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight font-display max-w-4xl mx-auto leading-tight">
-              <span className="gradient-text">{copy.headline}</span>
-            </motion.h1>
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                            <Sparkles className="w-3.5 h-3.5"/>
+                            <span>{t("about").toUpperCase()}</span>
+                        </motion.div>
 
-            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-              {copy.subHeadline}
-            </motion.p>
+                        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }} className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight font-display max-w-4xl mx-auto leading-tight">
+                            <span className="gradient-text">{copy.headline}</span>
+                        </motion.h1>
 
-            {/* Generated Banner Image */}
-            <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.7 }} className="relative rounded-3xl overflow-hidden aspect-[21/9] max-w-5xl mx-auto border border-white/10 shadow-2xl bg-slate-900 group">
-              <img src="/images/about/about_hero.jpg" alt="SellGrow futuristic AI development office" className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-1000 ease-out"/>
-              <div className="absolute inset-0 bg-gradient-to-t from-[#070b13] via-transparent to-transparent opacity-90"/>
-            </motion.div>
-          </div>
-        </section>
+                        <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                            {copy.subHeadline}
+                        </motion.p>
 
-        {/* MISSION & VISION */}
-        <section className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-            
-            {/* Card 1: Mission */}
-            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="p-8 sm:p-10 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-xl relative overflow-hidden flex flex-col justify-between space-y-6">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl"/>
-              
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white shadow-md">
-                  <Target className="w-6 h-6"/>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-bold text-white font-display">
-                  {language === "hi" ? "हमारा मिशन" : language === "ar" ? "رسالتنا" : language === "ta" ? "எங்கள் நோக்கம்" : "Our Core Mission"}
-                </h2>
-                <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                  {copy.mission}
-                </p>
-              </div>
-
-              <div className="text-xs font-semibold text-primary/80 tracking-wide uppercase">
-                // Driven by impact
-              </div>
-            </motion.div>
-
-            {/* Card 2: Vision */}
-            <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="p-8 sm:p-10 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-xl relative overflow-hidden flex flex-col justify-between space-y-6">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-secondary/10 rounded-full blur-2xl"/>
-              
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-secondary to-accent-brand flex items-center justify-center text-white shadow-md">
-                  <Compass className="w-6 h-6"/>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-bold text-white font-display">
-                  {language === "hi" ? "हमारा दृष्टिकोण" : language === "ar" ? "رؤيتنا المستقبليّة" : language === "ta" ? "எங்கள் பார்வை" : "Our Future Vision"}
-                </h2>
-                <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                  {copy.vision}
-                </p>
-              </div>
-
-              <div className="text-xs font-semibold text-secondary/80 tracking-wide uppercase">
-                // Innovation is standard
-              </div>
-            </motion.div>
-
-          </div>
-
-          {/* Founder's note tag */}
-          <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-12 text-center">
-            <p className="text-xs sm:text-sm text-slate-400 italic font-medium">
-              "{copy.founderNote}"
-            </p>
-          </motion.div>
-        </section>
-
-        {/* CORE VALUES */}
-        <section className="py-16 bg-slate-950/40 border-y border-white/5">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white text-center font-display mb-12">
-              {copy.coreValuesTitle}
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-              {coreValues.map((val) => {
-            const Icon = val.icon;
-            return (<motion.div key={val.id} initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="p-6 sm:p-8 rounded-3xl border border-white/5 bg-white/[0.01] hover:border-primary/40 hover:bg-white/[0.02] transition-all duration-300 text-left space-y-4 group">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-105 transition-transform duration-300">
-                      <Icon className="w-5 h-5 text-primary-foreground"/>
+                        <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.7 }} className="relative rounded-3xl overflow-hidden aspect-[21/9] max-w-5xl mx-auto border border-slate-200 shadow-2xl bg-white group">
+                            <img src="/images/about/about_hero.jpg" alt="SellGrow futuristic AI development office" className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-1000 ease-out"/>
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent opacity-80"/>
+                        </motion.div>
                     </div>
-                    <h3 className="text-base sm:text-lg font-bold text-white font-display">
-                      {val.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                      {val.desc}
-                    </p>
-                  </motion.div>);
-        })}
-            </div>
-          </div>
-        </section>
+                </section>
 
-        {/* INTERACTIVE TIMELINE / ROADMAP */}
-        <section className="py-16 md:py-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-4 mb-12">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
-              {copy.timelineTitle}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-              {copy.timelineDesc}
-            </p>
-          </div>
+                {/* MISSION & VISION */}
+                <section className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+                        <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="p-8 sm:p-10 rounded-3xl border border-slate-200 bg-white shadow-lg relative overflow-hidden flex flex-col justify-between space-y-6">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl"/>
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white shadow-md">
+                                    <Target className="w-6 h-6"/>
+                                </div>
+                                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-display">
+                                    {language === "hi" ? "हमारा मिशन" : language === "ar" ? "رسالتنا" : language === "ta" ? "எங்கள் நோக்கம்" : "Our Core Mission"}
+                                </h2>
+                                <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                                    {copy.mission}
+                                </p>
+                            </div>
+                            <div className="text-xs font-semibold text-primary tracking-wide uppercase">
+                                // Driven by impact
+                            </div>
+                        </motion.div>
 
-          {/* Stepper buttons bar */}
-          <div className="flex justify-center items-center gap-2 sm:gap-4 mb-8">
-            {milestones.map((ms, idx) => {
-            const isActive = activeMilestone === idx;
-            return (<button key={idx} id={`milestone-btn-${idx}`} onClick={() => setActiveMilestone(idx)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${isActive
-                    ? "bg-primary text-white shadow-lg shadow-primary/25 border border-primary/45"
-                    : "bg-white/5 hover:bg-white/10 text-slate-400 border border-white/5"}`}>
-                  {ms.year}
-                </button>);
-        })}
-          </div>
+                        <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="p-8 sm:p-10 rounded-3xl border border-slate-200 bg-white shadow-lg relative overflow-hidden flex flex-col justify-between space-y-6">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-secondary/10 rounded-full blur-2xl"/>
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-secondary to-accent-brand flex items-center justify-center text-white shadow-md">
+                                    <Compass className="w-6 h-6"/>
+                                </div>
+                                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-display">
+                                    {language === "hi" ? "हमारा दृष्टिकोण" : language === "ar" ? "رؤيتنا المستقبليّة" : language === "ta" ? "எங்கள் பார்வை" : "Our Future Vision"}
+                                </h2>
+                                <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                                    {copy.vision}
+                                </p>
+                            </div>
+                            <div className="text-xs font-semibold text-secondary tracking-wide uppercase">
+                                // Innovation is standard
+                            </div>
+                        </motion.div>
+                    </div>
 
-          {/* Milestone Details Card */}
-          <div className="min-h-[160px] relative">
-            <AnimatePresence mode="wait">
-              <motion.div key={activeMilestone} initial={{ opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -12, scale: 0.98 }} transition={{ duration: 0.3 }} className="p-6 sm:p-8 rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.02] to-transparent backdrop-blur-xl text-center space-y-4 max-w-2xl mx-auto shadow-xl">
-                <div className="inline-flex items-center gap-1 text-[10px] font-extrabold text-secondary uppercase bg-secondary/15 px-3 py-1 rounded-full border border-secondary/35">
-                  <Award className="w-3.5 h-3.5"/>
-                  <span>{milestones[activeMilestone].year} Milestone</span>
-                </div>
-                <h3 className="text-xl font-bold text-white font-display">
-                  {milestones[activeMilestone].title}
-                </h3>
-                <p className="text-sm text-slate-300 leading-relaxed max-w-xl mx-auto">
-                  {milestones[activeMilestone].desc}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </section>
+                    <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-12 text-center">
+                        <p className="text-xs sm:text-sm text-slate-500 italic font-medium">
+                            "{copy.founderNote}"
+                        </p>
+                    </motion.div>
+                </section>
 
-        {/* TEAM SECTION */}
-        <section className="py-16 md:py-24 bg-slate-950/40 border-t border-white/5">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center space-y-4 mb-14">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
-                {copy.teamTitle}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-                {copy.teamDesc}
-              </p>
-            </div>
+                {/* CORE VALUES */}
+                <section className="py-16 bg-white border-y border-slate-200">
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 text-center font-display mb-12">
+                            {copy.coreValuesTitle}
+                        </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {team.map((t, idx) => (<motion.div key={idx} initial={{ opacity: 0, scale: 0.97 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} whileHover={{ y: -5 }} className="p-6 rounded-3xl border border-white/5 bg-gradient-to-b from-white/[0.02] to-transparent space-y-4 hover:border-primary/30 transition-all duration-300 flex flex-col items-center text-center shadow-lg">
-                  {/* Initials profile bubble */}
-                  <div className={`w-14 h-14 rounded-full bg-gradient-to-tr ${t.gradient} flex items-center justify-center text-white text-base font-black shadow-lg shadow-black/40`}>
-                    {t.avatar}
-                  </div>
-                  <div>
-                    <h3 className="text-base sm:text-lg font-bold text-white font-display">{t.name}</h3>
-                    <p className="text-[11px] font-bold text-slate-400 tracking-wider uppercase mt-1">
-                      {t.role}
-                    </p>
-                  </div>
-                  <div className="text-xs text-primary/80 font-semibold px-3 py-1 rounded-xl bg-primary/10 border border-primary/20">
-                    {t.specialty}
-                  </div>
-                </motion.div>))}
-            </div>
-          </div>
-        </section>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+                            {coreValues.map((val) => {
+                                const Icon = val.icon;
+                                return (
+                                    <motion.div key={val.id} initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="p-6 sm:p-8 rounded-3xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-lg hover:border-primary/40 transition-all duration-300 text-left space-y-4 group">
+                                        <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-105 transition-transform duration-300">
+                                            <Icon className="w-5 h-5 text-primary"/>
+                                        </div>
+                                        <h3 className="text-base sm:text-lg font-bold text-slate-900 font-display">
+                                            {val.title}
+                                        </h3>
+                                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                            {val.desc}
+                                        </p>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
 
-        {/* BOTTOM CALL TO ACTION */}
-        <section className="py-16 md:py-20 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-tr from-primary/10 via-[#070b13] to-secondary/5 border border-white/10 shadow-2xl space-y-6 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none"/>
-            
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
-              {language === "hi" ? "सेलग्रो के साथ अपना व्यवसाय बढ़ाएं" : language === "ar" ? "ابدأ رحلة النمو مع SellGrow" : language === "ta" ? "SellGrow உடன் உங்கள் வணிகத்தை மேம்படுத்துங்கள்" : "Experience the Digital Commerce OS"}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
-              {language === "hi" ? "स्वचालित एआई वॉयस एजेंट्स और एकीकृत ओमनीचैनल इनबॉक्स का उपयोग करके अपनी बिक्री बढ़ाएं।" : language === "ar" ? "زد مبيعاتك وقنوات اتصالك باستخدام وكلاء الصوت بالذكاء الاصطناعي وصندوق الوارد الموحد." : language === "ta" ? "தானியங்கி AI குரல் முகவர்கள் மற்றும் ஒருங்கிணைந்த இன்பாக்ஸ் மூலம் உங்கள் வணிகத்தை வளர்க்கத் தொடங்குங்கள்." : "Unify CRM, WebRTC Voice receptionists, and WhatsApp business API broadcasting under one dashboard."}
-            </p>
+                {/* INTERACTIVE TIMELINE / ROADMAP */}
+                <section className="py-16 md:py-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center space-y-4 mb-12">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">
+                            {copy.timelineTitle}
+                        </h2>
+                        <p className="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto">
+                            {copy.timelineDesc}
+                        </p>
+                    </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <Link href="/register" id="btn-about-register" className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-bold text-xs sm:text-sm hover:opacity-95 shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2">
-                <span>Get Started Now</span>
-                <ArrowRight className="w-4 h-4"/>
-              </Link>
-              <Link href="/pricing" id="btn-about-pricing" className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold text-xs sm:text-sm transition-all">
-                View Modular Pricing
-              </Link>
-            </div>
-          </div>
-        </section>
+                    <div className="flex justify-center items-center gap-2 sm:gap-4 mb-8">
+                        {milestones.map((ms, idx) => {
+                            const isActive = activeMilestone === idx;
+                            return (
+                                <button key={idx} id={`milestone-btn-${idx}`} onClick={() => setActiveMilestone(idx)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${isActive ? "bg-primary text-white shadow-lg shadow-primary/25 border border-primary" : "bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200"}`}>
+                                    {ms.year}
+                                </button>
+                            );
+                        })}
+                    </div>
 
-      </main>
+                    <div className="min-h-[160px] relative">
+                        <AnimatePresence mode="wait">
+                            <motion.div key={activeMilestone} initial={{ opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -12, scale: 0.98 }} transition={{ duration: 0.3 }} className="p-6 sm:p-8 rounded-3xl border border-slate-200 bg-white text-center space-y-4 max-w-2xl mx-auto shadow-xl">
+                                <div className="inline-flex items-center gap-1 text-[10px] font-extrabold text-secondary uppercase bg-secondary/10 px-3 py-1 rounded-full border border-secondary/20">
+                                    <Award className="w-3.5 h-3.5"/>
+                                    <span>{milestones[activeMilestone].year} Milestone</span>
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 font-display">
+                                    {milestones[activeMilestone].title}
+                                </h3>
+                                <p className="text-sm text-slate-600 leading-relaxed max-w-xl mx-auto">
+                                    {milestones[activeMilestone].desc}
+                                </p>
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
+                </section>
 
-      <Footer />
-    </div>);
+                {/* TEAM SECTION */}
+                <section className="py-16 md:py-24 bg-white border-t border-slate-200">
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center space-y-4 mb-14">
+                            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">
+                                {copy.teamTitle}
+                            </h2>
+                            <p className="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto">
+                                {copy.teamDesc}
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                            {team.map((t, idx) => (
+                                <motion.div key={idx} initial={{ opacity: 0, scale: 0.97 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} whileHover={{ y: -5 }} className="p-6 rounded-3xl border border-slate-200 bg-slate-50 space-y-4 hover:border-primary/30 transition-all duration-300 flex flex-col items-center text-center shadow-md">
+                                    <div className={`w-14 h-14 rounded-full bg-gradient-to-tr ${t.gradient} flex items-center justify-center text-white text-base font-black shadow-md`}>
+                                        {t.avatar}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-base sm:text-lg font-bold text-slate-900 font-display">{t.name}</h3>
+                                        <p className="text-[11px] font-bold text-slate-500 tracking-wider uppercase mt-1">
+                                            {t.role}
+                                        </p>
+                                    </div>
+                                    <div className="text-xs text-primary font-semibold px-3 py-1 rounded-xl bg-primary/10 border border-primary/20">
+                                        {t.specialty}
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* BOTTOM CALL TO ACTION */}
+                <section className="py-16 md:py-20 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="p-8 sm:p-12 rounded-3xl bg-white border border-slate-200 shadow-2xl space-y-6 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none"/>
+                        
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">
+                            {language === "hi" ? "सेलग्रो के साथ अपना व्यवसाय बढ़ाएं" : language === "ar" ? "ابدأ رحلة النمو مع SellGrow" : language === "ta" ? "SellGrow உடன் உங்கள் வணிகத்தை மேம்படுத்துங்கள்" : "Experience the Digital Commerce OS"}
+                        </h2>
+                        <p className="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
+                            {language === "hi" ? "स्वचालित एआई वॉयस एजेंट्स और एकीकृत ओमनीचैनल इनबॉक्स का उपयोग करके अपनी बिक्री बढ़ाएं।" : language === "ar" ? "زد مبيعاتك وقنوات اتصالك باستخدام وكلاء الصوت بالذكاء الاصطناعي وصندوق الوارد الموحد." : language === "ta" ? "தானியங்கி AI குரல் முகவர்கள் மற்றும் ஒருங்கிணைந்த இன்பாக்ஸ் மூலம் உங்கள் வணிகத்தை வளர்க்கத் தொடங்குங்கள்।" : "Unify CRM, WebRTC Voice receptionists, and WhatsApp business API broadcasting under one dashboard."}
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                            <Link href="/register" id="btn-about-register" className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-bold text-xs sm:text-sm hover:opacity-95 shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2">
+                                <span>Get Started Now</span>
+                                <ArrowRight className="w-4 h-4"/>
+                            </Link>
+                            <Link href="/pricing" id="btn-about-pricing" className="w-full sm:w-auto px-6 py-3 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm transition-all">
+                                View Modular Pricing
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <Footer />
+        </div>
+    );
 }

@@ -69,7 +69,7 @@ export default function PricingPage() {
     {
       id: "elite",
       name: "Elite Plan",
-      badge: "Most Popular",
+      badge: "Scale Package",
       description:
         "Advanced scale package with 8-page static site, 8 CRM users, 8 AI languages, 1,000 WhatsApp messages, and SEO/Google Ads.",
       priceMonthly: isINR ? 3999 : 49,
@@ -79,7 +79,7 @@ export default function PricingPage() {
         ? "Billed annually (₹38,388/yr)"
         : "Billed annually ($468/yr)",
       accentGradient: "from-emerald-500 via-teal-500 to-emerald-600",
-      badgeStyle: "bg-emerald-500 text-white font-black",
+      badgeStyle: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
       borderStyle: "border-emerald-500 dark:border-emerald-450 ring-2 ring-emerald-500/40",
       glowStyle: "shadow-[0_0_40px_rgba(16,185,129,0.2)]",
       buttonStyle:
@@ -425,15 +425,15 @@ export default function PricingPage() {
                   >
                     {/* POPULAR BADGE */}
                     {plan.popular && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[11px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/30 flex items-center gap-1.5">
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[11px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/30 flex items-center gap-1.5 z-20">
                         <Star className="w-3.5 h-3.5 fill-white" />
-                        <span>{plan.badge}</span>
+                        <span>Most Popular</span>
                       </div>
                     )}
 
                     <div className="space-y-6">
                       {/* Header */}
-                      <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center justify-between gap-2 min-h-[48px]">
                         <div className="space-y-1">
                           <span
                             className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${plan.badgeStyle}`}
@@ -451,12 +451,12 @@ export default function PricingPage() {
                         </div>
                       </div>
 
-                      <p className="text-xs text-slate-600 dark:text-slate-400 font-medium min-h-[48px]">
+                      <p className="text-xs text-slate-600 dark:text-slate-400 font-medium min-h-[52px] flex items-center">
                         {plan.description}
                       </p>
 
                       {/* Pricing Display */}
-                      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-150 dark:border-slate-800 space-y-1">
+                      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-150 dark:border-slate-800 space-y-1 min-h-[76px] flex flex-col justify-center">
                         <div className="flex items-baseline gap-1.5">
                           <span className={`font-black text-slate-900 dark:text-white font-display ${plan.isCustomPrice ? "text-2xl" : "text-3xl"}`}>
                             {formattedPrice}
@@ -479,10 +479,10 @@ export default function PricingPage() {
                       {/* CTA BUTTON */}
                       <Link
                         href={plan.link}
-                        className={`w-full py-3.5 px-4 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all ${plan.buttonStyle}`}
+                        className={`w-full min-h-[48px] px-4 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all leading-tight text-center ${plan.buttonStyle}`}
                       >
                         <span>{plan.buttonText}</span>
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="w-4 h-4 shrink-0" />
                       </Link>
 
                       {/* Features List */}

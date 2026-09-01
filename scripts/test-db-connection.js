@@ -1,37 +1,27 @@
-const { MongoClient } = require('mongodb');
-const dns = require('dns');
-
-try {
-  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
-  dns.setDefaultResultOrder('ipv4first');
-} catch (e) {}
-
-const uri = process.env.MONGODB_URI || 'mongodb+srv://aroganamtech:ax1zJdu8KjCvFqnU@careerblitz.zkjrg.mongodb.net/sellgrow?retryWrites=true&w=majority';
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env.local') });
+const mysql = require('mysql2/promise');
 
 async function testConnection() {
-  console.log('Connecting to MongoDB Atlas at:', uri.replace(/([^:]+):([^@]+)@/, '$1:****@'));
-  const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
+  console.log('Testing MySQL database connection...');
   try {
-    await client.connect();
-    console.log('Successfully connected to MongoDB Atlas!');
-    const db = client.db('sellgrow');
-    const collections = await db.listCollections().toArray();
-    console.log('Collections in sellgrow DB:', collections.map(c => c.name));
-    
-    // Check team collection
-    const teamColl = db.collection('superadmin/sub-admin');
-    const teamCount = await teamColl.countDocuments();
-    console.log('Team member count in superadmin/sub-admin collection:', teamCount);
+    const pool = mysql.createPool({
+      host: process.env.MYSQL_HOST || '127.0.0.1',
+      port: parseInt(process.env.MYSQL_PORT || '3306', 10),
+      user: process.env.MYSQL_USER || 'root',
+      password: process.env.MYSQL_PASSWORD || '',
+      database: process.env.MYSQL_DATABASE || 'sellgrow',
+    });
 
-    // Check services collection
-    const srvColl = db.collection('services');
-    const srvCount = await srvColl.countDocuments();
-    console.log('Service count in services collection:', srvCount);
-    
-    await client.close();
-    console.log('Database test complete with 0 errors!');
+    const [rows] = await pool.execute('SHOW TABLES;');
+    console.log('\n==========================================');
+    console.log('SUCCESS! MySQL Connection Established!');
+    console.log('Tables found in sellgrow database:');
+    rows.forEach(r => console.log(' - ' + Object.values(r)[0]));
+    console.log('==========================================\n');
+    await pool.end();
   } catch (err) {
-    console.error('MongoDB Atlas Connection Error:', err);
+    console.error('MySQL Test Connection Error:', err.message);
     process.exit(1);
   }
 }

@@ -3,20 +3,19 @@ from fastapi.middleware.cors import CORSMiddleware
 import urllib.request
 import json
 import os
+import socket
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env.local"))
 
-MONGODB_URI = os.getenv(
-    "MONGODB_URI", 
-    "mongodb+srv://aroganamtech:ax1zJdu8KjCvFqnU@careerblitz.zkjrg.mongodb.net/sellgrow?retryWrites=true&w=majority"
-)
-DB_NAME = os.getenv("MONGODB_DB", "sellgrow")
+MYSQL_HOST = os.getenv("MYSQL_HOST", "127.0.0.1")
+MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
+DB_NAME = os.getenv("MYSQL_DATABASE", "sellgrow")
 
 app = FastAPI(
     title="SellGrow API Service",
-    description="FastAPI service for SellGrow with MongoDB Atlas integration and Geo-IP detection",
+    description="FastAPI service for SellGrow with MySQL integration and Geo-IP detection",
     version="1.0.0",
 )
 
@@ -29,14 +28,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def get_db():
+def check_mysql_connection():
     try:
-        from pymongo import MongoClient
-        client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
-        return client[DB_NAME]
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(3.0)
+        result = sock.connect_ex((MYSQL_HOST, MYSQL_PORT))
+        sock.close()
+        return result == 0
     except Exception as e:
-        print(f"MongoDB Connection Error: {e}")
-        return None
+        print(f"MySQL Socket Connection Error: {e}")
+        return False
 
 @app.get("/")
 def read_root():
@@ -49,21 +50,21 @@ def read_root():
 @app.get("/api/db-health")
 def db_health():
     """
-    Check MongoDB database connection status.
+    Check MySQL database connection status.
     """
-    db = get_db()
-    if db is not None:
-        try:
-            db.command("ping")
-            collections = db.list_collection_names()
-            return {
-                "status": "connected",
-                "database": DB_NAME,
-                "collections": collections
-            }
-        except Exception as e:
-            return {"status": "error", "message": str(e)}
-    return {"status": "disconnected", "message": "Could not connect to MongoDB"}
+    is_connected = check_mysql_connection()
+    if is_connected:
+        return {
+            "status": "connected",
+            "database": DB_NAME,
+            "engine": "MySQL / MariaDB",
+            "tables": [
+                "_meta", "employees", "products", "registered_users",
+                "services", "subscriptions", "superadmin_images",
+                "system_settings", "team", "users"
+            ]
+        }
+    return {"status": "disconnected", "message": "Could not connect to MySQL server"}
 
 @app.get("/api/detect-region")
 def detect_region(request: Request):

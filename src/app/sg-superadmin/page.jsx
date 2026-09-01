@@ -134,10 +134,6 @@ export default function SuperAdminChoicePage() {
                   <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform"/>
                   Return to Site
                 </Link>
-                <button onClick={toggleTheme} className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center gap-1.5 font-medium">
-                  {theme === "dark" ? <Moon className="w-3.5 h-3.5"/> : <Sun className="w-3.5 h-3.5"/>}
-                  {theme === "dark" ? "Dark Mode" : "Light Mode"}
-                </button>
               </div>
             </div>
           </div>
@@ -323,11 +319,6 @@ export default function SuperAdminChoicePage() {
             <Home className="w-3.5 h-3.5"/>
             Return to Public Site
           </Link>
-          <span className="w-px h-3.5 bg-slate-300 dark:bg-slate-700 hidden sm:block"/>
-          <button onClick={toggleTheme} className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors inline-flex items-center gap-1.5">
-            {theme === "dark" ? <Moon className="w-3.5 h-3.5"/> : <Sun className="w-3.5 h-3.5"/>}
-            {theme === "dark" ? "Dark Mode" : "Light Mode"}
-          </button>
           <span className="w-px h-3.5 bg-slate-300 dark:bg-slate-700 hidden sm:block"/>
           <span className="inline-flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"/>

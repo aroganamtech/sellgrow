@@ -25,35 +25,29 @@ const getPageThemeKey = (pathname) => {
 export const ThemeProvider = ({ children }) => {
     const pathname = usePathname();
     const pageKey = getPageThemeKey(pathname || "");
-    const [theme, setTheme] = useState("dark");
+    const [theme, setTheme] = useState("light");
     useEffect(() => {
         if (typeof window === "undefined")
             return;
-        const savedTheme = localStorage.getItem(pageKey);
-        let activeTheme;
-        if (savedTheme === "light" || savedTheme === "dark") {
-            activeTheme = savedTheme;
-        }
-        else {
-            activeTheme = document.documentElement.classList.contains("dark") ? "dark" : "light";
-        }
-        setTheme(activeTheme);
-        document.documentElement.classList.toggle("dark", activeTheme === "dark");
+        setTheme("light");
+        document.documentElement.classList.remove("dark");
+        try {
+            localStorage.setItem(pageKey, "light");
+        } catch(e) {}
     }, [pathname, pageKey]);
     const toggleTheme = () => {
-        const newTheme = theme === "light" ? "dark" : "light";
-        setTheme(newTheme);
+        setTheme("light");
         if (typeof window !== "undefined") {
-            localStorage.setItem(pageKey, newTheme);
+            try { localStorage.setItem(pageKey, "light"); } catch(e) {}
         }
-        document.documentElement.classList.toggle("dark", newTheme === "dark");
+        document.documentElement.classList.remove("dark");
     };
-    const setPageTheme = (newTheme) => {
-        setTheme(newTheme);
+    const setPageTheme = () => {
+        setTheme("light");
         if (typeof window !== "undefined") {
-            localStorage.setItem(pageKey, newTheme);
+            try { localStorage.setItem(pageKey, "light"); } catch(e) {}
         }
-        document.documentElement.classList.toggle("dark", newTheme === "dark");
+        document.documentElement.classList.remove("dark");
     };
     return (<ThemeContext.Provider value={{ theme, toggleTheme, setPageTheme }}>
       {children}

@@ -1369,16 +1369,6 @@ export default function AdminGrowthPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            {/* Theme switcher */}
-            <button onClick={toggleTheme} className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-808 text-slate-700 dark:text-slate-300 transition-colors shadow-sm flex items-center gap-1.5 text-xs font-bold" title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}>
-              {theme === "dark" ? (<>
-                  <Sun className="w-4 h-4 text-amber-400"/>
-                  <span className="hidden sm:inline">Light</span>
-                </>) : (<>
-                  <Moon className="w-4 h-4 text-indigo-600"/>
-                  <span className="hidden sm:inline">Dark</span>
-                </>)}
-            </button>
 
             {/* Back to hub */}
             <button onClick={() => router.push("/sg-superadmin")} className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 hover:bg-slate-202 dark:hover:bg-slate-800 text-xs font-semibold text-slate-705 dark:text-slate-300 transition-colors flex items-center gap-1.5">

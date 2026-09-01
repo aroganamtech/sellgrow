@@ -2075,11 +2075,6 @@ export default function DashboardPage() {
 
           <span className="w-px h-6 bg-border hidden sm:block"/>
 
-          {/* Theme Toggle */}
-          <button onClick={toggleTheme} className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors" aria-label="Toggle Theme">
-            {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400"/> : <Moon className="w-4 h-4"/>}
-          </button>
-
           {/* Language Dropdown Select */}
           <div className="relative flex items-center">
             <Globe className="w-3.5 h-3.5 absolute left-2.5 text-muted-foreground pointer-events-none"/>
@@ -2125,7 +2120,6 @@ export default function DashboardPage() {
                   <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 text-white font-bold flex items-center justify-center text-xs shadow-sm ring-2 ring-primary/20">
                     {(user?.name || "Naveen S").split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
                   </div>
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-[#0c1220] ring-1 ring-emerald-500/20"></span>
                 </div>
                 <div className="overflow-hidden">
                   <p className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-tight truncate">{user?.name || "Naveen S"}</p>

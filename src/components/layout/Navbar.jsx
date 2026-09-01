@@ -58,11 +58,6 @@ export default function Navbar() {
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            {/* Theme Toggle */}
-            <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors" aria-label="Toggle Theme" title="Toggle Light/Dark Theme">
-              {mounted && theme === "light" ? <Moon className="w-5 h-5"/> : <Sun className="w-5 h-5 text-amber-400"/>}
-            </button>
-
             {/* Region Selector (Auto IP vs Manual) */}
             <div className="relative">
               <button onClick={() => {
@@ -138,9 +133,6 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <div className="flex items-center md:hidden gap-2">
-            <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground">
-              {mounted && theme === "light" ? <Moon className="w-5 h-5"/> : <Sun className="w-5 h-5 text-amber-400"/>}
-            </button>
             <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground">
               {mobileMenuOpen ? <X className="w-6 h-6"/> : <Menu className="w-6 h-6"/>}
             </button>

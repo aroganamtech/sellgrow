@@ -53,11 +53,11 @@ export default function LoginPage() {
           </div>)}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
           <div className="space-y-1">
             <label className="text-xs font-semibold text-muted-foreground" htmlFor="email-input">{t("emailLabel")}</label>
             <div className="relative">
-              <input id="email-input" type="email" required placeholder="Enter email address" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full pl-10 pr-3 py-2 text-sm glass-input focus:outline-none"/>
+              <input id="email-input" name="email" type="email" required placeholder="Enter email address" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="off" className="w-full pl-10 pr-3 py-2 text-sm glass-input focus:outline-none"/>
               <Mail className="w-4 h-4 text-muted absolute left-3 top-3"/>
             </div>
           </div>
@@ -65,7 +65,7 @@ export default function LoginPage() {
           <div className="space-y-1">
             <label className="text-xs font-semibold text-muted-foreground" htmlFor="password-input">{t("passwordLabel")}</label>
             <div className="relative">
-              <input id="password-input" type="password" required placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-10 pr-3 py-2 text-sm glass-input focus:outline-none"/>
+              <input id="password-input" name="password" type="password" required placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" className="w-full pl-10 pr-3 py-2 text-sm glass-input focus:outline-none"/>
               <Lock className="w-4 h-4 text-muted absolute left-3 top-3"/>
             </div>
           </div>
@@ -80,7 +80,7 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <button type="submit" disabled={isLoading} className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold rounded-xl hover:opacity-95 disabled:opacity-50 transition-all shadow-md">
+          <button type="submit" disabled={isLoading} className="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold rounded-xl disabled:opacity-50 transition-all shadow-md shadow-blue-500/20">
             {isLoading ? (<>
                 <Loader2 className="w-4 h-4 animate-spin"/>
                 <span>{t("signingIn")}</span>
