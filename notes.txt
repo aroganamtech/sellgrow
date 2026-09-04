@@ -2,3 +2,92 @@ python brochure_ai_model/train_pdf_folder.py --epochs 10
 python brochure_ai_model/train_pdf_folder.py --pdf_dir brochure_ai_model/PDF --epochs 5 --output_json pdf_folder_training_dataset.json
 npm run build
 npm run dev
+
+
+open Api = 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
+sarvam = sk_8xaeu01n_9NNgIaWiPuxDz2s1fEc7Py7P
+
+model = 
+  "openrouter/bert-nebulon-alpha": "$OPENROUTER_API_KEY",
+
+  "x-ai/grok-4.1-fast:free": "$GROK_FAST_API_KEY",
+  "x-ai/grok-4.1-fast:v1": "$GROK_FAST_API_KEY",
+  "x-ai/grok-4.1-fast:v2": "$GROK_FAST_API_KEY",
+  "x-ai/grok-4.1-fast:v3": "$GROK_FAST_API_KEY",
+
+  "google/gemini-3-pro-preview": "$GEMINI_3_PRO_API_KEY",
+  "google/gemini-3-pro": "$GEMINI_3_PRO_API_KEY",
+  "google/gemini-3-pro-image-preview": "$GEMINI_3_PRO_API_KEY",
+
+  "meta-llama/llama-3.2-3b": "$META_LLAMA_3_2_3B_API_KEY",
+  "meta-llama/llama-3.2-3b-instruct": "$META_LLAMA_3_2_3B_API_KEY",
+
+  "openrouter/bert-nebulon-alpha": "$BERT_NEBULON_ALPHA_API_KEY",
+  "openrouter/bert-nebulon-alpha:free": "$BERT_NEBULON_ALPHA_API_KEY",
+
+  "mistralai/mistral-7b-instruct-v0.3": "$MISTRAL_7B_INSTRUCT_API_KEY",
+
+  "anthropic/claude-4-5-sonnet": "$CLAUDE_4_5_SONNET_API_KEY",
+  "anthropic/claude-3-5-sonnet": "$CLAUDE_4_5_SONNET_API_KEY",
+
+  "google/gemini-2.5-pro": "$GEMINI_2_5_PRO_API_KEY",
+  "google/gemini-3-pro-preview": "$GEMINI_3_PRO_API_KEY",
+  "google/gemini-2.5-flash-lite": "$GEMINI_2_5_FLASH_LITE_API_KEY",
+
+  "mistralai/mistral-7b-instruct-v0.3": "$MISTRAL_7B_INSTRUCT_API_KEY",
+
+  "qwen/qwen3-coder-30b": "$QWEN_3_CODER_30B_API_KEY",
+  "qwen/qwen3-max": "$QWEN_3_MAX_API_KEY",
+
+  "moonshotai/kimi-k2": "$KIMI_K2_API_KEY",
+  "moonshotai/kimi-k2-thinking": "$KIMI_K2_API_KEY",
+  "moonshotai/kimi-k2-thinking-v2": "$KIMI_K2_API_KEY",
+
+  "openai/gpt-4o-mini": "$OPENAI_GPT_4O_MINI_API_KEY",
+
+  "sarvam/sarvam-4-v1": "$SARVAM_4_V1_API_KEY",
+  "sarvam/sarvam-4-fast-v1": "$SARVAM_4_FAST_V1_API_KEY",
+  "sarvam/sarvam-4-v1-1": "$SARVAM_4_V1_1_API_KEY",
+
+  "groq/llama-3.3-70b-versatile": "$GROQ_LLAMA_3_3_70B_API_KEY",
+
+  "google/gemma-3-4b-it": "$GOGGLE_GEMMA_3_4B_IT_API_KEY",
+  "google/gemma-3-27b-it": "$GOGGLE_GEMMA_3_27B_IT_API_KEY",
+  "google/gemma-3-4b": "$GOGGLE_GEMMA_3_4B_API_KEY",
+  "google/gemma-3-27b": "$GOGGLE_GEMMA_3_27B_API_KEY",
+
+  "meta-llama/llama-3.3-70b-versatile": "$META_LLAMA_3_3_70B_API_KEY",
+
+  "openrouter/moonshotai/kimi-k2-thinking": "$KIMI_K2_API_KEY",
+
+  "google/gemini-flash-lite-latest": "$GEMINI_FLASH_LITE_API_KEY",
+  "google/gemini-flash-latest": "$GEMINI_FLASH_LITE_API_KEY",
+
+  "google/gemini-2.0-flash": "$GEMINI_2_0_FLASH_API_KEY",
+
+  "google/gemini-flash-1.5-latest": "$GEMINI_FLASH_1_5_API_KEY",
+  "google/gemini-pro-1.5-latest": "$GEMINI_FLASH_1_5_API_KEY",
+
+  "google/gemma-2-2b-it": "$GOGGLE_GEMMA_2_2B_IT_API_KEY",
+  "google/gemma-2-9b-it": "$GOGGLE_GEMMA_2_9B_IT_API_KEY",
+
+  "google/gemini-1.5-flash-001": "$GEMINI_1_5_FLASH_API_KEY",
+  "google/gemini-pro-1.5-001": "$GEMINI_FLASH_1_5_API_KEY",
+
+  "qwen/qwen-3-coder-4b-instruct": "$QWEN_3_CODER_4B_INSTRUCT_API_KEY",
+
+  "anthropic/claude-3-5-sonnet-20240620": "$CLAUDE_3_5_SONNET_API_KEY",
+  "anthropic/claude-sonnet-4-5-20250929": "$CLAUDE_SONNET_4_5_API_KEY",
+
+  "nvidia/nemotron-nano-4b-instruct-v2": "$NVIDIA_NEMOTRON_NANO_4B_API_KEY",
+
+  "meta-llama/llama-3.2-1b-instruct": "$META_LLAMA_3_2_1B_API_KEY",
+
+  "mistralai/mistral-8x22b": "$MISTRAL_8X22B_API_KEY",
+  "mistralai/mistral-8x22b-instruct": "$MISTRAL_8X22B_API_KEY",
+
+  "moonshotai/kimi-k2-thinking-v3": "$KIMI_K2_API_KEY",
+  "moonshotai/kimi-k2-thinking-v3-instruct": "$KIMI_K2_API_KEY",
+
+  "alibaba/tongyi-deepresearch-8b-a3b": "$ALIBABA_TONGYI_DEEPRESEARCH_API_KEY",
+  "alibaba/tongyi-deepresearch-8b-a3b-instruct": "$
