@@ -216,8 +216,6 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white relative transition-colors duration-300">
-      <Navbar />
-
       <main className="flex-grow pt-20 pb-16 md:pt-24 md:pb-24 relative z-10 overflow-x-hidden">
         {/* Ambient Glow */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-primary/5 dark:bg-primary/10 rounded-full blur-[140px] pointer-events-none" />

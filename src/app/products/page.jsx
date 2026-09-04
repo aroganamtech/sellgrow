@@ -226,20 +226,32 @@ export default function ProductsPage() {
         let autoImage = extractedData.image || "";
         if (!autoImage) {
             const lower = pdfName.toLowerCase();
-            if (lower.includes("4sp") || lower.includes("brush_cutter_4sp_pr")) {
-                autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
-            }
-            else if (lower.includes("bc_520") || lower.includes("bc-520")) {
-                autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png";
+            if (lower.includes("ch110") || lower.includes("combine") || lower.includes("harvester")) {
+                autoImage = "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=600&auto=format&fit=crop&q=80";
             }
             else if (lower.includes("m700")) {
-                autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
+                autoImage = "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&auto=format&fit=crop&q=80";
             }
             else if (lower.includes("m800")) {
+                autoImage = "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80";
+            }
+            else if (lower.includes("wm-990") || lower.includes("wm_990") || lower.includes("990")) {
+                autoImage = "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80";
+            }
+            else if (lower.includes("tiller") || lower.includes("mahaveer")) {
+                autoImage = "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&auto=format&fit=crop&q=80";
+            }
+            else if (lower.includes("reaper") || lower.includes("5pr") || lower.includes("7pr")) {
+                autoImage = "https://images.unsplash.com/photo-1589923188900-85dae523342b?w=600&auto=format&fit=crop&q=80";
+            }
+            else if (lower.includes("4sp") || lower.includes("brush_cutter_4sp_pr")) {
                 autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
             }
-            else {
+            else if (lower.includes("bc_520") || lower.includes("bc-520") || lower.includes("cutter") || lower.includes("brush")) {
                 autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png";
+            }
+            else {
+                autoImage = "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&auto=format&fit=crop&q=80";
             }
         }
         setBrochureData(prev => ({
@@ -311,6 +323,15 @@ export default function ProductsPage() {
             }
         };
         ProductPdfIntelligenceModel.selfTrainOnNewBrochure(pdfDocName, newProduct.name, newProduct.category, finalSpecs, finalHighlights, companyBrand);
+        try {
+            await fetch('/api/admin/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newProduct)
+            });
+        } catch (err) {
+            console.error("Failed to save brochure product to database:", err);
+        }
         setProductsList(prev => {
             const updated = [newProduct, ...prev];
             if (typeof window !== "undefined") {
@@ -320,7 +341,7 @@ export default function ProductsPage() {
             return updated;
         });
         setIsBrochureModalOpen(false);
-        alert(`🎉 Successfully saved "${newProduct.name}"!\nIt is now published live on the Products page.`);
+        alert(`🎉 Successfully saved "${newProduct.name}" to database!\nIt is now published live on the Products page.`);
     };
     // Voice AI Modal TTS states (English, Hindi, Tamil)
     const [voiceLang, setVoiceLang] = useState("en");
@@ -428,8 +449,27 @@ export default function ProductsPage() {
     const [holoUserQuery, setHoloUserQuery] = useState("");
     const [holoAiHistory, setHoloAiHistory] = useState([]);
     const [isListening, setIsListening] = useState(false);
+    const [isLiveConvActive, setIsLiveConvActive] = useState(false);
+    const isLiveConvActiveRef = React.useRef(false);
+    const isSpeakingRef = React.useRef(false);
+    const recognitionRef = React.useRef(null);
+    const holoChatEndRef = React.useRef(null);
     const [holoActiveTab, setHoloActiveTab] = useState("specs");
     const [isHoloAiPanelOpen, setIsHoloAiPanelOpen] = useState(false);
+
+    React.useEffect(() => {
+        isLiveConvActiveRef.current = isLiveConvActive;
+    }, [isLiveConvActive]);
+
+    React.useEffect(() => {
+        isSpeakingRef.current = isSpeaking;
+    }, [isSpeaking]);
+
+    React.useEffect(() => {
+        if (holoActiveTab === "chat" && holoChatEndRef.current) {
+            holoChatEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [holoAiHistory, holoActiveTab]);
     const handleHoloLangChange = (lang) => {
         setHoloAiLang(lang);
         stopTTS();
@@ -482,6 +522,8 @@ export default function ProductsPage() {
         const isPrice = q.includes("price") || q.includes("cost") || q.includes("rate") || q.includes("buy") || q.includes("purchase") || q.includes("விலை") || q.includes("कीमत") || q.includes("मूल्य") || q.includes("दाम");
         const isCut = q.includes("cut") || q.includes("width") || q.includes("blade") || q.includes("tilling") || q.includes("வெட்டு") || q.includes("कटिंग") || q.includes("चौड़ाई") || q.includes("ब्लेड");
         const isGreeting = q.includes("hello") || q.includes("hi") || q.includes("hey") || q.includes("namaste") || q.includes("vanakkam") || q.includes("வணக்கம்") || q.includes("नमस्ते") || q.includes("प्रणाम");
+        const isGeneralProduct = q.includes("spec") || q.includes("detail") || q.includes("info") || q.includes("feature") || q.includes("about") || q.includes("warranty") || q.includes("guarantee") || q.includes("product") || q.includes("machine") || q.includes("tool") || q.includes("equipment") || q.includes("help") || q.includes("விவரம்") || q.includes("தகவல்") || q.includes("தயாரிப்பு") || q.includes("जानकारी") || q.includes("विवरण") || q.includes("उत्पाद") || (name && q.includes(name.toLowerCase()));
+
         if (lang === "hi") {
             if (isPower)
                 return `${name} का अधिकतम पावर आउटपुट ${pwr} है। यह 4-स्ट्रोक एयर-कूल्ड इंजन के साथ आता है जो कठिन कृषि, कटाई और भारी मैदानी काम के लिए उच्च शक्ति और बेहतरीन परफॉरमेंस प्रदान करता है।`;
@@ -497,7 +539,9 @@ export default function ProductsPage() {
                 return `${name} की कटाई चौड़ाई ${cutWidth} है। इसमें उच्च गुणवत्ता वाले स्टील ब्लेड दिए गए हैं जो फसल कटाई और घास सफाई के लिए उपयुक्त हैं।`;
             if (isGreeting)
                 return `नमस्ते! मैं ${name} का AI उत्पाद सहायक हूँ। आप मुझसे इंजन, पावर, वजन या कीमत के बारे में हिंदी में कुछ भी पूछ सकते हैं!`;
-            return `${name} की संपूर्ण जानकारी: इंजन डिप्लेसमेंट ${disp}, इंजन प्रकार ${eng}, अधिकतम पावर ${pwr}, और कुल वजन ${wt} है। यह 100% शुद्ध पेट्रोल पर चलने वाला एक शक्तिशाली और टिकाऊ ब्रश कटर है।`;
+            if (isGeneralProduct)
+                return `${name} की संपूर्ण जानकारी: इंजन डिप्लेसमेंट ${disp}, इंजन प्रकार ${eng}, अधिकतम पावर ${pwr}, और कुल वजन ${wt} है। यह 100% शुद्ध पेट्रोल पर चलने वाला एक शक्तिशाली और टिकाऊ ब्रश कटर है।`;
+            return `यह जानकारी आधिकारिक ब्रोशर में उपलब्ध नहीं है। कृपया ब्रोशर में दी गई उत्पाद विशेषताओं (इंजन, पावर, वजन या कीमत) के बारे में ही सवाल पूछें!`;
         }
         if (lang === "ta") {
             if (isPower)
@@ -514,7 +558,9 @@ export default function ProductsPage() {
                 return `${name} இன் வெட்டு/வேலை அகலம் ${cutWidth} ஆகும்.`;
             if (isGreeting)
                 return `வணக்கம்! நான் ${name} இன் AI தயாரிப்பு உதவியாளர். எஞ்சின், பவர் மற்றும் விலை பற்றிய கேள்விகளைக் கேட்கலாம்!`;
-            return `${name} விவரக்குறிப்புகள்: எஞ்சின் கொள்ளளவு ${disp}, வகை ${eng}, ஆற்றல் ${pwr}, எடை ${wt} ஆகும்.`;
+            if (isGeneralProduct)
+                return `${name} விவரக்குறிப்புகள்: எஞ்சின் கொள்ளளவு ${disp}, வகை ${eng}, ஆற்றல் ${pwr}, எடை ${wt} ஆகும்.`;
+            return `இந்த விவரம் அதிகாரப்பூர்வ பிராச்சரில் இல்லை. தயவுசெய்து பிராச்சரில் உள்ள தயாரிப்பு விவரங்களை (எஞ்சின், பவர், எடை அல்லது விலை) மட்டுமே கேட்கவும்!`;
         }
         // Default English
         if (isPower)
@@ -531,24 +577,91 @@ export default function ProductsPage() {
             return `The cutting/working width of ${name} is ${cutWidth} equipped with heavy-duty steel blades.`;
         if (isGreeting)
             return `Hello! I am your AI Product Assistant for ${name}. Feel free to ask me anything about engine specs, power output, weight, or pricing!`;
-        return `${name} Specifications: Engine ${eng}, Displacement ${disp}, Max Power Output ${pwr}, and Weight ${wt}. Pure petrol operation with high fuel efficiency.`;
+        if (isGeneralProduct)
+            return `${name} Specifications: Engine ${eng}, Displacement ${disp}, Max Power Output ${pwr}, and Weight ${wt}. Pure petrol operation with high fuel efficiency.`;
+        return `The requested detail is not available in the official product brochure. Please ask about the specifications listed in the brochure!`;
     };
-    const handleHoloVoiceQuerySubmit = (queryText) => {
+    const toggleLiveVoiceConversation = () => {
+        if (isLiveConvActiveRef.current) {
+            setIsLiveConvActive(false);
+            isLiveConvActiveRef.current = false;
+            if (recognitionRef.current) {
+                try { recognitionRef.current.abort(); } catch (e) { }
+            }
+            setIsListening(false);
+            stopTTS();
+        } else {
+            setIsLiveConvActive(true);
+            isLiveConvActiveRef.current = true;
+            stopTTS();
+            handleStartVoiceListening(holoAiLang, (transcript) => {
+                setHoloUserQuery(transcript);
+                handleHoloVoiceQuerySubmit(transcript);
+            }, true);
+        }
+    };
+
+    const stopAllVoiceAndLiveMode = () => {
+        setIsLiveConvActive(false);
+        isLiveConvActiveRef.current = false;
+        if (recognitionRef.current) {
+            try { recognitionRef.current.abort(); } catch (e) { }
+        }
+        setIsListening(false);
+        stopTTS();
+    };
+
+    React.useEffect(() => {
+        if (!is3DModalOpen) {
+            stopAllVoiceAndLiveMode();
+        }
+    }, [is3DModalOpen]);
+
+    const handleHoloVoiceQuerySubmit = async (queryText) => {
         if (!queryText.trim() || !hologramProduct)
             return;
         const q = queryText.trim();
         setHoloUserQuery("");
         setHoloActiveTab("chat");
         setHoloAiHistory((prev) => [...prev, { sender: "user", text: q }]);
-        setTimeout(() => {
-            if (!hologramProduct)
-                return;
-            const answer = getSmartAiAnswer(hologramProduct, q, holoAiLang);
-            setHoloAiHistory((prev) => [...prev, { sender: "ai", text: answer }]);
-            speakTTS(answer, holoAiLang);
-        }, 300);
+
+        let answer = "";
+        try {
+            const aiRes = await fetch("/api/ai/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ product: hologramProduct, query: q, lang: holoAiLang }),
+            });
+            if (aiRes.ok) {
+                const aiData = await aiRes.json();
+                if (aiData?.text) {
+                    answer = aiData.text;
+                }
+            }
+        } catch (err) {
+            console.warn("Sarvam AI Chat API request error, falling back:", err);
+        }
+
+        if (!answer) {
+            answer = getSmartAiAnswer(hologramProduct, q, holoAiLang);
+        }
+
+        setHoloAiHistory((prev) => [...prev, { sender: "ai", text: answer }]);
+        speakTTS(answer, holoAiLang, () => {
+            if (isLiveConvActiveRef.current) {
+                setTimeout(() => {
+                    if (isLiveConvActiveRef.current) {
+                        handleStartVoiceListening(holoAiLang, (transcript) => {
+                            setHoloUserQuery(transcript);
+                            handleHoloVoiceQuerySubmit(transcript);
+                        }, true);
+                    }
+                }, 400);
+            }
+        });
     };
-    const handleStartVoiceListening = (lang, onResult) => {
+
+    const handleStartVoiceListening = (lang, onResult, isContinuous = false) => {
         if (typeof window === "undefined")
             return;
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -556,18 +669,65 @@ export default function ProductsPage() {
             alert("Speech recognition is not supported in this browser. Please type your question in the text box.");
             return;
         }
+        if (recognitionRef.current) {
+            try {
+                recognitionRef.current.abort();
+            } catch (e) { }
+        }
         try {
             const recognition = new SpeechRecognition();
+            recognitionRef.current = recognition;
             recognition.lang = lang === "ta" ? "ta-IN" : lang === "hi" ? "hi-IN" : "en-US";
-            recognition.interimResults = false;
+            recognition.interimResults = true;
+            recognition.continuous = false;
             recognition.maxAlternatives = 1;
+
+            let finalTranscript = "";
+            let silenceTimer = null;
+
             recognition.onstart = () => setIsListening(true);
-            recognition.onend = () => setIsListening(false);
-            recognition.onerror = () => setIsListening(false);
+            recognition.onend = () => {
+                setIsListening(false);
+                if (finalTranscript.trim()) {
+                    onResult(finalTranscript.trim());
+                    finalTranscript = "";
+                }
+                if (isLiveConvActiveRef.current && !isSpeakingRef.current) {
+                    setTimeout(() => {
+                        if (isLiveConvActiveRef.current && !isSpeakingRef.current) {
+                            try {
+                                recognition.start();
+                            } catch (err) {
+                                handleStartVoiceListening(lang, onResult, true);
+                            }
+                        }
+                    }, 300);
+                }
+            };
+            recognition.onerror = (err) => {
+                console.warn("Speech recognition error:", err);
+                setIsListening(false);
+                if (isLiveConvActiveRef.current && !isSpeakingRef.current) {
+                    setTimeout(() => {
+                        if (isLiveConvActiveRef.current && !isSpeakingRef.current) {
+                            handleStartVoiceListening(lang, onResult, true);
+                        }
+                    }, 500);
+                }
+            };
             recognition.onresult = (event) => {
-                const transcript = event.results[0]?.[0]?.transcript;
-                if (transcript) {
-                    onResult(transcript);
+                let currentText = "";
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    currentText += event.results[i][0].transcript;
+                }
+                if (currentText.trim()) {
+                    finalTranscript = currentText.trim();
+                    if (silenceTimer) clearTimeout(silenceTimer);
+                    silenceTimer = setTimeout(() => {
+                        try {
+                            recognition.stop();
+                        } catch (e) { }
+                    }, 550);
                 }
             };
             recognition.start();
@@ -632,12 +792,13 @@ export default function ProductsPage() {
                 const res = await fetch("/api/admin/products");
                 if (res.ok) {
                     const result = await res.json();
-                    if (result.status === "success" && Array.isArray(result.data) && result.data.length > 0) {
+                    if (result.status === "success" && Array.isArray(result.data)) {
                         const apiProducts = result.data.filter((p) => !deletedIds.includes(p.id) && !deletedIds.includes(p._id));
-                        if (apiProducts.length > 0) {
-                            setProductsList(apiProducts);
-                            return;
+                        setProductsList(apiProducts);
+                        if (typeof window !== "undefined") {
+                            localStorage.setItem("sellgrow_catalog_products", JSON.stringify(apiProducts));
                         }
+                        return;
                     }
                 }
             }
@@ -821,12 +982,61 @@ export default function ProductsPage() {
             window.speechSynthesis.cancel();
         }
         setIsSpeaking(false);
+        isSpeakingRef.current = false;
     };
-    const speakTTS = async (text, lang = "en") => {
+    const speakTTS = async (text, lang = "en", onEnded = null) => {
         if (!text)
             return;
         stopTTS();
         setIsSpeaking(true);
+        isSpeakingRef.current = true;
+        const handleFinished = () => {
+            setIsSpeaking(false);
+            isSpeakingRef.current = false;
+            activeAudioRef.current = null;
+            if (onEnded) onEnded();
+        };
+
+        // Try Sarvam AI TTS Endpoint first
+        try {
+            const ttsRes = await fetch("/api/ai/tts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text, lang }),
+            });
+            if (ttsRes.ok) {
+                const ttsData = await ttsRes.json();
+                if (ttsData?.audioUrl) {
+                    const audio = new Audio(ttsData.audioUrl);
+                    activeAudioRef.current = audio;
+                    audio.onplay = () => {
+                        setIsSpeaking(true);
+                        isSpeakingRef.current = true;
+                    };
+                    audio.onended = () => {
+                        handleFinished();
+                    };
+                    audio.onerror = () => {
+                        fallbackElevenLabsTTS(text, lang, onEnded);
+                    };
+                    audio.play().catch(() => fallbackElevenLabsTTS(text, lang, onEnded));
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn("Sarvam AI TTS call failed, falling back:", e);
+        }
+
+        fallbackElevenLabsTTS(text, lang, onEnded);
+    };
+
+    const fallbackElevenLabsTTS = async (text, lang = "en", onEnded = null) => {
+        const handleFinished = () => {
+            setIsSpeaking(false);
+            isSpeakingRef.current = false;
+            activeAudioRef.current = null;
+            if (onEnded) onEnded();
+        };
         try {
             const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
                 method: "POST",
@@ -848,26 +1058,26 @@ export default function ProductsPage() {
                 const audioUrl = URL.createObjectURL(audioBlob);
                 const audio = new Audio(audioUrl);
                 activeAudioRef.current = audio;
-                audio.onplay = () => setIsSpeaking(true);
+                audio.onplay = () => {
+                    setIsSpeaking(true);
+                    isSpeakingRef.current = true;
+                };
                 audio.onended = () => {
-                    setIsSpeaking(false);
-                    activeAudioRef.current = null;
+                    handleFinished();
                 };
                 audio.onerror = () => {
-                    setIsSpeaking(false);
-                    activeAudioRef.current = null;
-                    fallbackBrowserTTS(text, lang);
+                    fallbackBrowserTTS(text, lang, onEnded);
                 };
-                audio.play().catch(() => fallbackBrowserTTS(text, lang));
+                audio.play().catch(() => fallbackBrowserTTS(text, lang, onEnded));
                 return;
             }
             else {
-                fallbackBrowserTTS(text, lang);
+                fallbackBrowserTTS(text, lang, onEnded);
             }
         }
         catch (err) {
             console.warn("ElevenLabs Voice Synthesis error:", err);
-            fallbackBrowserTTS(text, lang);
+            fallbackBrowserTTS(text, lang, onEnded);
         }
     };
     const prepareTextForSpeech = (text, lang) => {
@@ -902,7 +1112,12 @@ export default function ProductsPage() {
         }
         return s.replace(/\s+/g, " ").trim();
     };
-    const fallbackBrowserTTS = (text, lang) => {
+    const fallbackBrowserTTS = (text, lang, onEnded = null) => {
+        const handleFinished = () => {
+            setIsSpeaking(false);
+            isSpeakingRef.current = false;
+            if (onEnded) onEnded();
+        };
         if (typeof window !== "undefined" && "speechSynthesis" in window) {
             window.speechSynthesis.cancel();
             const cleanText = prepareTextForSpeech(text, lang);
@@ -927,13 +1142,20 @@ export default function ProductsPage() {
                     utterance.voice = voice;
                 }
             }
-            utterance.onstart = () => setIsSpeaking(true);
-            utterance.onend = () => setIsSpeaking(false);
-            utterance.onerror = () => setIsSpeaking(false);
+            utterance.onstart = () => {
+                setIsSpeaking(true);
+                isSpeakingRef.current = true;
+            };
+            utterance.onend = () => {
+                handleFinished();
+            };
+            utterance.onerror = () => {
+                handleFinished();
+            };
             window.speechSynthesis.speak(utterance);
         }
         else {
-            setIsSpeaking(false);
+            handleFinished();
         }
     };
     const handleSendVoiceQuery = (e) => {
@@ -958,7 +1180,6 @@ export default function ProductsPage() {
     };
     // Main Page Render
     return (<>
-      <Navbar />
       <div className="min-h-screen bg-slate-100 dark:bg-[#070c14] text-foreground font-sans pt-16 pb-16 transition-colors duration-300">
 
       {/* ── PREMIUM HERO BANNER ── */}
@@ -1476,7 +1697,7 @@ export default function ProductsPage() {
       {/* ======================================================== */}
       {/* MODAL 0: 🛰️ CONNECTING TO HOLOGRAM FOR DEMO (5s Countdown) */}
       {/* ======================================================== */}
-      {isHoloDemoConnecting && holoDemoTargetProduct && (<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/92 backdrop-blur-xl animate-in fade-in duration-300">
+      {isHoloDemoConnecting && holoDemoTargetProduct && (<div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-slate-950/92 backdrop-blur-xl animate-in fade-in duration-300">
           <div className="relative w-full max-w-md bg-[#030712] text-white rounded-3xl border border-cyan-500/50 p-7 shadow-[0_0_90px_rgba(6,182,212,0.3)] space-y-6 text-center overflow-hidden">
             
             {/* Ambient Sci-Fi Pulsing Glow */}
@@ -1531,7 +1752,7 @@ export default function ProductsPage() {
       {/* ======================================================== */}
       {/* MODAL 1: 🎙️ ASK AI VOICE ASSISTANT MODAL */}
       {/* ======================================================== */}
-      {isVoiceModalOpen && voiceModelProduct && (<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      {isVoiceModalOpen && voiceModelProduct && (<div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
           <div className="relative w-full max-w-lg bg-slate-950 text-white rounded-3xl border border-emerald-500/40 p-6 shadow-2xl space-y-4">
             
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -1648,7 +1869,7 @@ export default function ProductsPage() {
       {/* ======================================================== */}
       {/* MODAL 2: 🔮 3D HOLOGRAM INTERACTIVE VIEWER MODAL (WHITE THEME STUDIO) */}
       {/* ======================================================== */}
-      {is3DModalOpen && hologramProduct && (<div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xl overflow-hidden animate-in fade-in duration-300">
+      {is3DModalOpen && hologramProduct && (<div className="fixed inset-0 z-[100000] flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xl overflow-hidden animate-in fade-in duration-300">
           <div className="relative w-full max-w-7xl h-[92vh] bg-white text-slate-900 rounded-3xl border border-slate-200/90 p-4 sm:p-5 shadow-[0_25px_80px_rgba(0,0,0,0.18)] flex flex-col justify-between overflow-hidden">
             
             {/* Ambient Sci-Fi Light Soft Glow Background */}
@@ -1712,7 +1933,7 @@ export default function ProductsPage() {
                   <div className={`w-full h-full flex items-center justify-center transition-transform ${isDraggingHologram ? "duration-0" : "duration-300"} ${is360Rotating ? "animate-360-stage-orbit" : ""}`} style={{
                 transform: !is360Rotating ? `perspective(1000px) rotateY(${dragRotationAngle}deg)` : undefined
             }}>
-                    {hologramProduct.hologramVideo || hologramProduct.id === "gm-bc-358-4sp" || hologramProduct.name.toLowerCase().includes("bc 358 4sp") ? (<video ref={hologramVideoRef} src={hologramProduct.hologramVideo || "/videos/remove_all_the_background.mp4"} autoPlay loop muted={isHologramMuted} playsInline className="max-w-[65%] max-h-[65%] sm:max-w-[60%] sm:max-h-[60%] object-contain filter drop-shadow-[0_15px_35px_rgba(0,0,0,0.15)] pointer-events-none transition-all duration-300"/>) : (<ProductGraphic product={hologramProduct} is3DHover={true}/>)}
+                    <video ref={hologramVideoRef} src={hologramProduct.hologramVideo || "/videos/george-maijo-bc-358-4sp-3d.mp4"} autoPlay loop muted={isHologramMuted} playsInline className="max-w-[65%] max-h-[65%] sm:max-w-[60%] sm:max-h-[60%] object-contain filter drop-shadow-[0_15px_35px_rgba(0,0,0,0.15)] pointer-events-none transition-all duration-300"/>
                   </div>
                 </div>
 
@@ -1851,9 +2072,9 @@ export default function ProductsPage() {
                       </button>
                     </div>) : (
                 /* Chat Stream View */
-                <div className="flex-1 flex flex-col justify-between space-y-2 min-h-0">
+                <div className="flex-1 flex flex-col min-h-0 space-y-2 overflow-hidden">
 
-                      <div className="flex-1 overflow-y-auto space-y-2.5 p-3 bg-slate-50 rounded-xl border border-cyan-200 text-xs">
+                      <div className="flex-1 overflow-y-auto max-h-[380px] sm:max-h-[450px] min-h-[220px] space-y-2.5 p-3 bg-slate-50 rounded-xl border border-cyan-200 text-xs touch-pan-y overscroll-contain pr-1.5 scrollbar-thin scrollbar-thumb-cyan-400">
                         {holoAiHistory.length === 0 ? (<div className="text-center py-8 space-y-2">
                             <Sparkles className="w-7 h-7 text-cyan-600 mx-auto animate-bounce"/>
                             <p className="text-xs text-slate-800 font-bold">
@@ -1866,7 +2087,8 @@ export default function ProductsPage() {
                                 ? `வணக்கம்! ${hologramProduct.name} எஞ்சின், ஆற்றல் மற்றும் விலை விவரங்களைக் கேட்கலாம்!`
                                 : `Type or speak any question about ${hologramProduct.name} specs, power, weight or price!`}
                             </p>
-                          </div>) : (holoAiHistory.map((h, i) => (<div key={i} className={`flex ${h.sender === "user" ? "justify-end" : "justify-start"}`}>
+                          </div>) : (<>
+                            {holoAiHistory.map((h, i) => (<div key={i} className={`flex ${h.sender === "user" ? "justify-end" : "justify-start"}`}>
                               <div className={`p-3 rounded-2xl max-w-[88%] text-[11.5px] leading-relaxed shadow-sm ${h.sender === "user"
                             ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-medium"
                             : "bg-white text-slate-800 border border-slate-200 flex flex-col gap-2"}`}>
@@ -1898,32 +2120,47 @@ export default function ProductsPage() {
                                     </button>
                                   </div>)}
                               </div>
-                            </div>)))}
+                            </div>))}
+                            <div ref={holoChatEndRef} />
+                          </>)}
                       </div>
                     </div>)}
 
-                  {/* Dedicated Voice Chat Bar (Voice Only - No Text Box) */}
+                  {/* Dedicated Live Voice Conversation Bar */}
                   <div className="pt-2.5 border-t border-slate-200 shrink-0 flex items-center justify-center">
-                    <button type="button" onClick={() => handleStartVoiceListening(holoAiLang, (transcript) => {
-                    setHoloUserQuery(transcript);
-                    handleHoloVoiceQuerySubmit(transcript);
-                })} className={`w-full py-3 px-4 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2.5 shadow-md active:scale-95 cursor-pointer ${isListening
-                    ? "bg-rose-500 text-white shadow-rose-500/30 animate-pulse"
+                    <button type="button" onClick={toggleLiveVoiceConversation} className={`w-full py-3 px-4 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2.5 shadow-md active:scale-95 cursor-pointer ${isLiveConvActive
+                    ? isSpeaking
+                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-indigo-500/40 border-2 border-indigo-300 animate-pulse"
+                        : "bg-emerald-500 text-white shadow-emerald-500/40 border-2 border-emerald-300 animate-pulse"
                     : "bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-600 hover:to-indigo-700 text-white shadow-cyan-500/25"}`}>
-                      <Mic className={`w-4 h-4 ${isListening ? "animate-ping" : "animate-pulse"}`}/>
-                      <span>
-                        {isListening
-                    ? holoAiLang === "hi"
-                        ? "सुन रहा हूँ... बोलें 🎙️"
+                      {isLiveConvActive ? (isSpeaking ? (<>
+                            <Volume2 className="w-4 h-4 text-white animate-bounce"/>
+                            <span>
+                              {holoAiLang === "hi"
+                            ? "🔊 एआई जवाब दे रहा है... (रोकने के लिए दबाएं 🔴)"
+                            : holoAiLang === "ta"
+                                ? "🔊 AI பதிலளிக்கிறது... (நிறுத்த அழுத்தவும் 🔴)"
+                                : "🔊 AI Replying... (Tap to End Live Mode 🔴)"}
+                            </span>
+                          </>) : (<>
+                            <Mic className="w-4 h-4 text-white animate-ping"/>
+                            <span>
+                              {holoAiLang === "hi"
+                            ? "🟢 लाइव बातचीत जारी — सुन रहा हूँ... (रोकने के लिए दबाएं 🔴)"
+                            : holoAiLang === "ta"
+                                ? "🟢 லைவ் உரையாடல் செயல்படுகிறது — கேட்கிறது... (நிறுத்த அழுத்தவும் 🔴)"
+                                : "🟢 Live Voice Active — Listening... (Tap to End 🔴)"}
+                            </span>
+                          </>)) : (<>
+                          <Mic className="w-4 h-4 animate-pulse"/>
+                          <span>
+                            {holoAiLang === "hi"
+                        ? "लाइव एआई बातचीत शुरू करें (Tap to Speak 🎙️)"
                         : holoAiLang === "ta"
-                            ? "கேட்கிறது... பேசுங்கள் 🎙️"
-                            : "Listening... Speak Now 🎙️"
-                    : holoAiLang === "hi"
-                        ? "बोलकर सवाल पूछें (Tap to Speak 🎙️)"
-                        : holoAiLang === "ta"
-                            ? "பேசி கேள்வி கேட்க (Tap to Speak 🎙️)"
-                            : "Tap to Speak Voice Question 🎙️"}
-                      </span>
+                            ? "லைவ் AI குரல் உரையாடல் தொடங்க (Tap to Speak 🎙️)"
+                            : "Tap to Start Live Voice Conversation 🎙️"}
+                          </span>
+                        </>)}
                     </button>
                   </div>
                 </div>)}
@@ -1936,7 +2173,7 @@ export default function ProductsPage() {
       {/* ======================================================== */}
       {/* MODAL 5: 🧠 TAMIL AI VOICE ASSISTANT TRAINING STUDIO */}
       {/* ======================================================== */}
-      {isTamilTrainingModalOpen && (<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/92 backdrop-blur-xl overflow-y-auto animate-in fade-in duration-300">
+      {isTamilTrainingModalOpen && (<div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-slate-950/92 backdrop-blur-xl overflow-y-auto animate-in fade-in duration-300">
           <div className="relative w-full max-w-2xl bg-[#030712] text-white rounded-3xl border border-purple-500/40 p-6 sm:p-7 shadow-[0_0_90px_rgba(168,85,247,0.25)] space-y-5 overflow-hidden">
             
             {/* Ambient Background Glow */}
@@ -2075,7 +2312,7 @@ export default function ProductsPage() {
       {/* ======================================================== */}
       {/* MODAL 3: 📡 CONNECT PHYSICAL HOLO DEVICE MODAL */}
       {/* ======================================================== */}
-      {isHoloDeviceModalOpen && hologramProduct && (<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl animate-in fade-in duration-200">
+      {isHoloDeviceModalOpen && hologramProduct && (<div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl animate-in fade-in duration-200">
           <div className="relative w-full max-w-md bg-slate-950 text-white rounded-3xl border border-sky-500/40 p-6 shadow-[0_0_60px_rgba(56,189,248,0.2)] space-y-5">
             
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -2143,7 +2380,7 @@ export default function ProductsPage() {
               <p className="text-[11px] text-slate-400">
                 Download the 3D hologram MP4 video formatted for physical 3D LED fan SD cards & USB drives.
               </p>
-              <a href={hologramProduct.hologramVideo || "/videos/remove_all_the_background.mp4"} download={`hologram-${hologramProduct.id}.mp4`} className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all mt-1">
+              <a href={hologramProduct.hologramVideo || "/videos/george-maijo-bc-358-4sp-3d.mp4"} download={`hologram-${hologramProduct.id}.mp4`} className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all mt-1">
                 <Download className="w-3.5 h-3.5 text-sky-400"/>
                 <span>Download 3D Holo Video (.MP4)</span>
               </a>
@@ -2307,7 +2544,10 @@ export default function ProductsPage() {
                         Extracted Product Image
                       </label>
                       <div className="h-28 w-full rounded-lg border border-border bg-slate-100 dark:bg-slate-900 flex items-center justify-center overflow-hidden p-1">
-                        {brochureData.image ? (<img src={brochureData.image} alt="Extracted Product" className="max-h-full object-contain"/>) : (<div className="text-muted-foreground text-[10px]">No image</div>)}
+                        {brochureData.image ? (<img src={brochureData.image} alt="Extracted Product" className="max-h-full object-contain" onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&auto=format&fit=crop&q=80";
+                        }}/>) : (<div className="text-muted-foreground text-[10px]">No image</div>)}
                       </div>
                       <label className="px-2.5 py-1 bg-muted hover:bg-muted/80 text-foreground text-[10px] font-extrabold rounded-lg cursor-pointer transition-all flex items-center gap-1">
                         <Upload className="w-3 h-3"/>
@@ -2423,7 +2663,7 @@ export default function ProductsPage() {
         </div>)}
 
       {/* 📅 BOOK THE SLOT MODAL */}
-      {isSlotModalOpen && slotProduct && (<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+      {isSlotModalOpen && slotProduct && (<div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
           <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6">
             
             {/* Header */}

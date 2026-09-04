@@ -1,0 +1,4 @@
+python brochure_ai_model/train_pdf_folder.py --epochs 10
+python brochure_ai_model/train_pdf_folder.py --pdf_dir brochure_ai_model/PDF --epochs 5 --output_json pdf_folder_training_dataset.json
+npm run build
+npm run dev

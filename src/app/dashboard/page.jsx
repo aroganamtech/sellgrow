@@ -1519,20 +1519,32 @@ export default function DashboardPage() {
         let autoImage = extractedData.image || "";
         if (!autoImage) {
             const lower = pdfName.toLowerCase();
-            if (lower.includes("4sp") || lower.includes("brush_cutter_4sp_pr")) {
-                autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
-            }
-            else if (lower.includes("bc_520") || lower.includes("bc-520")) {
-                autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png";
+            if (lower.includes("ch110") || lower.includes("combine") || lower.includes("harvester")) {
+                autoImage = "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=600&auto=format&fit=crop&q=80";
             }
             else if (lower.includes("m700")) {
-                autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
+                autoImage = "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&auto=format&fit=crop&q=80";
             }
             else if (lower.includes("m800")) {
+                autoImage = "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80";
+            }
+            else if (lower.includes("wm-990") || lower.includes("wm_990") || lower.includes("990")) {
+                autoImage = "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&auto=format&fit=crop&q=80";
+            }
+            else if (lower.includes("tiller") || lower.includes("mahaveer")) {
+                autoImage = "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&auto=format&fit=crop&q=80";
+            }
+            else if (lower.includes("reaper") || lower.includes("5pr") || lower.includes("7pr")) {
+                autoImage = "https://images.unsplash.com/photo-1589923188900-85dae523342b?w=600&auto=format&fit=crop&q=80";
+            }
+            else if (lower.includes("4sp") || lower.includes("brush_cutter_4sp_pr")) {
                 autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
             }
-            else {
+            else if (lower.includes("bc_520") || lower.includes("bc-520") || lower.includes("cutter") || lower.includes("brush")) {
                 autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png";
+            }
+            else {
+                autoImage = "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&auto=format&fit=crop&q=80";
             }
         }
         setBrochureData(prev => ({
@@ -4372,6 +4384,8 @@ export default function DashboardPage() {
                     { title: "Brush Cutter 4SP PR", pdf: "Brush_Cutter_4SP_PR_Brochure.pdf" },
                     { title: "Power Weeder M700 ECO", pdf: "Power_Weeder_M700_ECO_Brochure.pdf" },
                     { title: "Power Weeder M800 ECO", pdf: "Power_Weeder_M800_ECO_Brochure.pdf" },
+                    { title: "MW-CH110 Combine Harvester", pdf: "Maijo_Wenovus_MW_CH110_Brochure.pdf" },
+                    { title: "Mahaveer 13HP Power Tiller", pdf: "George_Maijo_Mahaveer_13HP_Power_Tiller.pdf" },
                     { title: "BC 520 2SP Brush Cutter", pdf: "George_Maijo_BC_520_2SP_Brochure.pdf" }
                 ].map((item, idx) => (<button key={idx} type="button" disabled={isAnalyzingPdf} onClick={async () => {
                         setBrochureData(prev => ({ ...prev, pdfFileName: item.pdf }));
@@ -4432,7 +4446,10 @@ export default function DashboardPage() {
                         Extracted Product Image
                       </label>
                       <div className="h-28 w-full rounded-lg border border-border bg-slate-100 dark:bg-slate-900 flex items-center justify-center overflow-hidden p-1">
-                        {brochureData.image ? (<img src={brochureData.image} alt="Extracted Product" className="max-h-full object-contain"/>) : (<div className="text-muted-foreground text-[10px]">No image</div>)}
+                        {brochureData.image ? (<img src={brochureData.image} alt="Extracted Product" className="max-h-full object-contain" onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&auto=format&fit=crop&q=80";
+                        }}/>) : (<div className="text-muted-foreground text-[10px]">No image</div>)}
                       </div>
                       <label className="px-2.5 py-1 bg-muted hover:bg-muted/80 text-foreground text-[10px] font-extrabold rounded-lg cursor-pointer transition-all flex items-center gap-1">
                         <Upload className="w-3 h-3"/>
@@ -4744,7 +4761,7 @@ export default function DashboardPage() {
                   </label>
                 </div>
 
-                <input type="text" value={editProductData.hologramVideo || ""} onChange={(e) => setEditProductData(prev => ({ ...prev, hologramVideo: e.target.value }))} placeholder="e.g. /videos/remove_all_the_background.mp4 or 3D model URL" className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-mono focus:outline-none focus:border-primary"/>
+                <input type="text" value={editProductData.hologramVideo || ""} onChange={(e) => setEditProductData(prev => ({ ...prev, hologramVideo: e.target.value }))} placeholder="e.g. /videos/george-maijo-bc-358-4sp-3d.mp4 or 3D model URL" className="w-full p-2.5 rounded-xl border border-border bg-background text-xs font-mono focus:outline-none focus:border-primary"/>
               </div>
 
               {/* Grid 3: Brochure PDF Link */}

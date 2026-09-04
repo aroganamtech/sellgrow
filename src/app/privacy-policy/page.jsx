@@ -17,8 +17,6 @@ export default function PrivacyPolicyPage() {
         { id: "contact", title: "7. Contact Privacy Officer" }
     ];
     return (<div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
-      <Navbar />
-
       <main className="flex-grow pt-20 pb-20 relative z-10 overflow-x-hidden">
         {/* Background Radial Glow */}
         <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-primary/10 dark:bg-primary/15 rounded-full blur-[140px] pointer-events-none -z-10"/>

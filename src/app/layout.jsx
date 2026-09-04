@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import ScrollRestoration from "@/components/utils/ScrollRestoration";
 import ScrollProgressIndicator from "@/components/utils/ScrollProgressIndicator";
 import SmoothScroll from "@/components/utils/SmoothScroll";
@@ -154,6 +155,7 @@ export default function RootLayout({ children, }) {
         <AuthProvider>
           <LanguageProvider>
             <ThemeProvider>
+              <HeaderWrapper />
               <SmoothScroll>
                 {children}
               </SmoothScroll>

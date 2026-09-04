@@ -1,9 +1,9 @@
 {
-  "training_timestamp": "2026-09-03 12:54:44",
-  "pdf_root_dir": "brochure_ai_model/PDF",
+  "training_timestamp": "2026-09-03 12:56:17",
+  "pdf_root_dir": "c:\\Users\\Naveen S\\OneDrive\\Desktop\\SellGrow_Main\\SellGrow_Web\\sellgrow\\brochure_ai_model\\PDF",
   "total_subfolders_scanned": 1,
   "total_pdfs_trained": 2,
-  "epochs_completed": 5,
+  "epochs_completed": 10,
   "final_training_loss": 0.024,
   "overall_accuracy": "99.85%",
   "trained_documents": [

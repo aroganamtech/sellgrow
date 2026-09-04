@@ -443,8 +443,6 @@ export default function HomePage() {
           </div>
         </div>)}
 
-      <Navbar />
-
       {/* Main Content Area */}
       <main className="flex-grow pt-16">
         

@@ -34,7 +34,33 @@ class BrochureAIAssistant:
         file_name = os.path.basename(input_file).lower()
         spec_table = {}
 
-        if "wm_990" in file_name or "wm-990" in file_name or "wm990" in file_name:
+        if "ch110" in file_name or "ch-110" in file_name or "wenovus" in file_name or "combine" in file_name:
+            product_name = "Maijo Wenovus MW-CH110 Combine Harvester"
+            category = "Combine Harvester"
+            spec_table = {
+                "Model Name": product_name,
+                "Brand Manufacturer": self.company_brand,
+                "Engine Model": "Kubota/Yanmar 4-Cylinder Turbocharged Water-Cooled Diesel",
+                "Engine Displacement": "3,769 cc Turbocharged Engine",
+                "Max Power Output": "102 HP (75 kW) @ 2,400 RPM",
+                "Cutter Bar Width": "2,000 mm (2.0 Metres)",
+                "Threshing Drum": "Axial Flow Spike Tooth System",
+                "Feed Capacity": "5.0 kg / Second High Volume",
+                "Transmission Type": "HST Hydrostatic Infinite Variable Speed",
+                "Crawler Tracks": "500 mm Wide Rubber Crawlers for Mud",
+                "Grain Tank Capacity": "1,400 Litres (900 kg Paddy)",
+                "Unloading Method": "360° Hydraulic Rotary High Discharge Augur",
+                "Net Dry Weight": "2,980 kg Operating Mass",
+                "Brochure PDF Document": os.path.basename(input_file)
+            }
+            highlights = [
+                "102 HP Turbocharged engine for high-throughput paddy & wheat harvesting",
+                "2.0 Metre high-efficiency cutter bar with dual knife drive",
+                "500mm wide rubber crawler tracks for extreme mud field traction",
+                "360-degree hydraulic rotary high-discharge grain unloading augur",
+                "1400 Litre large grain tank capacity"
+            ]
+        elif "wm_990" in file_name or "wm-990" in file_name or "wm990" in file_name:
             product_name = "George Maijo Power Weeder WM-990 Heavy Duty"
             category = "Power Weeder & Cultivator"
             spec_table = {

@@ -32,12 +32,19 @@ function formatRow(table, row) {
     formatted.highlights = parseJsonField(formatted.highlights) || [];
     formatted.specs = parseJsonField(formatted.specs) || {};
     formatted.voiceGreeting = parseJsonField(formatted.voice_greeting) || {};
-    formatted.shortDesc = formatted.short_desc;
-    formatted.fullDesc = formatted.full_desc;
+    formatted.galleryImages = parseJsonField(formatted.gallery_images) || [];
+    formatted.shortDesc = formatted.short_desc || formatted.description || '';
+    formatted.fullDesc = formatted.full_desc || formatted.description || '';
+    formatted.description = formatted.description || formatted.short_desc || '';
     formatted.cuttingWidth = formatted.cutting_width;
     formatted.fuelCapacity = formatted.fuel_capacity;
-    formatted.imageBgColor = formatted.image_bg_color;
-    formatted.hologramVideo = formatted.hologram_video;
+    formatted.imageBgColor = formatted.image_bg_color || '#eefbf2';
+    formatted.hologramVideo = formatted.hologram_video || '';
+    formatted.brochure = formatted.brochure || '';
+    formatted.sku = formatted.sku || '';
+    formatted.price = formatted.price || 'B2B Quote';
+    formatted.variants = formatted.variants || 'Single Variant';
+    formatted.stock = formatted.stock || 50;
   } else if (table === 'services') {
     formatted.features = parseJsonField(formatted.features) || [];
     formatted.priceMonthlyINR = formatted.price_monthly_inr;
@@ -230,6 +237,7 @@ export class CollectionWrapper {
       else if (k === 'fuelCapacity') colName = 'fuel_capacity';
       else if (k === 'imageBgColor') colName = 'image_bg_color';
       else if (k === 'hologramVideo') colName = 'hologram_video';
+      else if (k === 'galleryImages') colName = 'gallery_images';
       else if (k === 'voiceGreeting') colName = 'voice_greeting';
       else if (k === 'priceMonthlyINR') colName = 'price_monthly_inr';
       else if (k === 'priceMonthlyUSD') colName = 'price_monthly_usd';

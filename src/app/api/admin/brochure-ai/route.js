@@ -4,10 +4,10 @@ import { ProductPdfIntelligenceModel } from "@/services/pdfIntelligenceEngine";
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { action, fileName, productName, category, specs, highlights, brand } = body;
+        const { action, fileName, productName, category, specs, highlights, brand, image } = body;
         // Continuous Self-Training Endpoint
         if (action === "self-train") {
-            ProductPdfIntelligenceModel.selfTrainOnNewBrochure(fileName || "brochure.pdf", productName || "Equipment", category || "Agricultural Machinery", specs || {}, highlights || [], brand || "George Maijo Agri");
+            ProductPdfIntelligenceModel.selfTrainOnNewBrochure(fileName || "brochure.pdf", productName || "Equipment", category || "Agricultural Machinery", specs || {}, highlights || [], brand || "George Maijo Agri", image || "");
             return NextResponse.json({ success: true, message: `🧠 Brochure AI Model trained on "${fileName || productName}" successfully!` }, { status: 200 });
         }
         if (!fileName && !productName) {

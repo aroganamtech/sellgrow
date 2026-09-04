@@ -16,6 +16,7 @@ export class BrochureAiPipelineService {
             product_name: extracted.name,
             category: extracted.category,
             brand: extracted.brand,
+            image: extracted.image,
             short_description: extracted.shortDesc,
             full_description: extracted.fullDesc,
             technical_specifications: extracted.specs,

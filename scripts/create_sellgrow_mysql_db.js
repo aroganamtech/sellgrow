@@ -6,10 +6,14 @@ const PRODUCTS_DATA = [
   {
     id: "gm-bc-358-4sp",
     name: "GM BC 358 4SP (BRUSH CUTTER)",
+    sku: "GM-BC-358-4SP",
+    price: "B2B Quote",
+    variants: "Single Variant",
     category: "BRUSH CUTTER",
     brand: "GEORGE MAIJO EQUIPMENT",
     shortDesc: "High efficiency 4-stroke side pack brush cutter for effortless agricultural weed control.",
     fullDesc: "The GM BC 358 4SP Brush Cutter is engineered with advanced 4-stroke technology, delivering superior fuel economy, reduced vibration, and high torque output for agricultural clearing and commercial lawn maintenance.",
+    description: "High efficiency 4-stroke side pack brush cutter for effortless agricultural weed control.",
     engine: "GX35 / 4-Stroke OHC Engine",
     displacement: "35.8 cc",
     power: "1.5 HP @ 7000 RPM",
@@ -18,7 +22,10 @@ const PRODUCTS_DATA = [
     fuelCapacity: "0.63 Liters",
     imageBgColor: "#eefbf2",
     image: "/products/gm-bc-358-4sp.png",
+    galleryImages: ["/products/gm-bc-358-4sp.png"],
     hologramVideo: "/videos/remove_all_the_background.mp4",
+    brochure: "Brush_Cutter_4SP_PR_Brochure.pdf",
+    stock: 50,
     highlights: ["4-Stroke Engine Efficiency", "Low Noise & Vibration", "Side Pack Ergonomic Harness", "High Output Cutting Blade"],
     specs: { EngineType: "4-Stroke, Air-Cooled", FuelType: "Petrol (Unleaded)", IgnitionSystem: "Transistorized Magneto", StartingSystem: "Recoil Starter" },
     voiceGreeting: { en: "GM BC 358 4SP is a high performance 4-stroke brush cutter.", ta: "GM BC 358 4SP ஒரு சிறந்த 4-ஸ்ட்ரோக் விவசாய சாதனம்." }
@@ -26,10 +33,14 @@ const PRODUCTS_DATA = [
   {
     id: "gm-wp-80",
     name: "GM WP 80 (WATER PUMP)",
+    sku: "GM-WP-80",
+    price: "B2B Quote",
+    variants: "Single Variant",
     category: "WATER PUMP",
     brand: "GEORGE MAIJO EQUIPMENT",
     shortDesc: "Heavy-duty 3-inch agricultural water pump built for high-volume irrigation and field drainage.",
     fullDesc: "The GM WP 80 is designed for demanding agricultural irrigation tasks, offering massive water discharge capacity, robust alloy construction, and dependable engine performance.",
+    description: "Heavy-duty 3-inch agricultural water pump built for high-volume irrigation and field drainage.",
     engine: "7.0 HP 4-Stroke Commercial Engine",
     displacement: "212 cc",
     power: "7.0 HP @ 3600 RPM",
@@ -38,6 +49,10 @@ const PRODUCTS_DATA = [
     fuelCapacity: "3.6 Liters",
     imageBgColor: "#ebf5ff",
     image: "/products/gm-wp-80.png",
+    galleryImages: ["/products/gm-wp-80.png"],
+    hologramVideo: "/videos/george-maijo-bc-358-4sp-3d.mp4",
+    brochure: "Water_Pump_WP_80_Brochure.pdf",
+    stock: 50,
     highlights: ["3-Inch High Discharge Port", "7.0 HP Heavy Engine", "Self-Priming Pump Housing", "Cast Iron Impeller"],
     specs: { PumpType: "Centrifugal Self-Priming", MaxHead: "30 Meters", MaxSuction: "8 Meters", DischargeCapacity: "1000 L/min" },
     voiceGreeting: { en: "GM WP 80 is a heavy duty 3-inch agricultural water pump.", ta: "GM WP 80 ஒரு சக்திவாய்ந்த விவசாய தண்ணீர் பம்ப்." }
@@ -152,10 +167,14 @@ async function setupMySQL() {
       CREATE TABLE IF NOT EXISTS products (
         id VARCHAR(255) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
+        sku VARCHAR(255),
+        price VARCHAR(255),
+        variants VARCHAR(255),
         category VARCHAR(255),
         brand VARCHAR(255),
         short_desc TEXT,
         full_desc TEXT,
+        description TEXT,
         engine VARCHAR(255),
         displacement VARCHAR(255),
         power VARCHAR(255),
@@ -164,13 +183,35 @@ async function setupMySQL() {
         fuel_capacity VARCHAR(255),
         image_bg_color VARCHAR(50) DEFAULT '#eefbf2',
         image TEXT,
+        gallery_images JSON,
         hologram_video TEXT,
+        brochure TEXT,
+        stock INT DEFAULT 50,
         highlights JSON,
         specs JSON,
         voice_greeting JSON,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `);
+
+    // Ensure all columns exist on products table if table was created previously
+    const alterQueries = [
+      "ALTER TABLE products ADD COLUMN IF NOT EXISTS sku VARCHAR(255)",
+      "ALTER TABLE products ADD COLUMN IF NOT EXISTS price VARCHAR(255)",
+      "ALTER TABLE products ADD COLUMN IF NOT EXISTS variants VARCHAR(255)",
+      "ALTER TABLE products ADD COLUMN IF NOT EXISTS description TEXT",
+      "ALTER TABLE products ADD COLUMN IF NOT EXISTS gallery_images JSON",
+      "ALTER TABLE products ADD COLUMN IF NOT EXISTS brochure TEXT",
+      "ALTER TABLE products ADD COLUMN IF NOT EXISTS stock INT DEFAULT 50"
+    ];
+
+    for (const q of alterQueries) {
+      try {
+        await connection.query(q);
+      } catch (e) {
+        // Safe fallback for MariaDB versions without IF NOT EXISTS on ALTER
+      }
+    }
 
     await connection.query(`
       CREATE TABLE IF NOT EXISTS services (
@@ -277,11 +318,11 @@ async function setupMySQL() {
     // Products
     for (const p of PRODUCTS_DATA) {
       await connection.query(`
-        INSERT INTO products (id, name, category, brand, short_desc, full_desc, engine, displacement, power, weight, cutting_width, fuel_capacity, image_bg_color, image, hologram_video, highlights, specs, voice_greeting)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO products (id, name, sku, price, variants, category, brand, short_desc, full_desc, description, engine, displacement, power, weight, cutting_width, fuel_capacity, image_bg_color, image, gallery_images, hologram_video, brochure, stock, highlights, specs, voice_greeting)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE name=VALUES(name);
       `, [
-        p.id, p.name, p.category, p.brand, p.shortDesc, p.fullDesc, p.engine, p.displacement, p.power, p.weight, p.cuttingWidth, p.fuelCapacity, p.imageBgColor, p.image, p.hologramVideo || null,
+        p.id, p.name, p.sku, p.price, p.variants, p.category, p.brand, p.shortDesc, p.fullDesc, p.description, p.engine, p.displacement, p.power, p.weight, p.cuttingWidth, p.fuelCapacity, p.imageBgColor, p.image, JSON.stringify(p.galleryImages || []), p.hologramVideo || null, p.brochure || null, p.stock || 50,
         JSON.stringify(p.highlights || []), JSON.stringify(p.specs || {}), JSON.stringify(p.voiceGreeting || {})
       ]);
     }
@@ -326,9 +367,7 @@ async function setupMySQL() {
     await connection.query(`INSERT INTO _meta (meta_key, seeded) VALUES ('team_seeded', 1) ON DUPLICATE KEY UPDATE seeded=1;`);
 
     console.log('\n=============================================================');
-    console.log(`SUCCESS! Database '${dbName}' and all tables created in MySQL!`);
-    console.log('Tables created & seeded: system_settings, users, registered_users, products, services, employees, team, superadmin_images, subscriptions, _meta');
-    console.log('You can now see the database in phpMyAdmin!');
+    console.log(`SUCCESS! Database '${dbName}' updated in MySQL!`);
     console.log('=============================================================\n');
 
   } catch (err) {

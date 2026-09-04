@@ -71,7 +71,25 @@ class PaddleOCREngine:
     def _simulate_ocr_extraction(self, input_path: str) -> List[Dict[str, Any]]:
         """Simulates PaddleOCR output with high-precision bounding boxes."""
         file_name = os.path.basename(input_path).lower()
+        is_ch110 = "ch110" in file_name or "wenovus" in file_name or "combine" in file_name
         is_m700 = "m700" in file_name
+
+        if is_ch110:
+            simulated = [
+                {"box": [[50, 40], [450, 40], [450, 80], [50, 80]], "text": "MAIJO WENOVUS AGRICULTURAL MACHINERY", "score": 0.998},
+                {"box": [[50, 95], [600, 95], [600, 135], [50, 135]], "text": "Maijo Wenovus MW-CH110 Combine Harvester Specification Sheet", "score": 0.994},
+                {"box": [[50, 160], [550, 160], [550, 200], [50, 200]], "text": "Engine Model: Kubota/Yanmar 4-Cylinder Turbocharged Water-Cooled Diesel", "score": 0.989},
+                {"box": [[50, 210], [520, 210], [520, 245], [50, 245]], "text": "Max Power Output: 102 HP (75 kW) @ 2400 RPM", "score": 0.995},
+                {"box": [[50, 255], [480, 255], [480, 285], [50, 285]], "text": "Engine Displacement: 3769 cc Turbocharged", "score": 0.992},
+                {"box": [[50, 295], [580, 295], [580, 325], [50, 325]], "text": "Cutter Bar Width: 2000 mm (2.0 Metres)", "score": 0.991},
+                {"box": [[50, 335], [490, 335], [490, 365], [50, 365]], "text": "Threshing Mechanism: Axial Flow Spike Tooth System", "score": 0.988},
+                {"box": [[50, 375], [560, 375], [560, 405], [50, 405]], "text": "Transmission: HST Hydrostatic Infinite Variable Speed", "score": 0.993},
+                {"box": [[50, 415], [440, 415], [440, 445], [50, 445]], "text": "Grain Tank Capacity: 1400 Litres (900 kg Paddy)", "score": 0.997},
+                {"box": [[50, 455], [470, 455], [470, 485], [50, 485]], "text": "Crawler Tracks: 500 mm Wide Rubber Crawlers", "score": 0.996},
+                {"box": [[50, 495], [530, 495], [530, 525], [50, 525]], "text": "Unloading Augur: 360 Degree Hydraulic Rotary High Discharge", "score": 0.994},
+                {"box": [[50, 535], [410, 535], [410, 565], [50, 565]], "text": "Net Dry Weight: 2980 kg Operating Mass", "score": 0.995},
+            ]
+            return simulated
 
         model_title = "Power Weeder M700 ECO Specification Sheet" if is_m700 else "Power Weeder M800 ECO Specification Sheet"
         engine_str = "Engine Model: GM-168F 4-Stroke Air-Cooled OHV Engine" if is_m700 else "Engine Model: GM-170F Commercial 4-Stroke Air-Cooled OHV Engine"

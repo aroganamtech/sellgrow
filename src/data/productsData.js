@@ -1,3 +1,5 @@
+export const DEFAULT_HOLOGRAM_VIDEO = "/videos/george-maijo-bc-358-4sp-3d.mp4";
+
 export const CATEGORIES = [
     "All",
     "BRUSH CUTTER",
@@ -26,6 +28,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "430 mm",
         fuelCapacity: "1.2 L",
         imageBgColor: "#eefbf2",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "Powerful 2-Stroke Engine – Strong 42.7cc displacement for tough cutting jobs.",
             "Wide Cutting Path – 430 mm for quicker ground coverage.",
@@ -63,6 +66,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "430 mm",
         fuelCapacity: "1.2 L",
         imageBgColor: "#eefbf2",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "Backpack Ergonomic Design – Reduces shoulder and back strain during long shifts.",
             "Vibration Damping Mounts – Smooth operation with minimal handle vibration.",
@@ -96,7 +100,7 @@ export const PRODUCTS_DATA = [
         fuelCapacity: "0.65 L",
         imageBgColor: "#eefbf2",
         image: "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png",
-        hologramVideo: "/videos/remove_all_the_background.mp4",
+        hologramVideo: "/videos/george-maijo-bc-358-4sp-3d.mp4",
         highlights: [
             "Pure Petrol Operation – No petrol-oil mixing required.",
             "Low Smoke & Quiet Engine – Eco-friendly 4-stroke technology.",
@@ -130,6 +134,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "450 mm",
         fuelCapacity: "0.65 L",
         imageBgColor: "#eefbf2",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "4-Stroke Backpack Configuration – Ultra-comfortable padded harness.",
             "Low Noise Level – Ideal for noise-sensitive agricultural zones.",
@@ -160,6 +165,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "450 mm",
         fuelCapacity: "0.65 L",
         imageBgColor: "#eefbf2",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "Reinforced Gearbox – Industrial grade alloy gears for heavy torque.",
             "Steel Blade Included – High tensile 3-tooth blade for woody stalks.",
@@ -190,6 +196,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "450 mm",
         fuelCapacity: "0.65 L",
         imageBgColor: "#eefbf2",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "Direct Drive Straight Shaft – Maximum mechanical efficiency.",
             "Ergonomic Loop Handle – Easy maneuvering around crop rows.",
@@ -220,7 +227,7 @@ export const PRODUCTS_DATA = [
         fuelCapacity: "3.6 L",
         imageBgColor: "#f0fdf4",
         image: "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png",
-        hologramVideo: "/videos/remove_all_the_background.mp4",
+        hologramVideo: "/videos/george-maijo-bc-358-4sp-3d.mp4",
         highlights: [
             "7.0 HP High Torque Engine – Powerful 4-stroke performance for tough agricultural terrain.",
             "Direct Gear Transmission – Heavy-duty alloy gear system without belts or chains.",
@@ -256,6 +263,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "1100 mm (1.1 Meter)",
         fuelCapacity: "8.5 L",
         imageBgColor: "#fdf8ec",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "All-Terrain Rubber Tracks – Navigates muddy paddy fields with minimal soil compaction.",
             "1.1 Meter Harvesting Width – High output rate of 0.3 - 0.5 acres per hour.",
@@ -290,6 +298,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "800 - 1000 mm",
         fuelCapacity: "10 L",
         imageBgColor: "#fff7ed",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "13 HP Direct Injection Diesel – Unmatched pulling torque for wet and dry soil.",
             "6 Forward + 2 Reverse Speeds – Versatile gear selection for rotary tilling and transport trolley.",
@@ -323,6 +332,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "800 - 1050 mm",
         fuelCapacity: "3.6 L",
         imageBgColor: "#eff6ff",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "7 HP Petrol Engine – Strong torque for hard dry soil inter-cultivation.",
             "Direct Gear Drive – Heavy iron gearbox without belt slip.",
@@ -355,6 +365,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "1050 - 1350 mm",
         fuelCapacity: "4.0 L",
         imageBgColor: "#eff6ff",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "4 Forward + 2 Reverse Speeds – Precise speed control for all soil conditions.",
             "Auxiliary PTO Output Shaft – Connects water pumps, sprayers, and ridgers.",
@@ -387,6 +398,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "600 - 900 mm",
         fuelCapacity: "3.6 L",
         imageBgColor: "#eff6ff",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "Narrow Crop Clearance – Fits between narrow crop rows effortlessly.",
             "Lightweight Maneuverability – Easy turning at field borders.",
@@ -417,6 +429,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "800 - 1100 mm",
         fuelCapacity: "3.5 L Diesel",
         imageBgColor: "#eff6ff",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "Air-Cooled Diesel Engine – High torque at low RPM with minimal fuel cost.",
             "Direct Injection System – Cold weather easy recoil start.",
@@ -447,6 +460,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "800 - 1000 mm",
         fuelCapacity: "3.6 L",
         imageBgColor: "#eff6ff",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "Reliable 7HP Petrol Engine",
             "2 Speed Forward + 1 Reverse Gear",
@@ -476,6 +490,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "900 - 1100 mm",
         fuelCapacity: "3.6 L",
         imageBgColor: "#eff6ff",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "Front Bumper Protection Guard",
             "High Output 7.5HP Engine",
@@ -504,6 +519,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "750 - 900 mm",
         fuelCapacity: "3.6 L",
         imageBgColor: "#eff6ff",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "Belt Drive Clutch – Smooth start without sudden jerks.",
             "Ultra Lightweight (75 kg) – Very easy to transport in small pickup vans.",
@@ -534,6 +550,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "1200 mm (1.2 Meter)",
         fuelCapacity: "3.6 L",
         imageBgColor: "#faf5ff",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "1.2 Meter Cutting Bar – Clean crop cutting close to ground level.",
             "Conveyor Belt Lay-Down – Neatly stacks harvested stalks in continuous rows.",
@@ -566,6 +583,7 @@ export const PRODUCTS_DATA = [
         cuttingWidth: "1500 mm (1.5 Meter)",
         fuelCapacity: "4.5 L Diesel",
         imageBgColor: "#faf5ff",
+        hologramVideo: DEFAULT_HOLOGRAM_VIDEO,
         highlights: [
             "1.5 Meter Wide Cutter Bar – Extra wide single-pass crop cutting.",
             "Heavy Duty Conveyor Star Wheels – Prevents clogging in wet crops.",

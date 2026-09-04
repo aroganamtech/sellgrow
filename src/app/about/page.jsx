@@ -135,8 +135,6 @@ export default function AboutPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans transition-colors duration-200">
-            <Navbar />
-
             <main className="flex-grow pt-16">
                 {/* HERO SECTION */}
                 <section className="relative overflow-hidden pt-12 pb-16 md:pt-16 md:pb-24 border-b border-slate-200">

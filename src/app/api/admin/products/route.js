@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
-import { ObjectId } from 'mongodb';
 import { PRODUCTS_DATA } from '@/data/productsData';
+
 export async function GET() {
     try {
         const db = await getDatabase();
@@ -21,19 +21,26 @@ export async function GET() {
             id: item.id || item._id.toString(),
             _id: item._id.toString(),
             name: item.name,
+            sku: item.sku || `GM-${(item.name || '').toUpperCase().replace(/[^A-Z0-9]/g, "-").slice(0, 8)}-${Math.floor(100 + Math.random() * 900)}`,
+            price: item.price || "B2B Quote",
+            variants: item.variants || "Single Variant",
             category: item.category,
             brand: item.brand,
-            shortDesc: item.shortDesc,
-            fullDesc: item.fullDesc,
-            engine: item.engine,
-            displacement: item.displacement,
-            power: item.power,
-            weight: item.weight,
-            cuttingWidth: item.cuttingWidth,
-            fuelCapacity: item.fuelCapacity,
+            shortDesc: item.shortDesc || item.description || "",
+            fullDesc: item.fullDesc || item.description || "",
+            description: item.description || item.shortDesc || "",
+            engine: item.engine || "N/A",
+            displacement: item.displacement || "N/A",
+            power: item.power || "N/A",
+            weight: item.weight || "N/A",
+            cuttingWidth: item.cuttingWidth || "N/A",
+            fuelCapacity: item.fuelCapacity || "N/A",
             imageBgColor: item.imageBgColor || "#eefbf2",
             image: item.image || "",
-            hologramVideo: item.hologramVideo || (item.id === "gm-bc-358-4sp" ? "/videos/remove_all_the_background.mp4" : undefined),
+            galleryImages: item.galleryImages || [],
+            hologramVideo: item.hologramVideo || "/videos/george-maijo-bc-358-4sp-3d.mp4",
+            brochure: item.brochure || "",
+            stock: item.stock || 50,
             highlights: item.highlights || [],
             specs: item.specs || {},
             voiceGreeting: item.voiceGreeting || {
@@ -47,30 +54,47 @@ export async function GET() {
         return NextResponse.json({ status: 'error', message: error.message }, { status: 500 });
     }
 }
+
 export async function POST(req) {
     try {
         const db = await getDatabase();
         const collection = db.collection('products');
         const body = await req.json();
-        const { id, name, category, brand, shortDesc, fullDesc, engine, displacement, power, weight, cuttingWidth, fuelCapacity, imageBgColor, image, highlights, specs, voiceGreeting } = body;
+        const {
+            id, name, sku, price, variants, category, brand,
+            shortDesc, fullDesc, description, engine, displacement,
+            power, weight, cuttingWidth, fuelCapacity, imageBgColor,
+            image, galleryImages, hologramVideo, brochure, stock,
+            highlights, specs, voiceGreeting
+        } = body;
+
         if (!name) {
             return NextResponse.json({ status: 'error', message: 'Product name is required' }, { status: 400 });
         }
+
         const doc = {
             id: id || `prod_${Date.now()}`,
             name,
+            sku: sku || `GM-${name.toUpperCase().replace(/[^A-Z0-9]/g, "-").slice(0, 8)}-${Math.floor(100 + Math.random() * 900)}`,
+            price: price || "B2B Quote",
+            variants: variants || "Single Variant",
             category: category || 'BRUSH CUTTER',
             brand: brand || 'GEORGE MAIJO EQUIPMENT',
-            shortDesc: shortDesc || 'Heavy duty agricultural equipment.',
-            fullDesc: fullDesc || 'Designed for field efficiency and durability.',
-            engine: engine || 'Air-Cooled Engine',
-            displacement: displacement || 'N/A',
-            power: power || 'N/A',
-            weight: weight || 'N/A',
-            cuttingWidth: cuttingWidth || 'N/A',
-            fuelCapacity: fuelCapacity || 'N/A',
+            shortDesc: shortDesc || description || 'Heavy duty commercial equipment.',
+            fullDesc: fullDesc || description || 'Designed for field efficiency and durability.',
+            description: description || shortDesc || 'Heavy duty commercial equipment.',
+            engine: engine || (specs ? (specs["Engine Model"] || specs["Engine Type"] || "Air-Cooled Engine") : 'Air-Cooled Engine'),
+            displacement: displacement || (specs ? (specs["Displacement"] || "N/A") : 'N/A'),
+            power: power || (specs ? (specs["Max Power Output"] || specs["Power"] || "N/A") : 'N/A'),
+            weight: weight || (specs ? (specs["Dry Weight"] || specs["Weight"] || "N/A") : 'N/A'),
+            cuttingWidth: cuttingWidth || (specs ? (specs["Cutting Width"] || "N/A") : 'N/A'),
+            fuelCapacity: fuelCapacity || (specs ? (specs["Fuel Tank Capacity"] || specs["Fuel Tank"] || "N/A") : 'N/A'),
             imageBgColor: imageBgColor || '#eefbf2',
             image: image || '',
+            galleryImages: galleryImages || [],
+            hologramVideo: hologramVideo || '',
+            brochure: brochure || '',
+            stock: stock || 50,
             highlights: highlights || [],
             specs: specs || {},
             voiceGreeting: voiceGreeting || {
@@ -78,13 +102,15 @@ export async function POST(req) {
                 ta: `${name} சக்திவாய்ந்த விவசாய சாதனம்.`
             }
         };
-        await collection.insertOne(doc);
+
+        await collection.updateOne({ id: doc.id }, { $set: doc }, { upsert: true });
         return NextResponse.json({ status: 'success', data: doc });
     }
     catch (error) {
         return NextResponse.json({ status: 'error', message: error.message }, { status: 500 });
     }
 }
+
 export async function PUT(req) {
     try {
         const db = await getDatabase();
@@ -94,17 +120,14 @@ export async function PUT(req) {
         if (!id) {
             return NextResponse.json({ status: 'error', message: 'Product ID is required' }, { status: 400 });
         }
-        let filter = { id };
-        if (ObjectId.isValid(id)) {
-            filter = { $or: [{ _id: new ObjectId(id) }, { id }] };
-        }
-        const result = await collection.updateOne(filter, { $set: updateData });
+        const result = await collection.updateOne({ id }, { $set: updateData });
         return NextResponse.json({ status: 'success', message: 'Product updated successfully', result });
     }
     catch (error) {
         return NextResponse.json({ status: 'error', message: error.message }, { status: 500 });
     }
 }
+
 export async function DELETE(req) {
     try {
         const db = await getDatabase();
@@ -114,11 +137,7 @@ export async function DELETE(req) {
         if (!id) {
             return NextResponse.json({ status: 'error', message: 'Product ID is required' }, { status: 400 });
         }
-        let filter = { id };
-        if (ObjectId.isValid(id)) {
-            filter = { $or: [{ _id: new ObjectId(id) }, { id }] };
-        }
-        await collection.deleteOne(filter);
+        await collection.deleteOne({ id });
         return NextResponse.json({ status: 'success', message: 'Product deleted from collection' });
     }
     catch (error) {

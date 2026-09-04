@@ -1,12 +1,16 @@
+import path from 'path';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   compress: true,            // Gzip & Brotli compression for fast responses under load
   poweredByHeader: false,     // Disable X-Powered-By header
   distDir: '.next_build',
   images: {
     unoptimized: true,
+  },
+  turbopack: {
+    root: path.resolve('.'),
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', 'lenis'],

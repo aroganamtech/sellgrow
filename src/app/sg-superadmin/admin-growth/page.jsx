@@ -408,14 +408,32 @@ export default function AdminGrowthPage() {
         let autoImage = analysis.image || "";
         if (!autoImage) {
             const lower = targetPdf.toLowerCase();
-            if (lower.includes("4sp") || lower.includes("brush_cutter_4sp_pr")) {
+            if (lower.includes("ch110") || lower.includes("combine") || lower.includes("harvester")) {
+                autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/Combine-harvester-machine@2x.png";
+            }
+            else if (lower.includes("m700")) {
+                autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/Power-weeder-WM-1000NAM@2x.png";
+            }
+            else if (lower.includes("m800")) {
+                autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/1.1.WM1100-C6-DLX-PLUS-PRIME-600x400.png";
+            }
+            else if (lower.includes("wm-990") || lower.includes("wm_990") || lower.includes("990")) {
+                autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/Power-Weeder-WM-990@2x.png";
+            }
+            else if (lower.includes("tiller") || lower.includes("mahaveer")) {
+                autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/power-tiller-13hp@2x.png";
+            }
+            else if (lower.includes("reaper") || lower.includes("5pr") || lower.includes("7pr")) {
+                autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/paddy-reaper-5pr@2x.png";
+            }
+            else if (lower.includes("4sp") || lower.includes("brush_cutter_4sp_pr")) {
                 autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
             }
-            else if (lower.includes("bc_520") || lower.includes("bc-520")) {
+            else if (lower.includes("bc_520") || lower.includes("bc-520") || lower.includes("cutter") || lower.includes("brush")) {
                 autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/2.5.BC-520@2x.png";
             }
             else {
-                autoImage = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
+                autoImage = "https://www.georgemaijoagri.com/wp-content/uploads/2024/10/1.1.WM1100-C6-DLX-PLUS-PRIME-600x400.png";
             }
         }
         setBrochureData(prev => ({
@@ -431,7 +449,7 @@ export default function AdminGrowthPage() {
         setIsAnalyzingPdf(false);
         setBrochureStep(2);
     };
-    const handleSaveAddBrochure = (e) => {
+    const handleSaveAddBrochure = async (e) => {
         e.preventDefault();
         if (!brochureData.name.trim())
             return;
@@ -479,6 +497,15 @@ export default function AdminGrowthPage() {
             }
         };
         ProductPdfIntelligenceModel.selfTrainOnNewBrochure(pdfDocName, brochureData.name.trim(), brochureData.category, finalSpecs, finalHighlights, companyBrand);
+        try {
+            await fetch('/api/admin/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newProduct),
+            });
+        } catch (err) {
+            console.error("Failed to save brochure to database:", err);
+        }
         saveCatalogState([newProduct, ...adminCatalogProducts]);
         setIsBrochureModalOpen(false);
     };
@@ -524,6 +551,9 @@ export default function AdminGrowthPage() {
                     if (json?.status === 'success' && Array.isArray(json.data)) {
                         const activeProds = json.data.filter((p) => !deletedIds.includes(p.id) && !deletedIds.includes(p._id));
                         setAdminCatalogProducts(activeProds);
+                        if (typeof window !== "undefined") {
+                            localStorage.setItem("sellgrow_catalog_products", JSON.stringify(activeProds));
+                        }
                         return;
                     }
                 }
@@ -3484,7 +3514,10 @@ export default function AdminGrowthPage() {
                         Extracted Product Image
                       </label>
                       <div className="h-28 w-full rounded-lg border border-border bg-slate-100 dark:bg-slate-900 flex items-center justify-center overflow-hidden p-1">
-                        {brochureData.image ? (<img src={brochureData.image} alt="Extracted Product" className="max-h-full object-contain"/>) : (<div className="text-muted-foreground text-[10px]">No image</div>)}
+                        {brochureData.image ? (<img src={brochureData.image} alt="Extracted Product" className="max-h-full object-contain" onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&auto=format&fit=crop&q=80";
+                        }}/>) : (<div className="text-muted-foreground text-[10px]">No image</div>)}
                       </div>
                       <label className="px-2.5 py-1 bg-muted hover:bg-muted/80 text-foreground text-[10px] font-extrabold rounded-lg cursor-pointer transition-all flex items-center gap-1">
                         <Upload className="w-3 h-3"/>
