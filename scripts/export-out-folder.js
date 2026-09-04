@@ -58,8 +58,12 @@ function processHtmlFiles(dir) {
         } else if (file.endsWith('.html')) {
           let content = fs.readFileSync(filePath, 'utf8');
           let modified = false;
-          if (content.includes('/_next/') || content.includes('"_next/')) {
-            content = content.replace(/\/_next\//g, '/next/').replace(/"_next\//g, '"next/');
+          if (content.includes('_next')) {
+            content = content
+              .replace(/\/_next\//g, '/next/')
+              .replace(/"_next\//g, '"next/')
+              .replace(/\\\/_next\\\//g, '\\/next\\/')
+              .replace(/([/'"\\])_next\//g, '$1next/');
             modified = true;
           }
           if (modified) {
@@ -82,7 +86,18 @@ function processHtmlFiles(dir) {
 
 console.log('Building Hostinger-compatible out folder with full page URL aliases (Fast Engine)...');
 
-// 0. If built in .next_build, mirror to local .next
+// 0. Clean out directory before generating fresh output
+console.log('Cleaning stale out folder...');
+if (fs.existsSync(outDir)) {
+  try {
+    fs.rmSync(outDir, { recursive: true, force: true });
+  } catch (e) {
+    console.warn('Warning cleaning out directory:', e.message);
+  }
+}
+fs.mkdirSync(outDir, { recursive: true });
+
+// 0b. If built in .next_build, mirror to local .next
 if (fs.existsSync(altNextDir)) {
   copyFast(altNextDir, localNextDir);
 }
@@ -120,7 +135,90 @@ if (fs.existsSync(nextStatic)) {
   copyFast(nextStatic, path.join(outDir, 'next', 'static'));
 }
 
-// 6 & 7. Single-pass process all HTML files for aliases & asset path rewrites
+/**
+ * Clean internal Next.js server build artifacts (.segments, .meta, .rsc, etc.) from out
+ */
+/**
+ * Clean internal Next.js server build artifacts (.segments, .meta, .rsc, etc.) from out
+ */
+function cleanServerArtifacts(dir) {
+  if (!fs.existsSync(dir)) return;
+  try {
+    const files = fs.readdirSync(dir);
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const filePath = path.join(dir, file);
+      try {
+        const stat = fs.statSync(filePath);
+        if (stat.isDirectory()) {
+          if (file.endsWith('.segments')) {
+            fs.rmSync(filePath, { recursive: true, force: true });
+          } else {
+            cleanServerArtifacts(filePath);
+          }
+        } else if (file.endsWith('.meta') || file.endsWith('.rsc') || file.endsWith('.nft.json') || (file.endsWith('.js') && file.startsWith('page')) || file.endsWith('.map')) {
+          fs.rmSync(filePath, { force: true });
+        }
+      } catch (e) {}
+    }
+  } catch (e) {}
+}
+
+function cleanupHostingerOutFolder() {
+  // Convert .body files to proper static files
+  const robotsBody = path.join(outDir, 'robots.txt.body');
+  if (fs.existsSync(robotsBody)) {
+    try {
+      const content = fs.readFileSync(robotsBody, 'utf8');
+      const targetPath = path.join(outDir, 'robots.txt');
+      if (fs.existsSync(targetPath) && fs.statSync(targetPath).isDirectory()) {
+        fs.rmSync(targetPath, { recursive: true, force: true });
+      }
+      fs.writeFileSync(targetPath, content, 'utf8');
+      fs.rmSync(robotsBody, { force: true });
+    } catch (e) {}
+  }
+
+  const sitemapBody = path.join(outDir, 'sitemap.xml.body');
+  if (fs.existsSync(sitemapBody)) {
+    try {
+      const content = fs.readFileSync(sitemapBody, 'utf8');
+      const targetPath = path.join(outDir, 'sitemap.xml');
+      if (fs.existsSync(targetPath) && fs.statSync(targetPath).isDirectory()) {
+        fs.rmSync(targetPath, { recursive: true, force: true });
+      }
+      fs.writeFileSync(targetPath, content, 'utf8');
+      fs.rmSync(sitemapBody, { force: true });
+    } catch (e) {}
+  }
+
+  const iconBody = path.join(outDir, 'icon.png.body');
+  if (fs.existsSync(iconBody)) {
+    try {
+      const targetPath = path.join(outDir, 'icon.png');
+      if (fs.existsSync(targetPath) && fs.statSync(targetPath).isDirectory()) {
+        fs.rmSync(targetPath, { recursive: true, force: true });
+      }
+      fs.copyFileSync(iconBody, targetPath);
+      fs.rmSync(iconBody, { force: true });
+    } catch (e) {}
+  }
+
+  // Remove internal server folders and leftover junk files
+  const itemsToRemove = ['[company]', '_global-error', '_global-error.html', '_not-found', '_not-found.html', 'client', 'demo', 'page', 'sellgrow', 'page.js.map'];
+  itemsToRemove.forEach((item) => {
+    const itemPath = path.join(outDir, item);
+    if (fs.existsSync(itemPath)) {
+      try { fs.rmSync(itemPath, { recursive: true, force: true }); } catch (e) {}
+    }
+  });
+}
+
+// 6. Clean internal server artifacts from out folder
+cleanServerArtifacts(outDir);
+cleanupHostingerOutFolder();
+
+// 7. Single-pass process all HTML files for aliases & asset path rewrites
 processHtmlFiles(outDir);
 
 // 8. Fix asset paths in root index.html if present
@@ -128,8 +226,12 @@ const rootIndex = path.join(rootDir, 'index.html');
 if (fs.existsSync(rootIndex)) {
   try {
     let rootContent = fs.readFileSync(rootIndex, 'utf8');
-    if (rootContent.includes('/_next/') || rootContent.includes('"_next/')) {
-      rootContent = rootContent.replace(/\/_next\//g, '/next/').replace(/"_next\//g, '"next/');
+    if (rootContent.includes('_next')) {
+      rootContent = rootContent
+        .replace(/\/_next\//g, '/next/')
+        .replace(/"_next\//g, '"next/')
+        .replace(/\\\/_next\\\//g, '\\/next\\/')
+        .replace(/([/'"\\])_next\//g, '$1next/');
       fs.writeFileSync(rootIndex, rootContent, 'utf8');
     }
   } catch (e) {}

@@ -175,8 +175,8 @@ function CanvasParticles() {
 }
 export default function HomePage() {
     const { t, language, dir, region } = useLanguage();
-    const [pageLoading, setPageLoading] = useState(true);
-    const [hasCheckedSession, setHasCheckedSession] = useState(false);
+    const [pageLoading, setPageLoading] = useState(false);
+    const [hasCheckedSession, setHasCheckedSession] = useState(true);
     const [mounted, setMounted] = useState(false);
     const [techStatus, setTechStatus] = useState("Initializing System...");
     const [activeTab, setActiveTab] = useState("crm");
@@ -339,16 +339,6 @@ export default function HomePage() {
     }, []);
     return (<div className="relative min-h-screen flex flex-col">
       <OnboardingModal />
-      {/* Script to block hydration flash for returning users */}
-      <script dangerouslySetInnerHTML={{
-            __html: `
-            try {
-              if (sessionStorage.getItem('sellgrow_loaded') === 'true') {
-                document.documentElement.classList.add('sellgrow-already-loaded');
-              }
-            } catch (e) {}
-          `
-        }}/>
       {/* Loading Splash Screen Overlay */}
       {(!hasCheckedSession || pageLoading) && (<div className={`loading-overlay fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#070b13] space-y-8 select-none transition-all duration-700 ${pageLoading ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
           {/* Particle Canvas Background */}
@@ -451,7 +441,7 @@ export default function HomePage() {
           {/* Radial Light Glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-primary/10 via-secondary/5 to-transparent blur-3xl pointer-events-none -z-10"/>
 
-          <motion.div variants={heroContainerVariants} initial="hidden" animate={pageLoading ? "hidden" : "visible"} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+          <motion.div variants={heroContainerVariants} initial="hidden" animate="visible" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
             <motion.h1 variants={heroItemVariants} className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight font-display max-w-4xl mx-auto leading-tight">
               <span className="gradient-text">{t("heroTitle")}</span>
             </motion.h1>

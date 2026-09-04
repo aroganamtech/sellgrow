@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 11223",
+    "clean": "node -e \"const fs=require('fs'); ['out','.next_build','.next'].forEach(d => { if(fs.existsSync(d)) try{fs.rmSync(d,{recursive:true,force:true})}catch(e){} });\"",
     "build": "next build",
     "postbuild": "node scripts/export-out-folder.js",
+    "build:clean": "npm run clean && npm run build",
     "start": "next start -p 11223",
     "lint": "next lint",
     "db:init": "node scripts/create_sellgrow_mysql_db.js"

@@ -230,7 +230,7 @@ function SolutionBlock({ item, isReversed, onBookDemo, onOpenSolutionModal }) {
         }
     };
     const Icon = item.icon;
-    return (<motion.div id={`showcase-${item.id}`} initial={{ opacity: 0, y: 35, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="scroll-mt-[150px] bg-white dark:bg-[#0c121e] border border-border rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl transition-all duration-300 hover:shadow-2xl hover:border-border/80">
+    return (<motion.div id={`showcase-${item.id}`} initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="scroll-mt-[150px] bg-white dark:bg-[#0c121e] border border-border rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl transition-all duration-300 hover:shadow-2xl hover:border-border/80">
       <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center`}>
         
         {/* Left/Right Column: Details */}
