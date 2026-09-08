@@ -1,8 +1,12 @@
 python brochure_ai_model/train_pdf_folder.py --epochs 10
 python brochure_ai_model/train_pdf_folder.py --pdf_dir brochure_ai_model/PDF --epochs 5 --output_json pdf_folder_training_dataset.json
+npm run train:corpus
+npm run train:auto
+npm run train
 npm run build
 npm run dev
-
+npm run db:init
+npm run db:test
 
 open Api = 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
 sarvam = sk_8xaeu01n_9NNgIaWiPuxDz2s1fEc7Py7P

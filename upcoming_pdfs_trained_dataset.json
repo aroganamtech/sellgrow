@@ -1,20 +1,15 @@
 {
-  "training_timestamp": "2026-09-05 18:06:22",
-  "pdf_root_dir": "c:\\Users\\Naveen S\\OneDrive\\Desktop\\SellGrow_Main\\SellGrow_Web\\sellgrow\\brochure_ai_model\\PDF",
-  "total_subfolders_scanned": 1,
-  "total_pdfs_trained": 2,
-  "epochs_completed": 10,
-  "final_training_loss": 0.024,
-  "overall_accuracy": "99.85%",
-  "trained_documents": [
+  "training_timestamp": "2026-09-05 18:07:12",
+  "total_pdfs": 2,
+  "epochs": 10,
+  "trained_records": [
     {
       "file_name": "George_Maijo_BC_358_4SPR_Brochure.pdf",
       "relative_path": "George_Maijo_BC_358_4SPR_Brochure.pdf",
-      "subfolder": "General Catalog",
       "product_name": "George Maijo Brush Cutter 4SP PR",
       "category": "Brush Cutter & Trimmer",
       "spec_count": 13,
-      "technical_specifications": {
+      "specifications": {
         "Model Name": "George Maijo Brush Cutter 4SP PR",
         "Brand Manufacturer": "George Maijo Agri",
         "Engine Type": "4-Stroke, Air-Cooled OHV Engine",
@@ -36,18 +31,15 @@
         "Suitable for farms, plantations, orchards, and roadside maintenance",
         "Reduced vibration damping and easy recoil starting",
         "Automatic centrifugal clutch for enhanced field safety"
-      ],
-      "short_description": "",
-      "full_description": ""
+      ]
     },
     {
       "file_name": "Maijo_Wenovus_MW_CH110_Brochure.pdf",
       "relative_path": "Maijo_Wenovus_MW_CH110_Brochure.pdf",
-      "subfolder": "General Catalog",
       "product_name": "Maijo Wenovus MW-CH110 Combine Harvester",
       "category": "Combine Harvester",
       "spec_count": 14,
-      "technical_specifications": {
+      "specifications": {
         "Model Name": "Maijo Wenovus MW-CH110 Combine Harvester",
         "Brand Manufacturer": "George Maijo Agri",
         "Engine Model": "Kubota/Yanmar 4-Cylinder Turbocharged Water-Cooled Diesel",
@@ -69,9 +61,7 @@
         "500mm wide rubber crawler tracks for extreme mud field traction",
         "360-degree hydraulic rotary high-discharge grain unloading augur",
         "1400 Litre large grain tank capacity"
-      ],
-      "short_description": "MAIJO WENOVUS AGRICULTURAL MACHINERY",
-      "full_description": "MAIJO WENOVUS AGRICULTURAL MACHINERY"
+      ]
     }
   ]
 }
