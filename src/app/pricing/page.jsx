@@ -224,7 +224,7 @@ export default function PricingPage() {
           {/* HERO HEADER */}
           <div className="text-center space-y-4 max-w-3xl mx-auto pt-1">
             <motion.h1
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-display text-slate-900 dark:text-white leading-tight"
@@ -233,7 +233,7 @@ export default function PricingPage() {
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
               className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed"
@@ -360,7 +360,7 @@ export default function PricingPage() {
 
               {/* MONTHLY / YEARLY BILLING TOGGLE BELOW HEADING */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 1, scale: 1 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
                 className="pt-2 flex items-center justify-center"
@@ -412,7 +412,7 @@ export default function PricingPage() {
                 return (
                   <motion.div
                     key={plan.id}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 1, y: 0 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 * idx }}
                     className={`relative p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#090f1d] border flex flex-col justify-between transition-all duration-300 ${

@@ -49,11 +49,11 @@ export async function GET() {
                 }
             }
             else {
-                uniqueUsersMap.set(u._id.toString(), u);
+                uniqueUsersMap.set(u._id ? u._id.toString() : (u.id ? String(u.id) : `user_${Math.random()}`), u);
             }
         });
         const uniqueUsersArray = Array.from(uniqueUsersMap.values());
-        const formattedUsers = uniqueUsersArray.map((u) => {
+        const formattedUsers = uniqueUsersArray.map((u, idx) => {
             let region = "International";
             if (u.email && (u.email.endsWith('.in') || u.email.endsWith('.in.ac') || u.email.includes('.in'))) {
                 region = "India";
@@ -62,7 +62,7 @@ export async function GET() {
                 region = "India";
             }
             return {
-                id: u._id.toString(),
+                id: u._id ? u._id.toString() : (u.id ? String(u.id) : `usr_${100 + idx}`),
                 name: u.name || u.firstName || 'Master Operator',
                 email: u.email,
                 role: u.role === 'superadmin' || u.role === 'SuperAdmin' ? 'SuperAdmin' : u.role === 'admin' || u.role === 'Admin' ? 'Admin' : 'User',

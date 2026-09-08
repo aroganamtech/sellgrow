@@ -911,25 +911,32 @@ export default function AdminGrowthPage() {
         const savedAuth = sessionStorage.getItem("sg_superadmin_auth");
         if (savedAuth === "true") {
             setIsAuthenticated(true);
-            // Fetch from database API
-            fetch("/api/admin/stats")
-                .then((res) => res.json())
-                .then((data) => {
-                if (data.status === "success") {
-                    // Update stats
-                    setRegisteredCount(data.registeredUsers);
-                    setMrrInr(data.mrr.inr);
-                    setMrrUsd(data.mrr.usd);
-                    setExecutions(data.executions !== undefined ? data.executions : 0);
-                    // Backend Status parse
+            const safeFetch = async (url) => {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) return null;
+                    const ct = res.headers.get("content-type");
+                    if (!ct || !ct.includes("application/json")) return null;
+                    return await res.json();
+                } catch (e) {
+                    return null;
+                }
+            };
+
+            // 1. Fetch stats
+            safeFetch("/api/admin/stats").then((data) => {
+                if (data && data.status === "success") {
+                    if (data.registeredUsers !== undefined) setRegisteredCount(data.registeredUsers);
+                    if (data.mrr) {
+                        if (data.mrr.inr !== undefined) setMrrInr(data.mrr.inr);
+                        if (data.mrr.usd !== undefined) setMrrUsd(data.mrr.usd);
+                    }
+                    if (data.executions !== undefined) setExecutions(data.executions);
                     if (data.backendStatus) {
                         setBackendStatusText(data.backendStatus.includes("Healthy") ? "Online" : "Offline");
                         const latencyMatch = data.backendStatus.match(/\d+/);
-                        if (latencyMatch) {
-                            setBackendLatency(parseInt(latencyMatch[0], 10));
-                        }
+                        if (latencyMatch) setBackendLatency(parseInt(latencyMatch[0], 10));
                     }
-                    // Update clients list from database, assigning mock usage/plan if missing
                     if (data.users && data.users.length > 0) {
                         const uniqueEmails = new Set();
                         const uniqueDbUsers = [];
@@ -952,55 +959,46 @@ export default function AdminGrowthPage() {
                         });
                         setClients(uniqueDbUsers);
                     }
-                    // Fetch team members from DB
-                    fetch("/api/admin/team")
-                        .then((res) => res.json())
-                        .then((data) => {
-                        if (data.status === "success" && data.data) {
-                            setTeamMembers(data.data);
-                            const sa = data.data.find((tm) => tm.role === "SuperAdmin");
-                            if (sa) {
-                                setProfileName(sa.name);
-                                setProfileEmail(sa.email);
-                                setProfilePasscode(sa.password || "sellgrow123");
-                                setProfileAuthKey(sa.authKey || "Level-5 Master");
-                                setProfileAdminLevel(sa.adminLevel || "Platform Creator");
-                                setProfileCountry(sa.country || "IN India HQ");
-                                setSuperAdminId(sa.id);
-                            }
-                        }
-                    })
-                        .catch((err) => console.error("Error loading team database:", err));
-                    // Fetch employees from DB
-                    fetch("/api/admin/employees")
-                        .then((res) => res.json())
-                        .then((data) => {
-                        if (data.status === "success" && data.data) {
-                            setEmployees(data.data);
-                        }
-                    })
-                        .catch((err) => console.error("Error loading employees database:", err));
-                    // Fetch services from DB
-                    fetch("/api/admin/services")
-                        .then((res) => res.json())
-                        .then((data) => {
-                        if (data.status === "success" && data.data) {
-                            setServices(data.data);
-                        }
-                    })
-                        .catch((err) => console.error("Error loading services database:", err));
-                    // Fetch profile image from DB
-                    fetch("/api/admin/profile-image")
-                        .then((res) => res.json())
-                        .then((data) => {
-                        if (data.status === "success" && data.data?.imageBase64) {
-                            setProfileImage(`data:${data.data.mimeType};base64,${data.data.imageBase64}`);
-                        }
-                    })
-                        .catch((err) => console.error("Error loading profile image:", err));
                 }
-            })
-                .catch((err) => console.error("Error fetching stats:", err));
+            });
+
+            // 2. Fetch team members
+            safeFetch("/api/admin/team").then((data) => {
+                if (data && data.status === "success" && Array.isArray(data.data) && data.data.length > 0) {
+                    setTeamMembers(data.data);
+                    const sa = data.data.find((tm) => tm.role === "SuperAdmin");
+                    if (sa) {
+                        setProfileName(sa.name);
+                        setProfileEmail(sa.email);
+                        setProfilePasscode(sa.password || "sellgrow123");
+                        setProfileAuthKey(sa.authKey || "Level-5 Master");
+                        setProfileAdminLevel(sa.adminLevel || "Platform Creator");
+                        setProfileCountry(sa.country || "IN India HQ");
+                        setSuperAdminId(sa.id);
+                    }
+                }
+            });
+
+            // 3. Fetch employees
+            safeFetch("/api/admin/employees").then((data) => {
+                if (data && data.status === "success" && Array.isArray(data.data) && data.data.length > 0) {
+                    setEmployees(data.data);
+                }
+            });
+
+            // 4. Fetch services
+            safeFetch("/api/admin/services").then((data) => {
+                if (data && data.status === "success" && Array.isArray(data.data) && data.data.length > 0) {
+                    setServices(data.data);
+                }
+            });
+
+            // 5. Fetch profile image
+            safeFetch("/api/admin/profile-image").then((data) => {
+                if (data && data.status === "success" && data.data?.imageBase64) {
+                    setProfileImage(`data:${data.data.mimeType};base64,${data.data.imageBase64}`);
+                }
+            });
         }
         else {
             router.push("/sg-superadmin");

@@ -25,6 +25,8 @@ function formatRow(table, row) {
   
   if (formatted.id && !formatted._id) {
     formatted._id = String(formatted.id);
+  } else if (formatted._id && !formatted.id) {
+    formatted.id = String(formatted._id);
   }
 
   // Parse JSON fields based on table

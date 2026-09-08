@@ -129,8 +129,8 @@ export default function RootLayout({ children, }) {
       </head>
       <body className="antialiased min-h-screen grid-bg">
         {/* Google Analytics 4 Script */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-SELLGROW4" strategy="afterInteractive"/>
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-SELLGROW4" strategy="lazyOnload"/>
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}

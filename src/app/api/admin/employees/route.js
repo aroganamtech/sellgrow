@@ -22,8 +22,8 @@ export async function GET() {
         else if (list.length > 0 && !seedMeta) {
             await metaCollection.updateOne({ key: 'employees_seeded' }, { $set: { seeded: true, seededAt: new Date() } }, { upsert: true });
         }
-        const formatted = list.map((item) => ({
-            id: item._id.toString(),
+        const formatted = list.map((item, idx) => ({
+            id: item._id ? item._id.toString() : (item.id ? String(item.id) : `emp_${idx}`),
             name: item.name,
             email: item.email,
             work: item.work,
@@ -57,7 +57,7 @@ export async function POST(req) {
         const result = await collection.insertOne(doc);
         return NextResponse.json({
             status: 'success',
-            data: { id: result.insertedId.toString(), ...doc }
+            data: { id: result.insertedId ? result.insertedId.toString() : `emp_${Date.now()}`, ...doc }
         });
     }
     catch (error) {

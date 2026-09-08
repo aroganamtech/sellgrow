@@ -1763,9 +1763,9 @@ export default function DashboardPage() {
                     catch (e) { }
                 }
                 const res = await fetch("/api/admin/products");
-                if (res.ok) {
+                if (res.ok && res.headers.get("content-type")?.includes("application/json")) {
                     const json = await res.json();
-                    if (json.status === "success" && Array.isArray(json.data)) {
+                    if (json.status === "success" && Array.isArray(json.data) && json.data.length > 0) {
                         const apiProds = json.data
                             .filter((item) => !deletedIds.includes(item.id) && !deletedIds.includes(String(item._id)))
                             .map((item) => {

@@ -58,8 +58,9 @@ function processHtmlFiles(dir) {
         } else if (file.endsWith('.html')) {
           let content = fs.readFileSync(filePath, 'utf8');
           let modified = false;
-          if (content.includes('_next')) {
+          if (content.includes('_next') || content.includes('googletagmanager.com')) {
             content = content
+              .replace(/<link rel="preload" href="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-SELLGROW4" as="script"\/>/g, '')
               .replace(/\/_next\//g, '/next/')
               .replace(/"_next\//g, '"next/')
               .replace(/\\\/_next\\\//g, '\\/next\\/')

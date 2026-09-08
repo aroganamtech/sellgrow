@@ -28,9 +28,9 @@ export async function GET() {
         else if (list.length > 0 && !seedMeta) {
             await metaCollection.updateOne({ key: 'services_seeded' }, { $set: { seeded: true, seededAt: new Date() } }, { upsert: true });
         }
-        const formatted = list.map((item) => ({
-            id: item.id || item._id.toString(),
-            _id: item._id.toString(),
+        const formatted = list.map((item, idx) => ({
+            id: item.id || (item._id ? item._id.toString() : `srv_${idx}`),
+            _id: item._id ? item._id.toString() : String(item.id || `srv_${idx}`),
             name: item.name,
             description: item.description,
             status: item.status,

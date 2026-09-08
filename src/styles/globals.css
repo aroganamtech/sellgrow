@@ -268,3 +268,95 @@
     width: 100%;
   }
 }
+
+/* AI Robot & Hologram Speech Bubble Custom Keyframes & Utility Animations */
+@keyframes robotFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(1.2deg);
+  }
+}
+
+@keyframes bubbleFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes pedestalPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.75;
+    filter: blur(1px);
+  }
+  50% {
+    transform: scale(0.82);
+    opacity: 0.35;
+    filter: blur(2px);
+  }
+}
+
+@keyframes robotSpeaking {
+  0%, 100% {
+    transform: translateY(-4px) scale(1.03);
+  }
+  25% {
+    transform: translateY(-10px) scale(1.06) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.04) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-9px) scale(1.06) rotate(2deg);
+  }
+}
+
+@keyframes robotListening {
+  0%, 100% {
+    transform: translateY(-2px) scale(1.03);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.08);
+  }
+}
+
+@keyframes holoGlowPulse {
+  0%, 100% {
+    box-shadow: 0 10px 30px -5px rgba(6, 182, 212, 0.25), 0 0 15px rgba(6, 182, 212, 0.2);
+    border-color: rgba(34, 211, 238, 0.7);
+  }
+  50% {
+    box-shadow: 0 15px 40px -5px rgba(6, 182, 212, 0.45), 0 0 25px rgba(56, 189, 248, 0.4);
+    border-color: rgba(56, 189, 248, 0.95);
+  }
+}
+
+.animate-robot-float {
+  animation: robotFloat 3.6s ease-in-out infinite;
+}
+
+.animate-bubble-float {
+  animation: bubbleFloat 3.6s ease-in-out infinite;
+}
+
+.animate-pedestal-shadow {
+  animation: pedestalPulse 3.6s ease-in-out infinite;
+}
+
+.animate-robot-speaking {
+  animation: robotSpeaking 1.1s ease-in-out infinite;
+}
+
+.animate-robot-listening {
+  animation: robotListening 1.6s ease-in-out infinite;
+}
+
+.animate-holo-glow {
+  animation: holoGlowPulse 3s ease-in-out infinite;
+}
+

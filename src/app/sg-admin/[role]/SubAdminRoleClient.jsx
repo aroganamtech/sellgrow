@@ -92,7 +92,7 @@ export default function SubAdminRoleClient() {
             // 1. Sync team member permissions & assigned services
             fetch("/api/admin/team")
                 .then((res) => {
-                if (!res.ok)
+                if (!res.ok || !res.headers.get("content-type")?.includes("application/json"))
                     throw new Error("API offline");
                 return res.json();
             })
@@ -142,7 +142,7 @@ export default function SubAdminRoleClient() {
             // 2. Sync assigned employees
             fetch("/api/admin/employees")
                 .then((res) => {
-                if (!res.ok)
+                if (!res.ok || !res.headers.get("content-type")?.includes("application/json"))
                     throw new Error("API offline");
                 return res.json();
             })
@@ -185,7 +185,7 @@ export default function SubAdminRoleClient() {
         setLoginError("");
         fetch("/api/admin/team")
             .then((res) => {
-            if (!res.ok)
+            if (!res.ok || !res.headers.get("content-type")?.includes("application/json"))
                 throw new Error("Offline host");
             return res.json();
         })

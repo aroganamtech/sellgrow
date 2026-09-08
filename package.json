@@ -10,7 +10,11 @@
     "build:clean": "npm run clean && npm run build",
     "start": "next start -p 11223",
     "lint": "next lint",
-    "db:init": "node scripts/create_sellgrow_mysql_db.js"
+    "db:init": "node database/init_db.js",
+    "db:test": "node database/test_connection.js",
+    "train": "python brochure_ai_model/train_pdf_folder.py --epochs 10",
+    "train:auto": "python brochure_ai_model/auto_train_upcoming_pdfs.py --epochs 10",
+    "train:corpus": "python brochure_ai_model/dataset_corpus_trainer.py"
   },
   "dependencies": {
     "framer-motion": "^11.1.7",

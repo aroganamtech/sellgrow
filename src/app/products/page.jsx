@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { CATEGORIES, PRODUCTS_DATA, } from "@/data/productsData";
-import { Search, Filter, Mic, Sparkles, Zap, CheckCircle2, MessageSquare, Box, RotateCw, X, Volume2, ChevronRight, ArrowLeft, ChevronDown, ListFilter, Play, Pause, VolumeX, Activity, Layers, ShieldCheck, Cast, Wifi, Download, Radio, FileText, Upload, FilePlus, Calendar, Clock, BrainCircuit, Database, Bot } from "lucide-react";
+import { Search, Filter, Mic, Sparkles, Zap, CheckCircle2, MessageSquare, Box, RotateCw, X, Volume2, ChevronRight, ArrowLeft, ChevronDown, ListFilter, Play, Pause, VolumeX, Activity, Layers, ShieldCheck, Cast, Wifi, Download, Radio, FileText, Upload, FilePlus, Calendar, Clock, BrainCircuit, Database, Bot, Square } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -139,6 +139,7 @@ export default function ProductsPage() {
     const [is360Rotating, setIs360Rotating] = useState(true);
     const [dragRotationAngle, setDragRotationAngle] = useState(0);
     const [isDraggingHologram, setIsDraggingHologram] = useState(false);
+    const [hologramVideoError, setHologramVideoError] = useState(false);
     const dragStartXRef = React.useRef(0);
     const dragStartAngleRef = React.useRef(0);
     const handleHologramMouseDown = (e) => {
@@ -449,13 +450,16 @@ export default function ProductsPage() {
     const [holoUserQuery, setHoloUserQuery] = useState("");
     const [holoAiHistory, setHoloAiHistory] = useState([]);
     const [isListening, setIsListening] = useState(false);
+    const [liveVoiceTranscript, setLiveVoiceTranscript] = useState("");
     const [isLiveConvActive, setIsLiveConvActive] = useState(false);
     const isLiveConvActiveRef = React.useRef(false);
     const isSpeakingRef = React.useRef(false);
+    const isProcessingTurnRef = React.useRef(false);
     const recognitionRef = React.useRef(null);
     const holoChatEndRef = React.useRef(null);
     const [holoActiveTab, setHoloActiveTab] = useState("specs");
     const [isHoloAiPanelOpen, setIsHoloAiPanelOpen] = useState(false);
+    const [showFullChatStream, setShowFullChatStream] = useState(false);
 
     React.useEffect(() => {
         isLiveConvActiveRef.current = isLiveConvActive;
@@ -470,24 +474,140 @@ export default function ProductsPage() {
             holoChatEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [holoAiHistory, holoActiveTab]);
+    const getRandomAiGreeting = (product, lang = "en") => {
+        if (!product) return "Welcome! Ask me any question about product specs!";
+        const name = product.name || "George Maijo Equipment";
+        const power = product.power || "1.4 HP @ 7000 RPM";
+        const disp = product.displacement || "35.8 cc";
+
+        const enGreetings = [
+            `Welcome! I'm your AI Robot Assistant for ${name}. What would you like to know about its power, engine, or price today?`,
+            `Greetings! I'm here to help you explore ${name}. Feel free to ask about its specifications, weight, or features!`,
+            `Hello! How can I assist you with ${name} today? Ask me any question about specs, cutting width, or fuel capacity!`,
+            `Welcome! I'm ready to answer any questions about ${name}. What details would you like to check?`,
+            `Hi there! Looking for details on ${name}? Ask me about power output (${power}), displacement (${disp}), or quotation!`,
+            `Greetings! Ask me anything about ${name} engine performance, fuel capacity, or dry weight!`
+        ];
+
+        const hiGreetings = [
+            `नमस्ते! मैं ${name} का AI उत्पाद सहायक हूँ। आज मैं आपकी क्या सहायता कर सकता हूँ?`,
+            `स्वागत है! ${name} के इंजन, पावर, वजन या कीमत के बारे में मुझसे बेझिझक पूछें!`,
+            `नमस्कार प्रिय ग्राहक! ${name} की विशेषताएँ, डिप्लेसमेंट (${disp}) और परफॉरमेंस के बारे में कुछ भी पूछें!`,
+            `नमस्ते! क्या आप ${name} की जानकारी जानना चाहते हैं? पावर आउटपुट (${power}) या कीमत के बारे में पूछें!`,
+            `स्वागत है! मैं ${name} के लिए आपका एआई रोबोट सहायक हूँ। आप मुझसे हिंदी में कुछ भी पूछ सकते हैं!`
+        ];
+
+        const taGreetings = [
+            `வணக்கம்! நான் ${name} இன் AI தயாரிப்பு உதவியாளர். இன்று உங்களுக்கு எவ்வாறு உதவ வேண்டும்?`,
+            `நல்வரவு! ${name} இன் எஞ்சின், பவர் (${power}), எடை மற்றும் விலை விவரங்களை என்னிடம் கேட்கலாம்!`,
+            `வணக்கம் அன்பான வாடிக்கையாளரே! ${name} தயாரிப்பு விவரங்களை தயங்காமல் கேளுங்கள்!`,
+            `வணக்கம்! ${name} பற்றிய எந்தவொரு கேள்விக்கும் பதில் அளிக்க நான் தயார்!`,
+            `நல்வரவு! ${name} எஞ்சின் வகை (${disp}), வெட்டு அகலம் மற்றும் தள்ளுபடி விவரங்களைக் கேட்கலாம்!`
+        ];
+
+        let pool = enGreetings;
+        if (lang === "hi") pool = hiGreetings;
+        else if (lang === "ta") pool = taGreetings;
+
+        const randomIndex = Math.floor(Math.random() * pool.length);
+        return pool[randomIndex];
+    };
+
     const handleHoloLangChange = (lang) => {
         setHoloAiLang(lang);
         stopTTS();
         if (hologramProduct) {
-            const specText = getProductSpecsText(hologramProduct, lang);
-            speakTTS(specText, lang);
-            let greetingMsg = "";
-            if (lang === "hi") {
-                greetingMsg = `नमस्ते! मैं ${hologramProduct.name} का AI उत्पाद सहायक हूँ। इंजन, पावर, वजन या कीमत के बारे में हिंदी में पूछें!`;
-            }
-            else if (lang === "ta") {
-                greetingMsg = `வணக்கம்! நான் ${hologramProduct.name} இன் AI தயாரிப்பு உதவியாளர். விவரங்களை தமிழ் மொழியில் கேட்கலாம்!`;
-            }
-            else {
-                greetingMsg = `Hello! I am your AI Product Assistant for ${hologramProduct.name}. Ask me about specs, engine, power, or price!`;
-            }
+            const greetingMsg = getRandomAiGreeting(hologramProduct, lang);
             setHoloAiHistory([{ sender: "ai", text: greetingMsg }]);
+            speakTTS(greetingMsg, lang, () => {
+                if (isLiveConvActiveRef.current) {
+                    setTimeout(() => {
+                        isProcessingTurnRef.current = false;
+                        if (isLiveConvActiveRef.current && !isSpeakingRef.current) {
+                            handleStartVoiceListening(lang, (transcript) => {
+                                setHoloUserQuery(transcript);
+                                handleHoloVoiceQuerySubmit(transcript);
+                            }, true);
+                        }
+                    }, 500);
+                }
+            });
         }
+    };
+
+    const handleHoloVoiceQuerySubmit = async (queryText) => {
+        if (!queryText.trim() || !hologramProduct)
+            return;
+
+        // Lock turn & immediately abort mic to prevent hearing AI's own output
+        isProcessingTurnRef.current = true;
+        if (recognitionRef.current) {
+            try { recognitionRef.current.abort(); } catch (e) { }
+        }
+        setIsListening(false);
+
+        const q = queryText.trim();
+        setHoloUserQuery("");
+        setHoloActiveTab("chat");
+
+        // Automatic Spoken Language Switch Detection
+        const detectedLang = detectLanguageChangeIntent(q);
+        let activeLang = holoAiLang;
+        let isLangSwitchCommand = false;
+
+        if (detectedLang && detectedLang !== holoAiLang) {
+            activeLang = detectedLang;
+            setHoloAiLang(detectedLang); // Automatically updates top language pill button UI!
+            isLangSwitchCommand = true;
+        }
+
+        let userDisplayText = q;
+        if (isLangSwitchCommand) {
+            if (activeLang === "hi") userDisplayText = "🌐 Switch language to Hindi / भाषा हिंदी में बदलें 🇮🇳";
+            else if (activeLang === "ta") userDisplayText = "🌐 Switch language to Tamil / தமிழுக்கு மாற்றவும் 🇮🇳";
+            else if (activeLang === "en") userDisplayText = "🌐 Switch language to English / Switch to English 🇺🇸";
+        }
+        setHoloAiHistory((prev) => [...prev, { sender: "user", text: userDisplayText }]);
+
+        let answer = "";
+        try {
+            const aiRes = await fetch("/api/ai/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ product: hologramProduct, query: q, lang: activeLang }),
+            });
+            if (aiRes.ok && aiRes.headers.get("content-type")?.includes("application/json")) {
+                const aiData = await aiRes.json();
+                if (aiData?.text) {
+                    answer = aiData.text;
+                }
+            }
+        } catch (err) {
+            console.warn("Sarvam AI Chat API request error, falling back:", err);
+        }
+
+        if (!answer) {
+            answer = getSmartAiAnswer(hologramProduct, q, activeLang);
+        }
+
+        setHoloAiHistory((prev) => [...prev, { sender: "ai", text: answer }]);
+
+        // Speak TTS out loud; ONLY restart mic after TTS audio completes + 700ms acoustic cooling delay
+        speakTTS(answer, activeLang, () => {
+            if (isLiveConvActiveRef.current) {
+                setTimeout(() => {
+                    isProcessingTurnRef.current = false;
+                    if (isLiveConvActiveRef.current && !isSpeakingRef.current) {
+                        handleStartVoiceListening(activeLang, (transcript) => {
+                            setHoloUserQuery(transcript);
+                            handleHoloVoiceQuerySubmit(transcript);
+                        }, true);
+                    }
+                }, 700); // 700ms room acoustic cooling delay prevents mic from capturing speaker echo
+            } else {
+                isProcessingTurnRef.current = false;
+            }
+        });
     };
     const getProductSpecsText = (product, lang) => {
         const disp = product.displacement || "35.8 cc";
@@ -522,9 +642,12 @@ export default function ProductsPage() {
         const isPrice = q.includes("price") || q.includes("cost") || q.includes("rate") || q.includes("buy") || q.includes("purchase") || q.includes("விலை") || q.includes("कीमत") || q.includes("मूल्य") || q.includes("दाम");
         const isCut = q.includes("cut") || q.includes("width") || q.includes("blade") || q.includes("tilling") || q.includes("வெட்டு") || q.includes("कटिंग") || q.includes("चौड़ाई") || q.includes("ब्लेड");
         const isGreeting = q.includes("hello") || q.includes("hi") || q.includes("hey") || q.includes("namaste") || q.includes("vanakkam") || q.includes("வணக்கம்") || q.includes("नमस्ते") || q.includes("प्रणाम");
+        const isWebsite = q.includes("website") || q.includes("site") || q.includes("link") || q.includes("online") || q.includes("url") || q.includes("portal") || q.includes("web") || q.includes("वेबसाइट") || q.includes("लिंक") || q.includes("साइट") || q.includes("இணைப்பு") || q.includes("வலைத்தளம்");
         const isGeneralProduct = q.includes("spec") || q.includes("detail") || q.includes("info") || q.includes("feature") || q.includes("about") || q.includes("warranty") || q.includes("guarantee") || q.includes("product") || q.includes("machine") || q.includes("tool") || q.includes("equipment") || q.includes("help") || q.includes("விவரம்") || q.includes("தகவல்") || q.includes("தயாரிப்பு") || q.includes("जानकारी") || q.includes("विवरण") || q.includes("उत्पाद") || (name && q.includes(name.toLowerCase()));
 
         if (lang === "hi") {
+            if (isWebsite)
+                return `${name} और जॉर्ज मैजो एग्री की आधिकारिक वेबसाइट https://www.georgemaijoagri.com/ है। आप अधिक उत्पाद विवरण के लिए वेबसाइट पर जा सकते हैं।`;
             if (isPower)
                 return `${name} का अधिकतम पावर आउटपुट ${pwr} है। यह 4-स्ट्रोक एयर-कूल्ड इंजन के साथ आता है जो कठिन कृषि, कटाई और भारी मैदानी काम के लिए उच्च शक्ति और बेहतरीन परफॉरमेंस प्रदान करता है।`;
             if (isDisp)
@@ -540,10 +663,12 @@ export default function ProductsPage() {
             if (isGreeting)
                 return `नमस्ते! मैं ${name} का AI उत्पाद सहायक हूँ। आप मुझसे इंजन, पावर, वजन या कीमत के बारे में हिंदी में कुछ भी पूछ सकते हैं!`;
             if (isGeneralProduct)
-                return `${name} की संपूर्ण जानकारी: इंजन डिप्लेसमेंट ${disp}, इंजन प्रकार ${eng}, अधिकतम पावर ${pwr}, और कुल वजन ${wt} है। यह 100% शुद्ध पेट्रोल पर चलने वाला एक शक्तिशाली और टिकाऊ ब्रश कटर है।`;
-            return `यह जानकारी आधिकारिक ब्रोशर में उपलब्ध नहीं है। कृपया ब्रोशर में दी गई उत्पाद विशेषताओं (इंजन, पावर, वजन या कीमत) के बारे में ही सवाल पूछें!`;
+                return `${name} की संपूर्ण जानकारी: इंजन डिप्लेसमेंट ${disp}, इंजन प्रकार ${eng}, अधिकतम पावर ${pwr}, और कुल वजन ${wt} है। आधिकारिक वेबसाइट: https://www.georgemaijoagri.com/`;
+            return `यह जानकारी आधिकारिक ब्रोशर में उपलब्ध नहीं है। आप आधिकारिक वेबसाइट https://www.georgemaijoagri.com/ पर जा सकते हैं या ब्रोशर की विशेषताएँ पूछ सकते हैं!`;
         }
         if (lang === "ta") {
+            if (isWebsite)
+                return `${name} மற்றும் ஜார்ஜ் மைஜோ அக்ரியின் அதிகாரப்பூர்வ வலைத்தளம் https://www.georgemaijoagri.com/ ஆகும். கூடுதல் தகவல்களுக்கு இணையதளத்தை பார்வையிடலாம்.`;
             if (isPower)
                 return `${name} இன் அதிகபட்ச ஆற்றல் வெளியீடு ${pwr} ஆகும். விவசாய பணிகளுக்கு மிகச் சிறந்தது.`;
             if (isDisp)
@@ -559,10 +684,12 @@ export default function ProductsPage() {
             if (isGreeting)
                 return `வணக்கம்! நான் ${name} இன் AI தயாரிப்பு உதவியாளர். எஞ்சின், பவர் மற்றும் விலை பற்றிய கேள்விகளைக் கேட்கலாம்!`;
             if (isGeneralProduct)
-                return `${name} விவரக்குறிப்புகள்: எஞ்சின் கொள்ளளவு ${disp}, வகை ${eng}, ஆற்றல் ${pwr}, எடை ${wt} ஆகும்.`;
-            return `இந்த விவரம் அதிகாரப்பூர்வ பிராச்சரில் இல்லை. தயவுசெய்து பிராச்சரில் உள்ள தயாரிப்பு விவரங்களை (எஞ்சின், பவர், எடை அல்லது விலை) மட்டுமே கேட்கவும்!`;
+                return `${name} விவரக்குறிப்புகள்: எஞ்சின் கொள்ளளவு ${disp}, வகை ${eng}, ஆற்றல் ${pwr}, எடை ${wt} ஆகும். அதிகாரப்பூர்வ வலைத்தளம்: https://www.georgemaijoagri.com/`;
+            return `இந்த விவரம் அதிகாரப்பூர்வ பிராச்சரில் இல்லை. நீங்கள் அதிகாரப்பூர்வ இணையதளமான https://www.georgemaijoagri.com/ ஐப் பார்வையிடலாம்!`;
         }
         // Default English
+        if (isWebsite)
+            return `The official website link for ${name} and George Maijo Agri is https://www.georgemaijoagri.com/. You can visit the site for complete product information and catalogs.`;
         if (isPower)
             return `The maximum power output of ${name} is ${pwr}, delivering high performance for demanding operations.`;
         if (isDisp)
@@ -578,13 +705,14 @@ export default function ProductsPage() {
         if (isGreeting)
             return `Hello! I am your AI Product Assistant for ${name}. Feel free to ask me anything about engine specs, power output, weight, or pricing!`;
         if (isGeneralProduct)
-            return `${name} Specifications: Engine ${eng}, Displacement ${disp}, Max Power Output ${pwr}, and Weight ${wt}. Pure petrol operation with high fuel efficiency.`;
-        return `The requested detail is not available in the official product brochure. Please ask about the specifications listed in the brochure!`;
+            return `${name} Specifications: Engine ${eng}, Displacement ${disp}, Max Power Output ${pwr}, and Weight ${wt}. Official Website: https://www.georgemaijoagri.com/`;
+        return `The requested detail is not available in the official product brochure. You can visit the official website https://www.georgemaijoagri.com/ or ask about brochure specifications!`;
     };
     const toggleLiveVoiceConversation = () => {
         if (isLiveConvActiveRef.current) {
             setIsLiveConvActive(false);
             isLiveConvActiveRef.current = false;
+            isProcessingTurnRef.current = false;
             if (recognitionRef.current) {
                 try { recognitionRef.current.abort(); } catch (e) { }
             }
@@ -593,6 +721,7 @@ export default function ProductsPage() {
         } else {
             setIsLiveConvActive(true);
             isLiveConvActiveRef.current = true;
+            isProcessingTurnRef.current = false;
             stopTTS();
             handleStartVoiceListening(holoAiLang, (transcript) => {
                 setHoloUserQuery(transcript);
@@ -604,6 +733,7 @@ export default function ProductsPage() {
     const stopAllVoiceAndLiveMode = () => {
         setIsLiveConvActive(false);
         isLiveConvActiveRef.current = false;
+        isProcessingTurnRef.current = false;
         if (recognitionRef.current) {
             try { recognitionRef.current.abort(); } catch (e) { }
         }
@@ -617,53 +747,70 @@ export default function ProductsPage() {
         }
     }, [is3DModalOpen]);
 
-    const handleHoloVoiceQuerySubmit = async (queryText) => {
-        if (!queryText.trim() || !hologramProduct)
-            return;
-        const q = queryText.trim();
-        setHoloUserQuery("");
-        setHoloActiveTab("chat");
-        setHoloAiHistory((prev) => [...prev, { sender: "user", text: q }]);
+    const detectLanguageChangeIntent = (queryText) => {
+        if (!queryText) return null;
+        const q = queryText.toLowerCase().trim();
 
-        let answer = "";
-        try {
-            const aiRes = await fetch("/api/ai/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ product: hologramProduct, query: q, lang: holoAiLang }),
-            });
-            if (aiRes.ok) {
-                const aiData = await aiRes.json();
-                if (aiData?.text) {
-                    answer = aiData.text;
-                }
+        // 1. Script-Based Detection
+        // Tamil Unicode range: \u0B80-\u0BFF
+        if (/[\u0B80-\u0BFF]/.test(queryText)) {
+            if (q.includes("ஹிந்தி") || q.includes("இந்தி")) return "hi";
+            if (q.includes("இங்கிலீஷ்") || q.includes("ஆங்கிலம்")) return "en";
+            return "ta";
+        }
+        // Devanagari (Hindi) Unicode range: \u0900-\u097F
+        if (/[\u0900-\u097F]/.test(queryText)) {
+            // Check if Devanagari text asks for Tamil: e.g. "तमिळ", "तमिल", "तामिल"
+            if (q.includes("तमिळ") || q.includes("तमिल") || q.includes("तामिल")) {
+                return "ta";
             }
-        } catch (err) {
-            console.warn("Sarvam AI Chat API request error, falling back:", err);
+            if (q.includes("इंग्लिश") || q.includes("अंग्रेजी")) return "en";
+            return "hi";
         }
 
-        if (!answer) {
-            answer = getSmartAiAnswer(hologramProduct, q, holoAiLang);
+        // 2. Tamil Keyword / Vernacular Triggers (Latin script)
+        if (
+            q.includes("tamil") || q.includes("tamizh") || q.includes("thamil") || q.includes("tami") ||
+            q.includes("speak in tamil") || q.includes("talk in tamil") ||
+            q.includes("change to tamil") || q.includes("switch to tamil") ||
+            q.includes("language to tamil") || q.includes("tamil pesu") || q.includes("pesu") ||
+            q.includes("tamil la") || q.includes("tamizh la")
+        ) {
+            return "ta";
         }
 
-        setHoloAiHistory((prev) => [...prev, { sender: "ai", text: answer }]);
-        speakTTS(answer, holoAiLang, () => {
-            if (isLiveConvActiveRef.current) {
-                setTimeout(() => {
-                    if (isLiveConvActiveRef.current) {
-                        handleStartVoiceListening(holoAiLang, (transcript) => {
-                            setHoloUserQuery(transcript);
-                            handleHoloVoiceQuerySubmit(transcript);
-                        }, true);
-                    }
-                }, 400);
-            }
-        });
+        // 3. Hindi Keyword Triggers (Latin script)
+        if (
+            q.includes("hindi") || q.includes("hindu") ||
+            q.includes("speak in hindi") || q.includes("talk in hindi") ||
+            q.includes("change to hindi") || q.includes("switch to hindi") ||
+            q.includes("language to hindi") || q.includes("hindi me") || q.includes("hindi bolo")
+        ) {
+            return "hi";
+        }
+
+        // 4. English Keyword Triggers (Latin script)
+        if (
+            q.includes("english") || q.includes("inglesh") ||
+            q.includes("speak in english") || q.includes("talk in english") ||
+            q.includes("change to english") || q.includes("switch to english") ||
+            q.includes("language to english") || q.includes("speak english")
+        ) {
+            return "en";
+        }
+
+        return null;
     };
 
     const handleStartVoiceListening = (lang, onResult, isContinuous = false) => {
         if (typeof window === "undefined")
             return;
+
+        // Block mic if AI is currently speaking or processing a conversational turn
+        if (isSpeakingRef.current || isProcessingTurnRef.current) {
+            return;
+        }
+
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
             alert("Speech recognition is not supported in this browser. Please type your question in the text box.");
@@ -685,43 +832,59 @@ export default function ProductsPage() {
             let finalTranscript = "";
             let silenceTimer = null;
 
-            recognition.onstart = () => setIsListening(true);
+            recognition.onstart = () => {
+                setIsListening(true);
+                setLiveVoiceTranscript("");
+            };
             recognition.onend = () => {
                 setIsListening(false);
+                setLiveVoiceTranscript("");
+
+                // If valid transcript collected, set turn lock and submit without auto-restarting
                 if (finalTranscript.trim()) {
-                    onResult(finalTranscript.trim());
+                    const textToSubmit = finalTranscript.trim();
                     finalTranscript = "";
+                    isProcessingTurnRef.current = true;
+                    onResult(textToSubmit);
+                    return;
                 }
-                if (isLiveConvActiveRef.current && !isSpeakingRef.current) {
+
+                if (isLiveConvActiveRef.current && !isSpeakingRef.current && !isProcessingTurnRef.current) {
                     setTimeout(() => {
-                        if (isLiveConvActiveRef.current && !isSpeakingRef.current) {
+                        if (isLiveConvActiveRef.current && !isSpeakingRef.current && !isProcessingTurnRef.current) {
                             try {
                                 recognition.start();
                             } catch (err) {
                                 handleStartVoiceListening(lang, onResult, true);
                             }
                         }
-                    }, 300);
+                    }, 400);
                 }
             };
             recognition.onerror = (err) => {
                 console.warn("Speech recognition error:", err);
                 setIsListening(false);
-                if (isLiveConvActiveRef.current && !isSpeakingRef.current) {
+                setLiveVoiceTranscript("");
+                if (isLiveConvActiveRef.current && !isSpeakingRef.current && !isProcessingTurnRef.current) {
                     setTimeout(() => {
-                        if (isLiveConvActiveRef.current && !isSpeakingRef.current) {
+                        if (isLiveConvActiveRef.current && !isSpeakingRef.current && !isProcessingTurnRef.current) {
                             handleStartVoiceListening(lang, onResult, true);
                         }
-                    }, 500);
+                    }, 600);
                 }
             };
             recognition.onresult = (event) => {
+                if (isSpeakingRef.current || isProcessingTurnRef.current) {
+                    try { recognition.abort(); } catch (e) { }
+                    return;
+                }
                 let currentText = "";
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     currentText += event.results[i][0].transcript;
                 }
                 if (currentText.trim()) {
                     finalTranscript = currentText.trim();
+                    setLiveVoiceTranscript(currentText.trim());
                     if (silenceTimer) clearTimeout(silenceTimer);
                     silenceTimer = setTimeout(() => {
                         try {
@@ -730,7 +893,10 @@ export default function ProductsPage() {
                     }, 550);
                 }
             };
-            recognition.start();
+
+            if (!isSpeakingRef.current && !isProcessingTurnRef.current) {
+                recognition.start();
+            }
         }
         catch (err) {
             console.error("Speech recognition error:", err);
@@ -790,9 +956,9 @@ export default function ProductsPage() {
             }
             try {
                 const res = await fetch("/api/admin/products");
-                if (res.ok) {
+                if (res.ok && res.headers.get("content-type")?.includes("application/json")) {
                     const result = await res.json();
-                    if (result.status === "success" && Array.isArray(result.data)) {
+                    if (result.status === "success" && Array.isArray(result.data) && result.data.length > 0) {
                         const apiProducts = result.data.filter((p) => !deletedIds.includes(p.id) && !deletedIds.includes(p._id));
                         setProductsList(apiProducts);
                         if (typeof window !== "undefined") {
@@ -902,9 +1068,7 @@ export default function ProductsPage() {
         e.stopPropagation();
         setVoiceModelProduct(product);
         const activeLang = voiceLang || (language === "ta" ? "ta" : "en");
-        const greetingMsg = activeLang === "ta"
-            ? (product.voiceGreeting?.ta || `வணக்கம்! நான் ${product.name} எஞ்சினின் AI உதவியாளர். உங்களுக்கு எப்படி உதவ முடியும்?`)
-            : (product.voiceGreeting?.en || `Hello, I am the AI assistant for ${product.name}. How can I help you today?`);
+        const greetingMsg = getRandomAiGreeting(product, activeLang);
         setAiHistory([
             { sender: "ai", text: greetingMsg },
         ]);
@@ -918,13 +1082,11 @@ export default function ProductsPage() {
         setIsHologramPlaying(true);
         setIsHologramMuted(true);
         setIsHologramFullscreen(false);
+        setHologramVideoError(false);
         setHoloActiveTab("chat");
+        const greetingMsg = getRandomAiGreeting(product, holoAiLang);
         setHoloAiHistory([
-            { sender: "user", text: "What is the max power output?" },
-            {
-                sender: "ai",
-                text: `The maximum power output of ${product.name} is: ${product.power || "1.0 kW @ 7000 RPM"}, delivering high performance for demanding operations.`
-            }
+            { sender: "ai", text: greetingMsg }
         ]);
         setIs3DModalOpen(true);
     };
@@ -1004,7 +1166,7 @@ export default function ProductsPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text, lang }),
             });
-            if (ttsRes.ok) {
+            if (ttsRes.ok && ttsRes.headers.get("content-type")?.includes("application/json")) {
                 const ttsData = await ttsRes.json();
                 if (ttsData?.audioUrl) {
                     const audio = new Audio(ttsData.audioUrl);
@@ -1017,9 +1179,9 @@ export default function ProductsPage() {
                         handleFinished();
                     };
                     audio.onerror = () => {
-                        fallbackElevenLabsTTS(text, lang, onEnded);
+                        fallbackBrowserTTS(text, lang, onEnded);
                     };
-                    audio.play().catch(() => fallbackElevenLabsTTS(text, lang, onEnded));
+                    audio.play().catch(() => fallbackBrowserTTS(text, lang, onEnded));
                     return;
                 }
             }
@@ -1027,7 +1189,7 @@ export default function ProductsPage() {
             console.warn("Sarvam AI TTS call failed, falling back:", e);
         }
 
-        fallbackElevenLabsTTS(text, lang, onEnded);
+        fallbackBrowserTTS(text, lang, onEnded);
     };
 
     const fallbackElevenLabsTTS = async (text, lang = "en", onEnded = null) => {
@@ -1879,8 +2041,19 @@ export default function ProductsPage() {
             {/* Top Overlay Header Bar */}
             <div className="relative z-20 flex items-center justify-between pb-3 border-b border-slate-200/80">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 border border-cyan-200 flex items-center justify-center shadow-sm shrink-0">
-                  <Sparkles className="w-5 h-5 animate-pulse text-cyan-600"/>
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-50 via-white to-blue-50 border border-cyan-300/80 p-1 flex items-center justify-center shadow-md shrink-0 overflow-hidden relative group">
+                  {hologramProduct.image ? (
+                    <img 
+                      src={hologramProduct.image} 
+                      alt={hologramProduct.name} 
+                      className="w-full h-full object-contain drop-shadow-xs transition-transform duration-300 group-hover:scale-110" 
+                      onError={(e) => {
+                        e.currentTarget.src = "/assets/brochures/brush_cutter_4sp_pr_page_1_img_1.png";
+                      }}
+                    />
+                  ) : (
+                    <Sparkles className="w-5 h-5 animate-pulse text-cyan-600"/>
+                  )}
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight font-display">
@@ -1923,9 +2096,9 @@ export default function ProductsPage() {
                 <div className="absolute bottom-16 right-3 w-5 h-5 border-b-2 border-r-2 border-cyan-500 pointer-events-none"/>
 
                 {/* Top Left HUD Stats Badge */}
-                <div className="absolute top-3.5 left-3.5 z-20 bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-cyan-500/40 text-xs font-mono text-cyan-300 flex items-center gap-2 shadow-md">
-                  <Activity className="w-4 h-4 text-cyan-400 animate-pulse"/>
-                  <span className="font-bold">HUD MATRIX • 360° WIREFRAME</span>
+                <div className="absolute top-3.5 left-3.5 z-20 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-cyan-300 text-xs font-mono text-cyan-900 flex items-center gap-2 shadow-sm font-extrabold">
+                  <Activity className="w-4 h-4 text-cyan-600 animate-pulse"/>
+                  <span>HUD MATRIX • 360° WIREFRAME</span>
                 </div>
 
                 {/* Interactive Mouse & Touch Drag 360° Rotation Viewport Stage */}
@@ -1933,8 +2106,180 @@ export default function ProductsPage() {
                   <div className={`w-full h-full flex items-center justify-center transition-transform ${isDraggingHologram ? "duration-0" : "duration-300"} ${is360Rotating ? "animate-360-stage-orbit" : ""}`} style={{
                 transform: !is360Rotating ? `perspective(1000px) rotateY(${dragRotationAngle}deg)` : undefined
             }}>
-                    <video ref={hologramVideoRef} src={hologramProduct.hologramVideo || "/videos/george-maijo-bc-358-4sp-3d.mp4"} autoPlay loop muted={isHologramMuted} playsInline className="max-w-[65%] max-h-[65%] sm:max-w-[60%] sm:max-h-[60%] object-contain filter drop-shadow-[0_15px_35px_rgba(0,0,0,0.15)] pointer-events-none transition-all duration-300"/>
+                    {!hologramVideoError ? (
+                      <video ref={hologramVideoRef} src={hologramProduct.hologramVideo || "/videos/george-maijo-bc-358-4sp-3d.mp4"} autoPlay loop muted={isHologramMuted} playsInline onError={() => setHologramVideoError(true)} className="max-w-[65%] max-h-[65%] sm:max-w-[60%] sm:max-h-[60%] object-contain filter drop-shadow-[0_15px_35px_rgba(0,0,0,0.15)] pointer-events-none transition-all duration-300"/>
+                    ) : (
+                      <div className="w-56 h-56 flex items-center justify-center p-4">
+                        <ProductGraphic product={hologramProduct} is3DHover={true} />
+                      </div>
+                    )}
                   </div>
+                </div>
+
+                {/* Animated AI Robot Companion in Bottom-Right Corner of 3D Viewport with Floating Hologram Speech Bubble Above Head */}
+                <div className="absolute bottom-16 right-4 z-40 flex flex-col items-center select-none pointer-events-none">
+                  {/* Live Speech Bubble Floating Directly ABOVE the Robot's Head */}
+                  <div className="mb-3 max-w-[260px] sm:max-w-[320px] bg-white/95 backdrop-blur-xl border-2 border-cyan-400 rounded-2xl p-3.5 shadow-2xl text-slate-900 text-[11.5px] leading-relaxed flex flex-col gap-2 relative pointer-events-auto transition-all duration-300 animate-bubble-float animate-holo-glow">
+                    {/* Speech Bubble Header Badge with Mini Robot Avatar */}
+                    <div className="flex items-center justify-between border-b border-cyan-100/90 pb-2 font-extrabold text-[10.5px] text-cyan-900">
+                      <div className="flex items-center gap-1.5">
+                        <img src="/images/ai_robot.png" alt="AI Robot Avatar" className="w-5 h-5 object-contain bg-cyan-100 p-0.5 rounded-full border border-cyan-300 shadow-xs animate-pulse" />
+                        <span className="font-black text-[11px] text-cyan-950 tracking-tight">
+                          {holoAiLang === "hi" ? "एआई सहायक" : holoAiLang === "ta" ? "AI உதவியாளர்" : "AI Assistant"}
+                        </span>
+                      </div>
+                      
+                      {isSpeaking ? (
+                        <div className="flex items-center gap-1 px-2 py-0.5 bg-rose-50 border border-rose-200/90 rounded-full animate-pulse shadow-xs">
+                          <div className="flex items-end gap-0.5 h-3">
+                            <span className="w-0.5 h-2.5 bg-rose-500 rounded-full animate-bounce [animation-delay:0ms]"></span>
+                            <span className="w-0.5 h-3 bg-rose-600 rounded-full animate-bounce [animation-delay:150ms]"></span>
+                            <span className="w-0.5 h-2 bg-rose-500 rounded-full animate-bounce [animation-delay:300ms]"></span>
+                          </div>
+                          <span className="text-[9.5px] font-bold text-rose-700">{holoAiLang === "hi" ? "बोल रहा है..." : holoAiLang === "ta" ? "பேசுகிறது..." : "Speaking..."}</span>
+                        </div>
+                      ) : isListening ? (
+                        <div className="flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 border border-emerald-300/80 rounded-full shadow-xs">
+                          <div className="relative flex items-center justify-center w-3 h-3">
+                            <Mic className="w-3 h-3 text-emerald-600 z-10" />
+                            <span className="absolute inset-0 rounded-full bg-emerald-400/50 animate-ping" />
+                          </div>
+                          <span className="text-[9.5px] font-extrabold text-emerald-800">{holoAiLang === "hi" ? "सुन रहा हूँ..." : holoAiLang === "ta" ? "கேட்கிறது..." : "Listening..."}</span>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {/* Message Content: Show Live Speech Transcript, Listening Prompt, AI Response, or Welcome */}
+                    <div className="max-h-36 overflow-y-auto pr-1 text-slate-800 font-medium leading-relaxed scrollbar-thin scrollbar-thumb-cyan-300">
+                      {(() => {
+                        if (isListening) {
+                          if (liveVoiceTranscript) {
+                            return (
+                              <div className="flex flex-col gap-1 py-0.5">
+                                <span className="text-[9.5px] font-extrabold uppercase tracking-wider text-emerald-700 flex items-center gap-1">
+                                  <Mic className="w-3 h-3 text-emerald-600 animate-pulse" /> Live Voice Input:
+                                </span>
+                                <p className="text-slate-900 font-semibold italic text-[11.5px] bg-emerald-50/90 p-2 rounded-xl border border-emerald-200/90 shadow-xs">
+                                  "{liveVoiceTranscript}"
+                                </p>
+                              </div>
+                            );
+                          }
+                          return (
+                            <div className="flex flex-col items-center justify-center py-2 space-y-1 text-center">
+                              <div className="flex items-center gap-1.5 text-emerald-700">
+                                <div className="relative flex items-center justify-center w-4 h-4">
+                                  <Mic className="w-4 h-4 text-emerald-600 z-10" />
+                                  <span className="absolute inset-0 rounded-full bg-emerald-400/50 animate-ping" />
+                                </div>
+                                <span className="text-xs font-black animate-pulse">
+                                  {holoAiLang === "hi" ? "आपकी आवाज सुन रहा हूँ..." : holoAiLang === "ta" ? "உங்கள் குரலைக் கேட்கிறேன்..." : "Listening to your voice..."}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-600 font-semibold">
+                                {holoAiLang === "hi"
+                                  ? `अभी बोलें! मुझसे ${hologramProduct.name} के बारे में कुछ भी पूछें।`
+                                  : holoAiLang === "ta"
+                                  ? `இப்போது பேசுங்கள்! ${hologramProduct.name} பற்றி என்ன வேண்டுமானாலும் கேட்கலாம்.`
+                                  : `Speak now! Ask me any question about ${hologramProduct.name}.`}
+                              </p>
+                            </div>
+                          );
+                        }
+
+                        const aiMsgs = holoAiHistory.filter(h => h.sender === "ai");
+                        const latestAiMsg = aiMsgs.length > 0 ? aiMsgs[aiMsgs.length - 1] : null;
+                        if (latestAiMsg) {
+                          return latestAiMsg.text;
+                        }
+                        return holoAiLang === "hi"
+                          ? `नमस्ते! मैं आपका एआई सहायक हूँ। मुझसे ${hologramProduct.name} के स्पेक्स या कीमत के बारे में पूछें!`
+                          : holoAiLang === "ta"
+                          ? `வணக்கம்! நான் உங்கள் AI உதவியாளர். ${hologramProduct.name} விவரங்களைக் கேட்கலாம்!`
+                          : `Hello! Ask me any question about ${hologramProduct.name} specs, power, weight or price!`;
+                      })()}
+                    </div>
+
+                    {/* Action Controls inside Speech Bubble: Mic Active vs Audio Action */}
+                    {(() => {
+                      if (isListening) {
+                        return (
+                          <div className="flex items-center justify-between pt-1.5 border-t border-emerald-100 mt-0.5">
+                            <span className="text-[10.5px] font-extrabold text-emerald-800 flex items-center gap-1.5">
+                              <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                              </span>
+                              Mic Active & Listening
+                            </span>
+                            <button onClick={(e) => {
+                              e.stopPropagation();
+                              stopAllVoiceAndLiveMode();
+                            }} className="px-2.5 py-1 rounded-lg text-[9.5px] font-extrabold bg-rose-50 text-rose-700 border border-rose-300 hover:bg-rose-100 transition-all cursor-pointer shadow-xs flex items-center gap-1">
+                              <Square className="w-2.5 h-2.5 text-rose-600 fill-rose-600" />
+                              <span>Stop Mic</span>
+                            </button>
+                          </div>
+                        );
+                      }
+
+                      const aiMsgs = holoAiHistory.filter(h => h.sender === "ai");
+                      const latestAiMsg = aiMsgs.length > 0 ? aiMsgs[aiMsgs.length - 1] : null;
+                      if (!latestAiMsg) return null;
+                      return (
+                        <div className="flex items-center justify-end pt-1 border-t border-cyan-100/90 mt-0.5">
+                          <button onClick={(e) => {
+                            e.stopPropagation();
+                            if (isSpeaking) {
+                              stopTTS();
+                            } else {
+                              speakTTS(latestAiMsg.text, holoAiLang);
+                            }
+                          }} className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${isSpeaking ? "bg-rose-100 text-rose-700 border border-rose-300 hover:bg-rose-200 animate-pulse shadow-xs" : "bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100 shadow-xs"}`} title={isSpeaking ? "Stop Voice" : "Listen Audio"}>
+                            {isSpeaking ? (
+                              <>
+                                <Square className="w-2.5 h-2.5 text-rose-600 fill-rose-600" />
+                                <span>Stop Voice</span>
+                              </>
+                            ) : (
+                              <>
+                                <Volume2 className="w-3 h-3 text-cyan-600" />
+                                <span>{holoAiLang === "hi" ? "आवाज सुनें" : holoAiLang === "ta" ? "ஒலி கேட்க" : "Listen Audio"}</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Speech Bubble Arrow pointing down DIRECTLY centered to Robot's Head */}
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-white border-r-2 border-b-2 border-cyan-400 rotate-45 shadow-xs"></div>
+                  </div>
+
+                  {/* Interactive Robot Avatar Container - Click to Start Live Voice Listening */}
+                  <button type="button" onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isHoloAiPanelOpen) {
+                      setIsHoloAiPanelOpen(true);
+                    }
+                    toggleLiveVoiceConversation();
+                  }} className="relative flex flex-col items-center cursor-pointer pointer-events-auto group outline-none border-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 active:outline-none active:ring-0 [-webkit-tap-highlight-color:transparent] bg-transparent transition-all duration-300 active:scale-95 select-none" title={isLiveConvActive ? "Click Robot to Stop Voice Chat" : "Click AI Robot to Start Voice Conversation 🎙️"}>
+                    <div className={`relative transition-all duration-300 transform group-hover:scale-110 ${isSpeaking ? "animate-robot-speaking" : isListening ? "animate-robot-listening" : "animate-robot-float"}`}>
+                      <img src="/images/ai_robot.png" alt="AI Robot Companion - Click to Speak" className="w-24 h-24 sm:w-28 sm:h-28 object-contain aspect-auto drop-shadow-[0_8px_16px_rgba(6,182,212,0.6)] group-hover:drop-shadow-[0_12px_24px_rgba(6,182,212,0.95)] outline-none border-0 select-none pointer-events-none"/>
+                    </div>
+
+                    {/* Corner Glowing Pedestal Floor Ring Directly Under Robot Feet with synced pulse animation */}
+                    <div className={`w-24 h-3.5 -mt-4 rounded-[100%] border transition-all duration-500 animate-pedestal-shadow group-hover:border-cyan-300 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.8)] ${isSpeaking ? "bg-rose-500/35 border-rose-400 shadow-[0_0_18px_rgba(244,63,94,0.85)]" : isListening ? "bg-emerald-500/35 border-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.85)]" : "bg-cyan-500/30 border-cyan-400 shadow-[0_0_14px_rgba(6,182,212,0.6)]"}`}/>
+
+                    {/* Interactive 'Click to Speak' Badge - Vibrant Cyan & Emerald Theme */}
+                    <div className={`mt-2 px-3.5 py-1 rounded-full text-[10px] font-extrabold shadow-lg transition-all border flex items-center gap-1.5 ${isLiveConvActive ? (isSpeaking ? "bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 text-white border-rose-300 shadow-rose-500/30 animate-pulse" : "bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white border-emerald-300 shadow-emerald-500/30 animate-pulse") : "bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-600 text-white border-cyan-300 shadow-cyan-500/25 group-hover:from-cyan-600 group-hover:to-blue-600 group-hover:scale-105"}`}>
+                      {isLiveConvActive
+                        ? (isSpeaking
+                            ? (holoAiLang === "hi" ? "🔊 एआई बोल रहा है" : holoAiLang === "ta" ? "🔊 AI பேசுகிறது" : "🔊 AI Speaking")
+                            : (holoAiLang === "hi" ? "🎤 सुन रहा हूँ..." : holoAiLang === "ta" ? "🎤 கேட்கிறது..." : "🎤 Listening..."))
+                        : (holoAiLang === "hi" ? "🎙️ बात करने के लिए क्लिक करें" : holoAiLang === "ta" ? "🎙️ பேச கிளிக் செய்யவும்" : "🎙️ Click Robot to Speak")}
+                    </div>
+                  </button>
                 </div>
 
                 {/* Floating Custom Control Bar at bottom of stage */}
@@ -1960,20 +2305,7 @@ export default function ProductsPage() {
                     </button>
                   </div>
 
-                  {/* AI Assistant Button Placed Directly inside Bottom Control Bar (Right Side) */}
-                  <button onClick={() => setIsHoloAiPanelOpen(!isHoloAiPanelOpen)} className={`px-3.5 py-1.5 rounded-xl border backdrop-blur-md transition-all duration-300 flex items-center gap-2.5 shadow-md active:scale-95 cursor-pointer group ${isHoloAiPanelOpen
-                ? "bg-slate-900 text-white border-cyan-400 shadow-cyan-500/30"
-                : "bg-slate-900/95 text-white border-cyan-400/60 hover:border-cyan-300 hover:bg-slate-900 shadow-cyan-500/20"}`} title={isHoloAiPanelOpen ? "Close AI Assistant" : "Open AI Voice Assistant & Chat"}>
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${isSpeaking ? "bg-rose-500/20 text-rose-400 border border-rose-500/40" : "bg-cyan-500/20 text-cyan-400 border border-cyan-400/40"}`}>
-                      <Bot className={`w-3.5 h-3.5 ${isSpeaking ? "text-rose-400 animate-bounce" : "text-cyan-400 animate-pulse"}`}/>
-                    </div>
-                    <div className="flex flex-col items-start text-left">
-                      <span className="text-[10.5px] font-black uppercase tracking-wider bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent font-display">
-                        {holoAiLang === "hi" ? "AI वॉइस सहायक" : holoAiLang === "ta" ? "AI குரல் உதவியாளர்" : "AI Assistant"}
-                      </span>
-                    </div>
-                    <Sparkles className="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-12 transition-transform"/>
-                  </button>
+
                 </div>
               </div>
 
@@ -2057,8 +2389,8 @@ export default function ProductsPage() {
                         ? "bg-rose-100 text-rose-700 border border-rose-300 hover:bg-rose-200"
                         : "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white shadow-cyan-500/20"}`}>
                         {isSpeaking ? (<>
-                            <VolumeX className="w-4 h-4 text-rose-600 animate-pulse"/>
-                            <span>Stop Voice ⏹️</span>
+                            <Square className="w-3.5 h-3.5 text-rose-600 fill-rose-600"/>
+                            <span>Stop Voice</span>
                           </>) : (<>
                             <Volume2 className="w-4 h-4 fill-white text-white"/>
                             <span>
@@ -2073,7 +2405,6 @@ export default function ProductsPage() {
                     </div>) : (
                 /* Chat Stream View */
                 <div className="flex-1 flex flex-col min-h-0 space-y-2 overflow-hidden">
-
                       <div className="flex-1 overflow-y-auto max-h-[380px] sm:max-h-[450px] min-h-[220px] space-y-2.5 p-3 bg-slate-50 rounded-xl border border-cyan-200 text-xs touch-pan-y overscroll-contain pr-1.5 scrollbar-thin scrollbar-thumb-cyan-400">
                         {holoAiHistory.length === 0 ? (<div className="text-center py-8 space-y-2">
                             <Sparkles className="w-7 h-7 text-cyan-600 mx-auto animate-bounce"/>
@@ -2089,11 +2420,35 @@ export default function ProductsPage() {
                             </p>
                           </div>) : (<>
                             {holoAiHistory.map((h, i) => (<div key={i} className={`flex ${h.sender === "user" ? "justify-end" : "justify-start"}`}>
-                              <div className={`p-3 rounded-2xl max-w-[88%] text-[11.5px] leading-relaxed shadow-sm ${h.sender === "user"
-                            ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-medium"
-                            : "bg-white text-slate-800 border border-slate-200 flex flex-col gap-2"}`}>
-                                <span>{h.text}</span>
-                                {h.sender === "ai" && (<div className="flex items-center justify-end pt-1.5 border-t border-slate-100">
+                              <div className={`p-3.5 rounded-2xl max-w-[88%] text-[11.5px] leading-relaxed shadow-sm transition-all ${h.sender === "user"
+                            ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-medium shadow-cyan-600/10 rounded-tr-xs"
+                            : "bg-gradient-to-br from-cyan-50/90 via-white to-blue-50/50 text-slate-800 border border-cyan-300/80 shadow-md rounded-tl-xs flex flex-col gap-2 relative"}`}>
+                                {h.sender === "ai" && (
+                                  <div className="flex items-center justify-between border-b border-cyan-100 pb-1.5 mb-0.5">
+                                    <div className="flex items-center gap-1.5">
+                                      <img src="/images/ai_robot.png" alt="AI Robot Avatar" className="w-5 h-5 object-contain bg-cyan-100/90 p-0.5 rounded-full border border-cyan-400/60 shadow-xs" />
+                                      <span className="font-black text-[10.5px] text-cyan-950 tracking-wide flex items-center gap-1">
+                                        {holoAiLang === "hi" ? "एआई सहायक" : holoAiLang === "ta" ? "AI உதவியாளர்" : "AI Assistant"}
+                                      </span>
+                                    </div>
+                                    {isSpeaking && i === holoAiHistory.length - 1 && (
+                                      <div className="flex items-center gap-1.5 px-2 py-0.5 bg-rose-50 border border-rose-200/90 rounded-full animate-pulse">
+                                        <div className="flex items-end gap-0.5 h-3">
+                                          <span className="w-0.5 h-2.5 bg-rose-500 rounded-full animate-bounce [animation-delay:0ms]"></span>
+                                          <span className="w-0.5 h-3 bg-rose-600 rounded-full animate-bounce [animation-delay:150ms]"></span>
+                                          <span className="w-0.5 h-2 bg-rose-500 rounded-full animate-bounce [animation-delay:300ms]"></span>
+                                        </div>
+                                        <span className="text-[9.5px] font-bold text-rose-700">
+                                          {holoAiLang === "hi" ? "बोल रहा है..." : holoAiLang === "ta" ? "பேசுகிறது..." : "Speaking..."}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                <span className={h.sender === "ai" ? "text-slate-800 font-medium leading-relaxed" : ""}>{h.text}</span>
+                                
+                                {h.sender === "ai" && (<div className="flex items-center justify-end pt-1.5 border-t border-cyan-100/80 mt-0.5">
                                     <button onClick={() => {
                                 if (isSpeaking) {
                                     stopTTS();
@@ -2103,63 +2458,73 @@ export default function ProductsPage() {
                                 }
                             }} className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${isSpeaking
                                 ? "bg-rose-100 text-rose-700 border border-rose-300 hover:bg-rose-200 animate-pulse"
-                                : "bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100"}`} title={isSpeaking ? "Stop Voice" : "Listen Audio"}>
+                                : "bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100 shadow-xs"}`} title={isSpeaking ? "Stop Voice" : "Listen Audio"}>
                                       {isSpeaking ? (<>
-                                          <VolumeX className="w-3 h-3 text-rose-400"/>
-                                          <span>Stop Voice ⏹️</span>
+                                          <Square className="w-2.5 h-2.5 text-rose-600 fill-rose-600"/>
+                                          <span>Stop Voice</span>
                                         </>) : (<>
-                                          <Volume2 className="w-3 h-3 text-cyan-400"/>
+                                          <Volume2 className="w-3 h-3 text-cyan-500"/>
                                           <span>
                                             {holoAiLang === "hi"
-                                    ? "आवाज सुनें 🔊"
+                                    ? "आवाज सुनें"
                                     : holoAiLang === "ta"
-                                        ? "ஒலி கேட்க 🔊"
-                                        : "Listen Audio 🔊"}
+                                        ? "ஒலி கேட்க"
+                                        : "Listen Audio"}
                                           </span>
                                         </>)}
                                     </button>
                                   </div>)}
                               </div>
                             </div>))}
-                            <div ref={holoChatEndRef} />
+                            <div ref={holoChatEndRef}/>
                           </>)}
                       </div>
                     </div>)}
 
                   {/* Dedicated Live Voice Conversation Bar */}
                   <div className="pt-2.5 border-t border-slate-200 shrink-0 flex items-center justify-center">
-                    <button type="button" onClick={toggleLiveVoiceConversation} className={`w-full py-3 px-4 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2.5 shadow-md active:scale-95 cursor-pointer ${isLiveConvActive
+                    <button type="button" onClick={toggleLiveVoiceConversation} className={`w-full py-3 px-4 rounded-2xl font-black text-xs transition-all flex items-center justify-between gap-2 shadow-lg active:scale-95 cursor-pointer relative overflow-hidden group ${isLiveConvActive
                     ? isSpeaking
-                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-indigo-500/40 border-2 border-indigo-300 animate-pulse"
-                        : "bg-emerald-500 text-white shadow-emerald-500/40 border-2 border-emerald-300 animate-pulse"
-                    : "bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-600 hover:to-indigo-700 text-white shadow-cyan-500/25"}`}>
+                        ? "bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 text-white shadow-rose-500/30 border border-rose-300/80"
+                        : "bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white shadow-emerald-500/30 border border-emerald-300/80"
+                    : "bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-600 hover:to-indigo-700 text-white shadow-cyan-500/30 border border-cyan-300/60"}`}>
                       {isLiveConvActive ? (isSpeaking ? (<>
-                            <Volume2 className="w-4 h-4 text-white animate-bounce"/>
-                            <span>
+                            <div className="flex items-end gap-0.5 h-3.5 shrink-0">
+                              <span className="w-0.5 h-3 bg-white rounded-full animate-bounce [animation-delay:0ms]"></span>
+                              <span className="w-0.5 h-3.5 bg-white rounded-full animate-bounce [animation-delay:150ms]"></span>
+                              <span className="w-0.5 h-2.5 bg-white rounded-full animate-bounce [animation-delay:300ms]"></span>
+                            </div>
+                            <span className="truncate font-extrabold text-[12px] tracking-tight">
                               {holoAiLang === "hi"
-                            ? "🔊 एआई जवाब दे रहा है... (रोकने के लिए दबाएं 🔴)"
+                            ? "एआई जवाब दे रहा है... (रोकने के लिए दबाएं)"
                             : holoAiLang === "ta"
-                                ? "🔊 AI பதிலளிக்கிறது... (நிறுத்த அழுத்தவும் 🔴)"
-                                : "🔊 AI Replying... (Tap to End Live Mode 🔴)"}
+                                ? "AI பதிலளிக்கிறது... (நிறுத்த அழுத்தவும்)"
+                                : "AI Speaking... (Tap to Stop)"}
                             </span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-rose-300 animate-ping shrink-0 ml-auto"/>
                           </>) : (<>
-                            <Mic className="w-4 h-4 text-white animate-ping"/>
-                            <span>
+                            <div className="relative flex items-center justify-center w-4 h-4 shrink-0">
+                              <Mic className="w-4 h-4 text-white z-10"/>
+                              <span className="absolute inset-0 rounded-full bg-white/50 animate-ping"/>
+                            </div>
+                            <span className="truncate font-extrabold text-[12px] tracking-tight">
                               {holoAiLang === "hi"
-                            ? "🟢 लाइव बातचीत जारी — सुन रहा हूँ... (रोकने के लिए दबाएं 🔴)"
+                            ? "सुन रहा हूँ... (रोकने के लिए दबाएं)"
                             : holoAiLang === "ta"
-                                ? "🟢 லைவ் உரையாடல் செயல்படுகிறது — கேட்கிறது... (நிறுத்த அழுத்தவும் 🔴)"
-                                : "🟢 Live Voice Active — Listening... (Tap to End 🔴)"}
+                                ? "கேட்கிறது... (நிறுத்த அழுத்தவும்)"
+                                : "Listening... (Tap to Stop)"}
                             </span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-200 animate-ping shrink-0 ml-auto"/>
                           </>)) : (<>
-                          <Mic className="w-4 h-4 animate-pulse"/>
-                          <span>
+                          <Mic className="w-4 h-4 text-white animate-pulse shrink-0"/>
+                          <span className="truncate font-extrabold text-[12px] tracking-tight">
                             {holoAiLang === "hi"
-                        ? "लाइव एआई बातचीत शुरू करें (Tap to Speak 🎙️)"
+                        ? "लाइव वॉइस चैट शुरू करें"
                         : holoAiLang === "ta"
-                            ? "லைவ் AI குரல் உரையாடல் தொடங்க (Tap to Speak 🎙️)"
-                            : "Tap to Start Live Voice Conversation 🎙️"}
+                            ? "லைவ் குரல் உரையாடல் தொடங்க"
+                            : "Start Live Voice Chat"}
                           </span>
+                          <Sparkles className="w-4 h-4 text-cyan-200 animate-spin shrink-0 ml-auto opacity-90" />
                         </>)}
                     </button>
                   </div>

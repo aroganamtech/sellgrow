@@ -17,9 +17,9 @@ export async function GET() {
         else if (list.length > 0 && !seedMeta) {
             await metaCollection.updateOne({ key: 'products_seeded' }, { $set: { seeded: true, seededAt: new Date() } }, { upsert: true });
         }
-        const formatted = list.map((item) => ({
-            id: item.id || item._id.toString(),
-            _id: item._id.toString(),
+        const formatted = list.map((item, idx) => ({
+            id: item.id || (item._id ? item._id.toString() : `prod_${idx}`),
+            _id: item._id ? item._id.toString() : String(item.id || `prod_${idx}`),
             name: item.name,
             sku: item.sku || `GM-${(item.name || '').toUpperCase().replace(/[^A-Z0-9]/g, "-").slice(0, 8)}-${Math.floor(100 + Math.random() * 900)}`,
             price: item.price || "B2B Quote",

@@ -9,7 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import { MessageSquare, ArrowRight, Sparkles, Video, X, } from "lucide-react";
 const heroContainerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
         opacity: 1,
         transition: {
@@ -19,7 +19,7 @@ const heroContainerVariants = {
     }
 };
 const heroItemVariants = {
-    hidden: { opacity: 0, y: 25 },
+    hidden: { opacity: 1, y: 0 },
     visible: {
         opacity: 1,
         y: 0,
@@ -27,7 +27,7 @@ const heroItemVariants = {
     }
 };
 const heroMockupVariants = {
-    hidden: { opacity: 0, scale: 0.96, y: 35 },
+    hidden: { opacity: 1, scale: 1, y: 0 },
     visible: {
         opacity: 1,
         scale: 1,
@@ -36,7 +36,7 @@ const heroMockupVariants = {
     }
 };
 const cardContainerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
         opacity: 1,
         transition: {
@@ -45,7 +45,7 @@ const cardContainerVariants = {
     }
 };
 const cardItemVariants = {
-    hidden: { opacity: 0, y: 25 },
+    hidden: { opacity: 1, y: 0 },
     visible: {
         opacity: 1,
         y: 0,

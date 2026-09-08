@@ -8,6 +8,7 @@ const TRAINED_BROCHURE_DATABASE = {
   "George Maijo Brush Cutter 4SP PR": {
     "Model Name": "George Maijo Brush Cutter BC 358 4SPR (4SP PR)",
     "Brand Manufacturer": "George Maijo Agri Equipment",
+    "Official Website Portal": "https://www.georgemaijoagri.com/",
     "Engine Type": "4-Stroke, Air-Cooled OHV Single Cylinder Engine",
     "Engine Displacement": "35.8 cc Single Cylinder",
     "Max Power Output": "1.25 kW (1.7 HP) @ 7,000 RPM",
@@ -26,6 +27,7 @@ const TRAINED_BROCHURE_DATABASE = {
   "George Maijo Power Weeder M800 ECO": {
     "Model Name": "George Maijo Power Weeder M800 ECO",
     "Brand Manufacturer": "George Maijo Agri Equipment",
+    "Official Website Portal": "https://www.georgemaijoagri.com/",
     "Engine Model": "GM-170F Commercial 4-Stroke Air-Cooled OHV Engine",
     "Engine Displacement": "212 cc Single Cylinder",
     "Max Power Output": "7.0 HP (5.2 kW) @ 3,600 RPM",
@@ -70,14 +72,17 @@ Exact Trained Brochure Database Specs for "${productName}":
 ${specsFormatted}
 
 CRITICAL RULES:
-1. VOICE PERSONA: Be extremely friendly, respectful, warm, and conversational in ${langName}!
-   - Start responses with a polite greeting (e.g. "Hello there! I'm happy to help you!", "नमस्ते प्रिय ग्राहक!", "வணக்கம் அன்பான வாடிக்கையாளரே!").
-   - Keep answers clear, accurate, and concise (1-3 sentences), perfect for speech readout.
+1. FRIENDLY VOICE PERSONA & CONCISE ANSWERS:
+   - Be extremely friendly, respectful, warm, and conversational in ${langName}!
+   - ONLY greet the customer if the user explicitly says a greeting (e.g. "hi", "hello", "namaste", "vanakkam") or when explicitly switching language.
+   - For all technical/spec questions (about power, engine, weight, price, displacement, etc.), ANSWER DIRECTLY AND HELPFULLY in ${langName} WITHOUT prepending "Hello there!" or repetitive greetings!
 2. EXACT DATABASE RETRIEVAL: Retrieve exact values from the database specifications listed above when asked about power, engine displacement, gearbox, weight, clutch, starting mechanism, fuel, or cutting swath.
-3. DATA NOT IN BROCHURE: If the user asks for a detail, price quote, or specification NOT present in the official brochure database above (or asks an out-of-brochure question), reply politely with EXACTLY:
-   - If English (${lang === "en"}): "Hello there! The requested detail is not available in the official product brochure. Please ask about the specifications listed in the brochure!"
-   - If Hindi (${lang === "hi"}): "नमस्ते! यह जानकारी आधिकारिक ब्रोशर में उपलब्ध नहीं है। कृपया ब्रोशर में दी गई उत्पाद विशेषताओं (इंजन, पावर, वजन या कीमत) के बारे में ही सवाल पूछें!"
-   - If Tamil (${lang === "ta"}): "வணக்கம்! இந்த விவரம் அதிகாரப்பூர்வ பிராச்சரில் இல்லை. தயவுசெய்து பிராச்சரில் உள்ள தயாரிப்பு விவரங்களை மட்டுமே கேட்கவும்!"`;
+3. OFFICIAL WEBSITE PORTAL LINK:
+   - Whenever the user asks for the website, link, portal, online address, or web page of George Maijo Agri or the product, ALWAYS provide the official website URL: https://www.georgemaijoagri.com/ in your response!
+4. DATA NOT IN BROCHURE: If the user asks for a detail, price quote, or specification NOT present in the official brochure database above (or asks an out-of-brochure question), reply politely in ${langName} WITHOUT prepending "Hello there!":
+   - If English (${lang === "en"}): "The requested detail is not available in the official product brochure. You can visit the official website https://www.georgemaijoagri.com/ or ask about brochure specifications!"
+   - If Hindi (${lang === "hi"}): "यह जानकारी आधिकारिक ब्रोशर में उपलब्ध नहीं है। आप आधिकारिक वेबसाइट https://www.georgemaijoagri.com/ पर जा सकते हैं या ब्रोशर की अन्य विशेषताएँ पूछ सकते हैं!"
+   - If Tamil (${lang === "ta"}): "இந்த விவரம் அதிகாரப்பூர்வ பிராச்சரில் இல்லை. நீங்கள் அதிகாரப்பூர்வ இணையதளமான https://www.georgemaijoagri.com/ ஐப் பார்வையிடலாம்!";`;
 
     let replyText = null;
 

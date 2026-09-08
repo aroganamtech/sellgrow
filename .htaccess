@@ -15,25 +15,35 @@
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # 4. Map clean URL requests to corresponding .html files
-  # /pricing -> pricing.html
-  # /sg-superadmin -> sg-superadmin.html
-  # /sg-superadmin/admin-growth -> sg-superadmin/admin-growth.html
-  # /sg-admin/operator -> sg-admin/operator.html
-  # /login -> login.html
-  # /register -> register.html
-  # /dashboard -> dashboard.html
-  # /about -> about.html
+  # 4. Map clean URL requests to corresponding .html files or folder index.html
   RewriteCond %{DOCUMENT_ROOT}/$1.html -f
   RewriteRule ^(.*)$ $1.html [L]
 
-  # 5. Fallback all SPA routes to /index.html
+  RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
+  RewriteRule ^(.*)$ $1/index.html [L]
+
+  # 5. Fallback non-API SPA routes to /index.html
+  RewriteCond %{REQUEST_URI} !^/api/
+  RewriteCond %{REQUEST_URI} !^/next/
+  RewriteCond %{REQUEST_URI} !^/_next/
   RewriteRule ^(.*)$ /index.html [L]
+</IfModule>
+
+# MIME Types for 3D Assets & Videos on Hostinger
+<IfModule mod_mime.c>
+  AddType video/mp4 .mp4 .m4v
+  AddType video/webm .webm
+  AddType video/ogg .ogv
+  AddType audio/mpeg .mp3
+  AddType audio/wav .wav
+  AddType model/gltf-binary .glb
+  AddType model/gltf+json .gltf
 </IfModule>
 
 # Enable CORS and Prevent Stale Caching on Hostinger
 <IfModule mod_headers.c>
   Header set Access-Control-Allow-Origin "*"
+  Header set Accept-Ranges "bytes"
 
   # Disable HTML caching so Hostinger and browsers always fetch the updated build
   <FilesMatch "\.(html|htm)$">
@@ -42,8 +52,9 @@
     Header set Expires "0"
   </FilesMatch>
 
-  # Cache static assets (JS, CSS, images) with long max-age
-  <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+  # Cache static assets (JS, CSS, images, videos, 3D models) with long max-age
+  <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|mp4|webm|glb|gltf)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 </IfModule>
+
